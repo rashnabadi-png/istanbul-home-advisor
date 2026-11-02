@@ -417,6 +417,7 @@ function lookupName(q){
 
 /* ===== Typed questions go to Claude (via our server; the API key never reaches the browser) ===== */
 async function askClaude(text){
+  if (CONFIG.ai !== true){ const m = text.match(/\((IST-[AEX]-\d+)\)\.$/); const p = m && P.find(x=>x.id===m[1]); return p ? moreLocal(p) : localAnswer(text); }
   turns.push({role:"user", content:text});
   const out = addMsg("bot", t("typing"));
   $("#send").disabled = true; $("#stop").hidden = false; ctl = new AbortController();
@@ -477,6 +478,40 @@ function onText(text){
   if (st && st.input) return answer(text, text);
   if (step==="budget" && /[\d٠-٩۰-۹]/.test(text)){ A.budget = null; A.budgetText = text; addMsg("me", text); return go("payment"); }
   addMsg("me", text); askClaude(text);
+}
+
+/* ===== No-AI mode: answer typed messages from our own data only ===== */
+const TOPICS = [
+  ["cit", /citizen|passport|vatanda|pasaport|جنسي|جواز|شهروند|تابعیت|پاسپورت|граждан|паспорт/i],
+  ["res", /residen|ikamet|إقامة|اقامة|اقامت|вид на жительство|внж|резиден/i],
+  ["deed", /deed|tapu|title|طابو|سند|право собствен/i],
+  ["tax", /tax|vat\b|kdv|vergi|harç|ضريب|مالیات|налог|ндс|пошлин/i],
+  ["pay", /payment|pay\b|transfer|ödeme|havale|دفع|تحويل|پرداخت|оплат|перевод/i],
+  ["steps", /step|process|how (do|to|can) (i )?buy|adım|süreç|nasıl|خطوات|مراحل|چطور|چگونه|шаг|процесс|как купить/i],
+];
+const GENERIC = new Set("istanbul residence residences residential park city tower towers evleri evler konutlari konaklari villa villas villalari project projects apartment apartments home homes house houses sea view new with near what price prices about tell more the and for".split(" "));
+function findProject(text){
+  const words = norm(text).split(" ").filter(Boolean);
+  for (let n = Math.min(4, words.length); n >= 1; n--)
+    for (let i = 0; i + n <= words.length; i++){
+      const ws = words.slice(i, i+n), q = ws.join(" ");
+      if (q.length < 4 || ws.every(w => GENERIC.has(w) || w.length < 3)) continue;
+      if (n === 1 && q.length < 5) continue;
+      if (lookupName(q).length) return q;
+    }
+  return null;
+}
+function localAnswer(text){
+  const q = findProject(text);
+  if (q) return projectAnswer(q);
+  const topic = TOPICS.find(([, re]) => re.test(text));
+  if (topic) return legalAnswer(topic[0]);
+  addMsg("bot", t("ai_off"));
+  if (!S[step] || !(S[step].options || S[step].input)) setReplies([["a_find_homes","flow"],["a_legal","legal"],["a_agent","lead"]]);
+}
+function moreLocal(p){
+  const parts = [p.desc, (p.ksp||[]).filter(Boolean).join(" · "), p.pay && ("Payment: " + p.pay), p.delivery && ("Delivery: " + p.delivery), p.priceSrc && ("Price source: " + p.priceSrc)].filter(Boolean);
+  addMsg("bot", parts.join("\n\n") || t("proj_pending",{name:p.name}));
 }
 function restart(){
   for (const k of Object.keys(A)) delete A[k]; turns.length = 0; window._ranked = null; window._shown = 0; leadI = -1; lead = {};

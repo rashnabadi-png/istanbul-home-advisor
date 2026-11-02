@@ -17,7 +17,7 @@ Buyer's browser ──► public/index.html (chat)
 - Changes appear within ~10 minutes.
 
 ## One-time setup (about 30 minutes)
-1. **Claude API key** — console.anthropic.com → sign up → Billing (add card, set a monthly spend limit) → API keys → Create key.
+1. **Claude API key** (optional, only when you want AI answers) — console.anthropic.com → sign up → Billing (add card, set a monthly spend limit) → API keys → Create key.
 2. **Google service account** (lets the server read the sheet and add leads)
    - console.cloud.google.com → create project "istanbul-bot" → enable **Google Sheets API**.
    - IAM & Admin → Service accounts → Create → Keys → Add key → JSON (a file downloads).
@@ -27,6 +27,11 @@ Buyer's browser ──► public/index.html (chat)
    environment variables from `.env.example` (paste the whole JSON file as `GOOGLE_SERVICE_ACCOUNT`) → Deploy.
 5. Fill in the [brackets] in `public/privacy.html` and have a lawyer check it.
 6. Optional: Vercel → Domains → add your domain (e.g. chat.yourdomain.com), then set `ALLOWED_ORIGINS`.
+
+## No-AI mode (current, costs nothing)
+Without `ANTHROPIC_API_KEY` the bot uses only your data: all button flows and recommendations work as normal; typed messages
+are matched to a project name (shows its card) or a legal topic (citizenship, residence, title deed, taxes, payments, buying steps,
+in all 5 languages); anything else gets a friendly "use the buttons or talk to an agent". Add the key later and redeploy to switch Claude on.
 
 ## Private test mode (current)
 - Set `ACCESS_CODE` in Vercel (any phrase). Visitors see a "Private preview" box and must enter it; the chat and the API are locked for everyone else. The code is remembered on that device for 30 days.
