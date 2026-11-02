@@ -28,6 +28,16 @@ Buyer's browser ──► public/index.html (chat)
 5. Fill in the [brackets] in `public/privacy.html` and have a lawyer check it.
 6. Optional: Vercel → Domains → add your domain (e.g. chat.yourdomain.com), then set `ALLOWED_ORIGINS`.
 
+## Private test mode (current)
+- Set `ACCESS_CODE` in Vercel (any phrase). Visitors see a "Private preview" box and must enter it; the chat and the API are locked for everyone else. The code is remembered on that device for 30 days.
+- Share a direct link with your team: `https://YOUR-APP.vercel.app/?access=YOUR-CODE`.
+- `public/robots.txt` tells search engines not to list the site.
+- **To go public:** delete `ACCESS_CODE` in Vercel, replace `public/robots.txt` with `User-agent: *` / `Allow: /`, redeploy.
+
+## Database
+The Google Sheet is the database for now: projects are read from *Tier 1 Research* + *Source Inventory*, leads go to *Leads*.
+All sheet access is in `lib/sheet.js` and `lib/data.js`, so moving to a real database later (e.g. Supabase/Postgres for leads, chat logs and a CRM view) only changes those two files.
+
 ## Test locally
 `npm run dev` (with the env vars set) → http://localhost:3000. `test/` has a fake Claude API and a browser test.
 
