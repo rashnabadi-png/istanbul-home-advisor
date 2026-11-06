@@ -4,8 +4,11 @@ export const config = { matcher: "/((?!privacy\\.html|favicon\\.ico).*)" };
 
 const COOKIE = "iha_access";
 
+// Codes are compared without spaces and ignoring capitals (phones auto-capitalise the first letter).
+const norm = (c) => String(c || "").normalize("NFKC").replace(/\s+/g, "").toLocaleLowerCase("en-US");
+
 async function digest(code) {
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("iha:" + code));
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("iha:" + norm(code)));
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
@@ -19,7 +22,7 @@ h1{font-size:1.2rem;margin:0 0 6px}p{color:var(--m);margin:0 0 16px;font-size:.9
 input,button{width:100%;box-sizing:border-box;font:inherit;padding:10px 12px;border-radius:10px;border:1px solid var(--l);background:var(--bg);color:var(--i)}
 button{margin-top:10px;background:var(--a);color:#fff;border:0;font-weight:600;cursor:pointer}.e{color:#A1302B}</style></head>
 <body><form method="get" action="/"><h1>Private preview</h1><p ${wrong ? 'class="e">That code didn\'t work. Try again.' : ">Enter the access code to try the advisor."}</p>
-<input name="access" type="password" autocomplete="current-password" autofocus required aria-label="Access code"><button>Open</button></form></body></html>`;
+<input name="access" type="text" autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="off" autofocus required aria-label="Access code"><button>Open</button></form></body></html>`;
 
 export default async function middleware(request) {
   const code = process.env.ACCESS_CODE;
@@ -38,5 +41,5 @@ export default async function middleware(request) {
     } });
   }
   if (url.pathname.startsWith("/api/")) return new Response('{"error":"private"}', { status: 401, headers: { "content-type": "application/json" } });
-  return new Response(page(!!given), { status: 401, headers: { "content-type": "text/html; charset=utf-8", "x-robots-tag": "noindex" } });
+  return new Response(page(!!given), { status: 200, headers: { "content-type": "text/html; charset=utf-8", "x-robots-tag": "noindex", "cache-control": "no-store" } });
 }
