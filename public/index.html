@@ -184,69 +184,35 @@ footer a{color:var(--muted)}
 @media (max-width:560px){.panel{inset:0;width:100%;height:100dvh;border-radius:0;border:0}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 
-/* ===== Immersive journey: one tall section with a sticky stage; scroll progress (0→1) drives every scene. ===== */
-body.immersive .top{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;color:#fff}
-body.immersive .top nav.links a{color:rgba(255,255,255,.8)}
-body.immersive .top .langsel select{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.3);color:#fff}
+/* ===== Immersive journey: one tall section with a sticky stage; scroll progress (0→1) drives every shot. ===== */
+body.immersive .top{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;color:#fff;border-bottom-color:transparent}
+body.immersive .top nav.links a{color:rgba(255,255,255,.85)}
+body.immersive .top .langsel select{background:rgba(0,0,0,.18);border-color:rgba(255,255,255,.35);color:#fff}
 body.immersive .top .langsel select option{color:#13212B}
-body.immersive .top .langsel::after{border-color:rgba(255,255,255,.8)}
+body.immersive .top .langsel::after{border-color:rgba(255,255,255,.85)}
 .top{transition:background .3s,color .3s}
-.journey{position:relative;height:620vh;margin-top:-64px;background:#0A1424}
-.stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;color:#fff;contain:paint}
-.scene{position:absolute;inset:0;width:100%;height:100%;will-change:transform,opacity}
-.map-scene{background:#0B2440;perspective:1200px}
-.tilt{position:absolute;inset:0}
-#bigMap{width:100%;height:100%;display:block}
-.m-land{fill:#E8DFCC}.m-water{fill:#2B6C9A}.m-strait{stroke:#2B6C9A;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.m-roads{stroke:#C9BBA0;stroke-width:1.2;fill:none;opacity:.7}.m-park{fill:#CBD6B0}
-.m-lbl{font:600 15px var(--f-body);fill:#5C4F3C;letter-spacing:.18em}.m-lbl.big{font:400 46px var(--f-display);fill:#3E5A74;letter-spacing:.32em}
-.m-lbl.sea{fill:#BFD8EA;font-style:italic;letter-spacing:.12em;font-weight:500}
-.m-dot{fill:#B5652B}.m-ring{fill:none;stroke:#B5652B;stroke-width:2}
-.pano{opacity:0}
-.layer{position:absolute;inset:0;width:100%;height:100%;transform-origin:50% 64%;will-change:transform}
-.sky{background:linear-gradient(to bottom,var(--s1),var(--s2) calc(var(--hz,72%) - 17%),var(--s3) var(--hz,72%))}
-.sun{position:absolute;left:var(--sunX,62%);top:var(--sunY,48%);width:110px;height:110px;margin:-55px;border-radius:50%;background:radial-gradient(circle,#FFF4D6 0 34%,#FFC46B 46%,rgba(255,150,70,.0) 70%);filter:blur(.5px);opacity:calc(1 - var(--night,0) * 1.4)}
-.moon{position:absolute;left:24%;top:16%;width:34px;height:34px;border-radius:50%;background:#F4F1E6;box-shadow:0 0 40px 8px rgba(244,241,230,.35);opacity:var(--night,0)}
-.moon::after{content:"";position:absolute;inset:-2px -2px 2px 8px;border-radius:50%;background:var(--s1)}
-.stars{position:absolute;inset:0 0 40% 0;opacity:var(--night,0)}
-.stars i{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;animation:tw 3s ease-in-out infinite}
-@keyframes tw{50%{opacity:.25}}
-.hill2{fill:var(--h2)}.hill1{fill:var(--h1)}
-.bridge{fill:var(--br)}.bridge .cable,.bridge .hangers{fill:none;stroke:var(--br);stroke-width:3}.bridge .hangers{stroke-width:1.2}
-.deck-lights circle,.farlights circle{fill:#FFD88A;opacity:var(--night,0)}
-.deck-lights circle:nth-child(3n){fill:#9FD3FF}.deck-lights circle:nth-child(5n){fill:#E6A2FF}
-.water{top:auto;height:var(--wh,35%);background:linear-gradient(to bottom,var(--w1),var(--w2));transform-origin:50% 0}
-.water>svg:first-of-type{position:absolute;inset:0;width:100%;height:100%}
-.shimmer rect{fill:var(--sh)}
-.shimmer rect{animation:sh 6s ease-in-out infinite alternate}
-@keyframes sh{to{transform:translateX(40px)}}
-.reflect{position:absolute;left:calc(var(--sunX,62%) - 60px);width:120px;top:0;bottom:0;background:linear-gradient(to bottom,rgba(255,206,120,.75),rgba(255,206,120,0));filter:blur(6px);opacity:var(--day,1);mask:repeating-linear-gradient(to bottom,#000 0 4px,transparent 4px 9px);-webkit-mask:repeating-linear-gradient(to bottom,#000 0 4px,transparent 4px 9px)}
-.ferry{position:absolute;width:120px;height:40px;fill:var(--ferry)}.ferry .fw{fill:#FFE3A3;opacity:var(--night,0)}
-.ferry.f1{top:22%;animation:ferry1 38s linear infinite}
-.ferry.f2{top:52%;width:150px;height:50px;animation:ferry2 52s linear infinite;animation-delay:-20s}
-@keyframes ferry1{from{left:-10%}to{left:105%}}@keyframes ferry2{from{left:105%;transform:scaleX(-1)}to{left:-15%;transform:scaleX(-1)}}
-.shore{fill:var(--sho)}
-.windows rect{fill:#FFCF7A;opacity:0;transition:opacity .6s}
-.windows rect.on{opacity:.95}
-.glow{position:absolute;inset:0;background:radial-gradient(ellipse at 62% 60%,rgba(255,170,80,.28),transparent 60%);opacity:var(--day,1);pointer-events:none}
-.room{opacity:0;transform-origin:50% 44.4%}
-.cap{position:absolute;left:50%;top:50%;width:min(760px,calc(100% - 32px));transform:translate(-50%,-50%);text-align:center;opacity:0;pointer-events:none;text-shadow:0 2px 24px rgba(0,0,0,.45);will-change:opacity,transform}
+.journey{position:relative;height:700vh;margin-top:-64px;background:#0B1A26}
+.stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;color:#fff;contain:paint;background:#0B1A26}
+.shots{position:absolute;inset:0}
+.shot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;will-change:transform,opacity;backface-visibility:hidden;user-select:none;-webkit-user-drag:none}
+.shot:first-child{opacity:1}
+.scrim{position:absolute;inset:0;pointer-events:none;background:
+  linear-gradient(to bottom,rgba(6,14,22,.55),rgba(6,14,22,0) 22%),
+  radial-gradient(ellipse 70% 55% at 50% 50%,rgba(6,14,22,.62),rgba(6,14,22,.18) 75%);opacity:var(--o,.9)}
+.cap{position:absolute;left:50%;top:50%;width:min(760px,calc(100% - 32px));transform:translate(-50%,-50%);text-align:center;opacity:0;pointer-events:none;text-shadow:0 2px 28px rgba(0,0,0,.55);will-change:opacity,transform}
 .cap.on{pointer-events:auto}
 .cap h1{font-size:clamp(2rem,5.6vw,4rem)}
 .cap h2{font-size:clamp(1.9rem,5vw,3.6rem)}
-.cap p{margin:16px auto 0;max-width:34em;font-size:clamp(1rem,1.6vw,1.18rem);color:rgba(255,255,255,.88)}
-.cap .kicker{color:#9FE3E0}
+.cap p{margin:16px auto 0;max-width:34em;font-size:clamp(1rem,1.6vw,1.18rem);color:rgba(255,255,255,.9)}
+.cap .kicker{color:#A8E6E2}
 .cap .ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:26px}
-.cap.c1{top:52%}
-.cap.c1 h1,.cap.c1 p,.cap.c1 .kicker{color:#13212B;text-shadow:0 1px 18px rgba(232,223,204,.9)}
-.cap.c1 .kicker{color:#0F7F80}
-.cap.c5{top:42%}
-.btn.ghost.light{color:#fff;border-color:rgba(255,255,255,.45)}
-.hint{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);display:grid;justify-items:center;gap:8px;font-size:.82rem;font-weight:600;letter-spacing:.06em;color:#13212B;transition:opacity .3s}
+.cap.c1{opacity:1}
+.btn.ghost.light{color:#fff;border-color:rgba(255,255,255,.5);background:rgba(0,0,0,.15)}
+.hint{position:absolute;left:50%;bottom:max(28px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:grid;justify-items:center;gap:8px;font-size:.82rem;font-weight:600;letter-spacing:.06em;color:#fff;text-shadow:0 1px 12px rgba(0,0,0,.6);transition:opacity .3s}
 .hint i{width:22px;height:34px;border:2px solid currentColor;border-radius:12px;position:relative}
 .hint i::after{content:"";position:absolute;left:50%;top:6px;width:4px;height:8px;margin-left:-2px;border-radius:2px;background:currentColor;animation:wheel 1.6s infinite}
 @keyframes wheel{to{transform:translateY(10px);opacity:0}}
-.progress{position:absolute;inset-inline-start:18px;top:50%;width:3px;height:120px;margin-top:-60px;border-radius:2px;background:rgba(255,255,255,.2)}
+.progress{position:absolute;inset-inline-start:max(18px,env(safe-area-inset-left,0px));top:50%;width:3px;height:120px;margin-top:-60px;border-radius:2px;background:rgba(255,255,255,.25)}
 .progress b{display:block;width:100%;height:100%;border-radius:2px;background:#fff;transform-origin:top;transform:scaleY(var(--p,0))}
 .statsband{background:var(--surface);border-bottom:1px solid var(--line);padding-block:26px}
 .statsband .stats{margin:0;justify-content:center;gap:56px}
@@ -276,16 +242,16 @@ body.immersive .top .langsel::after{border-color:rgba(255,255,255,.8)}
 .dcard li span{color:var(--muted);font-size:.85rem;white-space:nowrap;font-variant-numeric:tabular-nums}
 @media (max-width:820px){.dmap{grid-template-columns:1fr}}
 
-/* Reduced motion: no scroll-scrubbing; scenes appear as a calm stack */
+/* Reduced motion: no scroll-scrubbing; the photos appear as a calm stack with their captions */
 @media (prefers-reduced-motion:reduce){
-  .journey{height:auto;margin-top:0}.stage{position:relative;height:auto;display:grid}
-  .scene{position:relative;height:70vh;opacity:1!important;transform:none!important}
-  .cap{position:relative;left:auto;top:auto;transform:none;opacity:1;margin:32px auto;pointer-events:auto;color:var(--ink);text-shadow:none}
-  .cap p{color:var(--muted)}.hint,.progress{display:none}
+  .journey{height:auto;margin-top:0}.stage{position:relative;height:auto;display:grid;gap:0}
+  .shots{position:relative;display:grid}.shot{position:relative;height:56vh;opacity:1!important;transform:none!important}
+  .scrim,.hint,.progress{display:none}
+  .cap{position:relative;left:auto;top:auto;transform:none!important;opacity:1!important;margin:32px auto;pointer-events:auto;color:var(--ink);text-shadow:none}
+  .cap p{color:var(--muted)}.cap .kicker{color:var(--tile)}.btn.ghost.light{color:var(--ink);border-color:var(--line);background:transparent}
+  .stage{background:var(--bg)}
   body.immersive .top{background:var(--bg);color:var(--ink)}
 }
-.map-scene::before{content:"";position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse at 50% 50%,rgba(6,16,30,.62),rgba(6,16,30,.25) 70%);opacity:var(--dim,0);pointer-events:none}
-.map-scene::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 52%,rgba(232,223,204,.92),rgba(232,223,204,.55) 38%,rgba(232,223,204,0) 66%);opacity:var(--veil,1);pointer-events:none}
 </style>
 </head>
 <body>
@@ -316,69 +282,22 @@ body.immersive .top .langsel::after{border-color:rgba(255,255,255,.8)}
 <main>
 <section class="journey" id="journey" aria-label="Istanbul">
   <div class="stage">
-    <!-- Scene 1: Istanbul from above (map built by JS) -->
-    <div class="scene map-scene" id="sMap"><div class="tilt" id="mapTilt"><svg id="bigMap" viewBox="0 0 1000 720" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div></div>
-
-    <!-- Scene 2: Bosphorus panorama, golden hour to night -->
-    <div class="scene pano" id="sPano" aria-hidden="true">
-      <div class="layer sky" id="sky"><div class="stars" id="stars"></div><div class="sun" id="sun"></div><div class="moon" id="moon"></div></div>
-      <svg class="layer" id="lHills" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
-        <path class="hill2" d="M0 560 C120 520 220 545 330 520 S560 500 680 525 S900 490 1040 515 S1300 480 1450 505 S1560 500 1600 495 V900 H0Z"/>
-        <path class="hill1" d="M0 590 C150 565 260 580 380 562 S620 548 760 566 S1000 540 1150 560 S1420 545 1600 556 V900 H0Z"/>
-        <g class="farlights" id="farLights"></g>
-      </svg>
-      <svg class="layer" id="lBridge" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
-        <g class="bridge">
-          <rect x="455" y="420" width="12" height="165"/><rect x="487" y="420" width="12" height="165"/><rect x="455" y="450" width="44" height="6"/><rect x="455" y="500" width="44" height="6"/>
-          <rect x="1101" y="420" width="12" height="165"/><rect x="1133" y="420" width="12" height="165"/><rect x="1101" y="450" width="44" height="6"/><rect x="1101" y="500" width="44" height="6"/>
-          <path class="cable" d="M120 568 Q300 545 477 424 Q800 560 1123 424 Q1300 545 1480 568"/>
-          <path class="hangers" d="M560 465v100M640 492v74M720 510v56M800 516v50M880 510v56M960 492v74M1040 465v100M260 548v20M360 525v42M1200 466v99M1300 525v42M1400 548v20"/>
-          <rect x="60" y="566" width="1480" height="9" rx="2"/>
-        </g>
-        <g class="deck-lights" id="deckLights"></g>
-      </svg>
-      <div class="layer water" id="water">
-        <div class="reflect" id="reflect"></div>
-        <svg viewBox="0 0 1600 330" preserveAspectRatio="none"><g class="shimmer" id="shimmer"></g></svg>
-        <svg class="ferry f1" viewBox="0 0 120 40"><path d="M6 26h108l-12 10H18z"/><rect x="24" y="14" width="66" height="12" rx="2"/><rect x="38" y="6" width="34" height="9" rx="2"/><rect x="66" y="0" width="5" height="7"/><g class="fw"><rect x="28" y="17" width="5" height="4"/><rect x="38" y="17" width="5" height="4"/><rect x="48" y="17" width="5" height="4"/><rect x="58" y="17" width="5" height="4"/><rect x="68" y="17" width="5" height="4"/><rect x="78" y="17" width="5" height="4"/></g></svg>
-        <svg class="ferry f2" viewBox="0 0 120 40"><path d="M6 26h108l-12 10H18z"/><rect x="24" y="14" width="66" height="12" rx="2"/><rect x="38" y="6" width="34" height="9" rx="2"/><rect x="66" y="0" width="5" height="7"/><g class="fw"><rect x="28" y="17" width="5" height="4"/><rect x="38" y="17" width="5" height="4"/><rect x="48" y="17" width="5" height="4"/><rect x="58" y="17" width="5" height="4"/><rect x="68" y="17" width="5" height="4"/><rect x="78" y="17" width="5" height="4"/></g></svg>
-      </div>
-      <svg class="layer" id="lShore" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
-        <g class="shore">
-          <path d="M0 900V610h40v-30h30v-22h18v22h26v-46h22v46h20v-60l14-30 14 30v60h18v-24h40v-40h8v-90l4-14 4 14v90h8v40h12v-30a46 46 0 0 1 92 0v30h12v-40h8v-90l4-14 4 14v90h8v40h22v-26h30v40h36v-50h28l14-40 14 40h6v56h40v-28h50v40h30v-20h40v50h20v-36h50v60h40v40h-60v30H0z"/>
-          <path d="M1600 900V650h-30v-26h-40v34h-30v-50h-50v44h-26v-30h-46v40h-30v-22h-40v42h-34v-30h-30v50h-60v40h-40v32z"/>
-        </g>
-        <g class="windows" id="winLights"></g>
-      </svg>
-      <div class="glow" id="glow"></div>
+    <!-- Photo journey: Istanbul from above → the shore → a Bosphorus villa → inside → up the stairs → the view from the bedroom.
+         Each shot zooms toward its focus point (data-f, as fractions of the image) between scales data-z, over scroll range data-r. -->
+    <div class="shots" aria-hidden="true">
+      <img class="shot" src="img/journey/1-istanbul.webp" alt="" width="1672" height="941" fetchpriority="high" decoding="async" data-f=".43 .69" data-z="1 3.6" data-r="0 .25">
+      <img class="shot" src="img/journey/2-villa.webp" alt="" width="1672" height="941" decoding="async" data-f=".5 .63" data-z="1 1.9" data-r=".19 .42">
+      <img class="shot" src="img/journey/3-terrace.webp" alt="" width="1672" height="941" decoding="async" data-f=".5 .47" data-z="1 1.8" data-r=".36 .57">
+      <img class="shot" src="img/journey/4-living.webp" alt="" width="1672" height="941" decoding="async" data-f=".84 .44" data-z="1.04 1.75" data-r=".51 .73">
+      <img class="shot" src="img/journey/5-stairs.webp" alt="" width="1672" height="941" decoding="async" data-f=".5 .3" data-z="1 2.3" data-r=".67 .87">
+      <img class="shot" src="img/journey/6-view.webp" alt="" width="1672" height="941" decoding="async" data-f=".6 .38" data-z="1 1.4" data-r=".81 .97">
     </div>
-
-    <!-- Scene 3: pull back into a living room; the window frames the view -->
-    <svg class="scene room" id="sRoom" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <defs>
-        <linearGradient id="wallG" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#2A211C"/><stop offset="1" stop-color="#15100D"/></linearGradient>
-        <radialGradient id="lampG" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFC983" stop-opacity=".55"/><stop offset="1" stop-color="#FFC983" stop-opacity="0"/></radialGradient>
-      </defs>
-      <path fill="url(#wallG)" fill-rule="evenodd" d="M-2000-2000H3600V2900H-2000Z M330 110H1270V690H330Z"/>
-      <g class="frame" fill="#0E0A08">
-        <rect x="318" y="98" width="964" height="16"/><rect x="318" y="686" width="964" height="22"/><rect x="318" y="98" width="16" height="610"/><rect x="1266" y="98" width="16" height="610"/>
-        <rect x="793" y="110" width="14" height="580"/><rect x="330" y="300" width="940" height="8" opacity=".85"/>
-      </g>
-      <path fill="#3B2A22" d="M250 80c40 120 30 330 10 520-6 60 0 120 20 180h90c-30-90-40-220-20-360 14-100 10-240-30-340z"/>
-      <path fill="#3B2A22" d="M1350 80c-40 120-30 330-10 520 6 60 0 120-20 180h-90c30-90 40-220 20-360-14-100-10-240 30-340z"/>
-      <rect x="200" y="70" width="1200" height="14" rx="7" fill="#0E0A08"/>
-      <circle cx="1440" cy="460" r="230" fill="url(#lampG)"/>
-      <path fill="#0B0807" d="M1410 360h60l24 60h-108z M1438 420h4v300h-4z M1400 720h80v10h-80z"/>
-      <path fill="#0B0807" d="M150 900c0-40 6-80 30-100h40c24 20 30 60 30 100z M200 800c-40-60-70-140-40-210 30 40 40 110 40 210 0-90 10-170 60-220 10 80-20 160-60 220z M200 800c20-80 60-140 120-160-10 70-60 130-120 160z M200 800c-30-90-100-130-160-130 30 70 90 110 160 130z"/>
-      <path fill="#120D0B" d="M420 900c0-70 10-120 40-140h680c30 20 40 70 40 140z"/>
-      <path fill="#1B1411" d="M470 770c0-40 20-60 60-60h540c40 0 60 20 60 60v20H470z"/>
-      <rect x="600" y="732" width="120" height="70" rx="20" fill="#2C211C"/><rect x="880" y="732" width="120" height="70" rx="20" fill="#2C211C"/>
-    </svg>
+    <div class="scrim" id="scrim"></div>
 
     <div class="cap c1"><span class="kicker" data-t="kicker">New-build homes for international buyers</span><h1 data-t="h1">Find the right home in Istanbul, with honest advice in your language.</h1><p data-t="sub"></p><div class="ctas"><button class="btn" type="button" data-chat data-t="cta_main">Start with the advisor</button></div></div>
     <div class="cap c2"><h2 data-t="j1_t">Two continents. One city.</h2><p data-t="j1_p"></p></div>
-    <div class="cap c3"><h2 data-t="j2_t">The Bosphorus at golden hour</h2><p data-t="j2_p"></p></div>
-    <div class="cap c4"><h2 data-t="j3_t">As the city lights up</h2><p data-t="j3_p"></p></div>
+    <div class="cap c3"><h2 data-t="j2_t">Life on the Bosphorus shore</h2><p data-t="j2_p"></p></div>
+    <div class="cap c4"><h2 data-t="j3_t">Step inside</h2><p data-t="j3_p"></p></div>
     <div class="cap c5"><h2 data-t="j4_t">This could be your view.</h2><p data-t="j4_p"></p><div class="ctas"><button class="btn" type="button" data-chat data-t="j4_cta">Find my view</button><a class="btn ghost light" href="#districts" data-t="j4_map">Explore the map</a></div></div>
     <div class="hint" id="hint"><span data-t="j_hint">Scroll to explore</span><i></i></div>
     <div class="progress" aria-hidden="true"><b id="prog"></b></div>
@@ -741,36 +660,36 @@ addEventListener("scroll", () => $("#top").classList.toggle("scrolled", scrollY 
 /* ===== Extra text for the immersive journey and the district map ===== */
 const T2 = {
 en:{j_hint:"Scroll to explore",j1_t:"Two continents. One city.",j1_p:"Istanbul stretches across Europe and Asia, joined by the Bosphorus.",
- j2_t:"The Bosphorus at golden hour",j2_p:"Bridges, waterside palaces and ferries crossing between continents, all day long.",
- j3_t:"As the city lights up",j3_p:"Some of Istanbul's most sought-after homes look out over this water.",
+ j2_t:"Life on the Bosphorus shore",j2_p:"Waterside homes beside Ortaköy, with the bridge and the ferries in front of you.",
+ j3_t:"Step inside",j3_p:"Light, space and calm, a few steps from the water.",
  j4_t:"This could be your view.",j4_p:"Tell the advisor what you are dreaming of, and it finds approved homes that match.",j4_cta:"Find my view",j4_map:"Explore the map",
  m_eu:"EUROPE",m_as:"ASIA",m_bs:"Black Sea",m_mar:"Sea of Marmara",m_bos:"Bosphorus",m_gh:"Golden Horn",
  d_h:"Explore by district",d_p:"Tap a district to see the approved projects there. Orange is the European side, teal the Asian side.",d_pick:"Pick a district on the map to see its projects.",
  d_count:"{n} approved projects",d_short:"Get a shortlist for this area",nav_map:"Map"},
 tr:{j_hint:"Keşfetmek için kaydırın",j1_t:"İki kıta. Tek şehir.",j1_p:"İstanbul, Boğaz'la birleşen Avrupa ve Asya'ya yayılır.",
- j2_t:"Gün batımında Boğaz",j2_p:"Köprüler, yalılar ve kıtalar arasında gidip gelen vapurlar.",
- j3_t:"Şehrin ışıkları yanarken",j3_p:"İstanbul'un en çok aranan evlerinden bazıları bu manzaraya bakıyor.",
+ j2_t:"Boğaz kıyısında yaşam",j2_p:"Ortaköy yakınında, önünüzde köprü ve vapurlarla su kenarında evler.",
+ j3_t:"İçeri buyurun",j3_p:"Suya birkaç adım mesafede ışık, ferahlık ve huzur.",
  j4_t:"Bu sizin manzaranız olabilir.",j4_p:"Danışmana hayalinizdeki evi anlatın; size uyan onaylı evleri bulsun.",j4_cta:"Manzaramı bul",j4_map:"Haritayı keşfet",
  m_eu:"AVRUPA",m_as:"ASYA",m_bs:"Karadeniz",m_mar:"Marmara Denizi",m_bos:"İstanbul Boğazı",m_gh:"Haliç",
  d_h:"İlçelere göre keşfedin",d_p:"Onaylı projeleri görmek için bir ilçeye dokunun. Turuncu Avrupa Yakası, turkuaz Anadolu Yakası.",d_pick:"Projelerini görmek için haritadan bir ilçe seçin.",
  d_count:"{n} onaylı proje",d_short:"Bu bölge için liste alın",nav_map:"Harita"},
 ar:{j_hint:"مرّر للاستكشاف",j1_t:"قارتان. مدينة واحدة.",j1_p:"تمتد إسطنبول بين أوروبا وآسيا، ويصل بينهما البوسفور.",
- j2_t:"البوسفور عند الغروب",j2_p:"جسور وقصور على الماء وعبّارات تعبر بين القارتين طوال اليوم.",
- j3_t:"حين تضيء المدينة",j3_p:"بعض أكثر المنازل طلبًا في إسطنبول تطل على هذا الماء.",
+ j2_t:"الحياة على ضفاف البوسفور",j2_p:"منازل على الماء قرب أورتاكوي، والجسر والعبّارات أمامك.",
+ j3_t:"تفضّل بالدخول",j3_p:"ضوء ومساحة وهدوء، على بُعد خطوات من الماء.",
  j4_t:"قد تكون هذه إطلالتك.",j4_p:"أخبر المستشار بما تحلم به، وسيجد منازل معتمدة تناسبك.",j4_cta:"اعثر على إطلالتي",j4_map:"استكشف الخريطة",
  m_eu:"أوروبا",m_as:"آسيا",m_bs:"البحر الأسود",m_mar:"بحر مرمرة",m_bos:"البوسفور",m_gh:"القرن الذهبي",
  d_h:"استكشف حسب المنطقة",d_p:"اضغط على منطقة لرؤية المشاريع المعتمدة فيها. البرتقالي للجانب الأوروبي، والفيروزي للجانب الآسيوي.",d_pick:"اختر منطقة على الخريطة لرؤية مشاريعها.",
  d_count:"{n} مشروعًا معتمدًا",d_short:"احصل على قائمة لهذه المنطقة",nav_map:"الخريطة"},
 fa:{j_hint:"برای کاوش اسکرول کنید",j1_t:"دو قاره. یک شهر.",j1_p:"استانبول میان اروپا و آسیا گسترده است و بسفر آن‌ها را به هم می‌پیوندد.",
- j2_t:"بسفر در غروب",j2_p:"پل‌ها، کاخ‌های کنار آب و کشتی‌هایی که تمام روز میان دو قاره رفت‌وآمد می‌کنند.",
- j3_t:"وقتی شهر روشن می‌شود",j3_p:"برخی از پرطرفدارترین خانه‌های استانبول رو به همین آب هستند.",
+ j2_t:"زندگی در ساحل بسفر",j2_p:"خانه‌هایی کنار آب نزدیک اورتاکوی، با پل و کشتی‌ها روبه‌رویتان.",
+ j3_t:"بفرمایید داخل",j3_p:"نور، فضا و آرامش، چند قدم دورتر از آب.",
  j4_t:"این می‌تواند منظرهٔ شما باشد.",j4_p:"به مشاور بگویید رؤیایتان چیست؛ خانه‌های تأییدشدهٔ مناسب را پیدا می‌کند.",j4_cta:"منظره‌ام را پیدا کن",j4_map:"کاوش در نقشه",
  m_eu:"اروپا",m_as:"آسیا",m_bs:"دریای سیاه",m_mar:"دریای مرمره",m_bos:"بسفر",m_gh:"شاخ طلایی",
  d_h:"کاوش بر اساس منطقه",d_p:"روی یک منطقه بزنید تا پروژه‌های تأییدشدهٔ آن را ببینید. نارنجی بخش اروپایی و فیروزه‌ای بخش آسیایی است.",d_pick:"برای دیدن پروژه‌ها، یک منطقه را روی نقشه انتخاب کنید.",
  d_count:"{n} پروژهٔ تأییدشده",d_short:"برای این منطقه فهرست بگیرید",nav_map:"نقشه"},
 ru:{j_hint:"Прокрутите, чтобы исследовать",j1_t:"Два континента. Один город.",j1_p:"Стамбул раскинулся в Европе и Азии, которые соединяет Босфор.",
- j2_t:"Босфор на закате",j2_p:"Мосты, дворцы у воды и паромы, весь день курсирующие между континентами.",
- j3_t:"Когда город зажигает огни",j3_p:"Из окон самых востребованных домов Стамбула видна именно эта вода.",
+ j2_t:"Жизнь на берегу Босфора",j2_p:"Дома у воды рядом с Ортакёем — мост и паромы прямо перед вами.",
+ j3_t:"Заходите",j3_p:"Свет, простор и тишина в нескольких шагах от воды.",
  j4_t:"Это может быть ваш вид.",j4_p:"Расскажите консультанту, о чём мечтаете, и он подберёт подходящие одобренные дома.",j4_cta:"Найти мой вид",j4_map:"Открыть карту",
  m_eu:"ЕВРОПА",m_as:"АЗИЯ",m_bs:"Чёрное море",m_mar:"Мраморное море",m_bos:"Босфор",m_gh:"Золотой Рог",
  d_h:"Районы на карте",d_p:"Нажмите на район, чтобы увидеть одобренные проекты. Оранжевый — европейская сторона, бирюзовый — азиатская.",d_pick:"Выберите район на карте, чтобы увидеть его проекты.",
@@ -818,114 +737,40 @@ function buildMap(svg, withLabels){
   }
 }
 
-/* ===== Panorama decorations ===== */
-const rnd = (a, b) => a + Math.random() * (b - a);
-(function decorate(){
-  const st = $("#stars"); st.innerHTML = Array.from({length:80}, () => `<i style="left:${rnd(0,100).toFixed(1)}%;top:${rnd(0,100).toFixed(1)}%;animation-delay:${rnd(0,3).toFixed(1)}s;opacity:${rnd(.4,1).toFixed(2)}"></i>`).join("");
-  $("#farLights").innerHTML = Array.from({length:90}, () => `<circle cx="${rnd(0,1600).toFixed(0)}" cy="${rnd(545,600).toFixed(0)}" r="${rnd(.8,1.8).toFixed(1)}"/>`).join("");
-  let d = ""; for (let x = 80; x <= 1520; x += 22) d += `<circle cx="${x}" cy="572" r="2.4"/>`;
-  for (let y = 430; y < 580; y += 18) d += `<circle cx="477" cy="${y}" r="2"/><circle cx="1123" cy="${y}" r="2"/>`;
-  $("#deckLights").innerHTML = d;
-  const win = []; const add = (x0,x1,y0,y1,n) => { for (let i=0;i<n;i++) win.push(`<rect x="${rnd(x0,x1).toFixed(0)}" y="${rnd(y0,y1).toFixed(0)}" width="5" height="7" data-th="${Math.random().toFixed(3)}"/>`); };
-  add(10,640,640,880,110); add(1190,1590,700,880,60);
-  $("#winLights").innerHTML = win.join("");
-  $("#shimmer").innerHTML = Array.from({length:70}, () => `<rect x="${rnd(-40,1600).toFixed(0)}" y="${rnd(4,325).toFixed(0)}" width="${rnd(20,140).toFixed(0)}" height="2" rx="1" opacity="${rnd(.25,.9).toFixed(2)}" style="animation-duration:${rnd(4,9).toFixed(1)}s"/>`).join("");
-})();
-
-/* ===== Scroll engine ===== */
+/* ===== Scroll engine: photo journey ===== */
 const clamp = (x, a=0, b=1) => Math.min(b, Math.max(a, x));
-const ease = x => x < .5 ? 4*x*x*x : 1 - Math.pow(-2*x + 2, 3) / 2;
+const ease = x => x < .5 ? 2*x*x : 1 - Math.pow(-2*x + 2, 2) / 2;
 const win01 = (p, a, b, f=.035) => clamp(Math.min((p - a) / f, (b - p) / f)); // fade in after a, out before b
-const hex = h => [1,3,5].map(i => parseInt(h.slice(i, i+2), 16));
-const mix = (a, b, k) => "rgb(" + hex(a).map((v, i) => Math.round(v + (hex(b)[i] - v) * k)).join(",") + ")";
-const DUSK  = {s1:"#2B3E73", s2:"#E98A5B", s3:"#FFD39A", h2:"#7A5B78", h1:"#4E3D5C", br:"#2A2238", w1:"#C87D6A", w2:"#3E3550", sho:"#1E1626", ferry:"#1B1424", sh:"#FFE0B0"};
-const NIGHT = {s1:"#050A1A", s2:"#10204A", s3:"#2A3566", h2:"#141B33", h1:"#0E1428", br:"#0A0E1C", w1:"#1A2550", w2:"#070B1A", sho:"#05070F", ferry:"#04060C", sh:"#9DB6F0"};
-const J = {journey:$("#journey"), stage:$(".stage"), tilt:$("#mapTilt"), map:$("#sMap"), pano:$("#sPano"), room:$("#sRoom"),
-  layers:{hills:$("#lHills"), bridge:$("#lBridge"), water:$("#water"), shore:$("#lShore"), sky:$("#sky")},
-  caps:[...document.querySelectorAll(".journey .cap")], hint:$("#hint"), wins:[], body:document.body};
+const FADE = .06; // each new shot crossfades in over this much scroll
+const J = {journey:$("#journey"), stage:$(".stage"), scrim:$("#scrim"), caps:[...document.querySelectorAll(".journey .cap")], hint:$("#hint"), body:document.body,
+  shots:[...document.querySelectorAll(".journey .shot")].map(el => ({el, f:el.dataset.f.split(" ").map(Number), z:el.dataset.z.split(" ").map(Number), r:el.dataset.r.split(" ").map(Number)}))};
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-let lastP = -1, ticking = false, lastNight = -1;
-
-// The map and room use preserveAspectRatio "slice": work out where a viewBox point lands on screen, to zoom exactly into it.
-function originFor(vbW, vbH, x, y){
-  const W = J.stage.clientWidth, H = J.stage.clientHeight, s = Math.max(W / vbW, H / vbH);
-  return `${(W/2 + (x - vbW/2) * s).toFixed(1)}px ${(H/2 + (y - vbH/2) * s).toFixed(1)}px`;
-}
-const PANO_SVGS = () => [J.layers.hills, J.layers.bridge, J.layers.shore];
-let panoShift = 0;
+let lastP = -1, ticking = false;
+// With object-fit:cover, setting object-position and transform-origin to the same percentages keeps the focus point fixed on screen
+// at every screen shape, so each zoom heads straight for it (and phones crop toward it).
 function layout(){
-  const W = J.stage.clientWidth, H = J.stage.clientHeight;
-  const [bx, by] = prj([29.035, 41.045]);
-  J.tilt.style.transformOrigin = originFor(1000, 720, bx, by);
-  // Panorama: always keep both bridge towers in view. Wide screens fill by height; narrow (phone) screens fit 1000 units of width
-  // and let the sky take the extra height. Every layer is anchored to the bottom, so the water line sits at H - 315*s.
-  let sp = Math.max(W / 1600, H / 900), cx = 800;
-  if (W / sp < 1000){ sp = W / 1000; PANO_SVGS().forEach(v => { v.setAttribute("viewBox", `300 ${(900 - H/sp).toFixed(1)} 1000 ${(H/sp).toFixed(1)}`); v.setAttribute("preserveAspectRatio", "xMidYMax meet"); }); }
-  else PANO_SVGS().forEach(v => { v.setAttribute("viewBox", "0 0 1600 900"); v.setAttribute("preserveAspectRatio", "xMidYMax slice"); });
-  const horizon = H - 340 * sp, ps = J.pano.style;
-  ps.setProperty("--wh", (315 * sp).toFixed(1) + "px");
-  ps.setProperty("--hz", (horizon / H * 100).toFixed(1) + "%");
-  ps.setProperty("--sunX", (W/2 + (992 - cx) * sp).toFixed(1) + "px");
-  ps.setProperty("--sunTop", horizon);
-  const org = `50% ${horizon.toFixed(1)}px`;
-  Object.entries(J.layers).forEach(([n, l]) => { if (n !== "water") l.style.transformOrigin = org; });
-  // Room: narrow screens show the whole window plus some wall; zoom in on the right-hand pane so the centre bar slides away.
-  let sr = Math.max(W / 1600, H / 900);
-  if (W / sr < 1100){ sr = W / 1100; J.room.setAttribute("viewBox", `250 ${(450 - H/sr/2).toFixed(1)} 1100 ${(H/sr).toFixed(1)}`); J.room.setAttribute("preserveAspectRatio", "xMidYMid meet"); }
-  else { J.room.setAttribute("viewBox", "0 0 1600 900"); J.room.setAttribute("preserveAspectRatio", "xMidYMid slice"); }
-  J.room.style.transformOrigin = `${(W/2 + (1040 - 800) * sr).toFixed(1)}px ${(H/2 + (500 - 450) * sr).toFixed(1)}px`;
-  // When we pull back, slide the city so its skyline sits in the lower part of the window.
-  panoShift = horizon - (H/2 + (600 - 450) * sr);
-  lastNight = -1;
-  J.wins = [...document.querySelectorAll("#winLights rect")];
+  J.shots.forEach(s => { const pos = `${s.f[0]*100}% ${s.f[1]*100}%`; s.el.style.objectPosition = pos; s.el.style.transformOrigin = pos; });
   lastP = -1; frame_();
 }
 function frame_(){
   ticking = false;
-  if (reduced.matches){ J.body.classList.remove("immersive"); return; }
-  const r = J.journey.getBoundingClientRect(), len = r.height - innerHeight;
-  const p = clamp(-r.top / len);
-  J.body.classList.toggle("immersive", p > .17 && r.bottom > 64);
-  if (Math.abs(p - lastP) < .0004) return; lastP = p;
+  const r = J.journey.getBoundingClientRect();
+  J.body.classList.toggle("immersive", !reduced.matches && r.bottom > 64);
+  if (reduced.matches) return;
+  const p = clamp(-r.top / (r.height - innerHeight));
+  if (Math.abs(p - lastP) < .0003) return; lastP = p;
   J.stage.style.setProperty("--p", p);
-
-  // 1. Dive into the map
-  const z = ease(clamp(p / .22));
-  J.tilt.style.transform = `perspective(1200px) rotateX(${(z * 48).toFixed(2)}deg) scale(${(1 + z * 9).toFixed(3)})`;
-  J.map.style.opacity = 1 - clamp((p - .16) / .07);
-  J.map.style.setProperty("--veil", 1 - clamp(p / .05));
-  J.map.style.setProperty("--dim", clamp((p - .05) / .05));
-  const ml = document.getElementById("mapLabels"); if (ml) ml.style.opacity = 1 - clamp(p / .06);
-  J.map.style.visibility = p > .24 ? "hidden" : "visible";
-
-  // 2. Bosphorus: camera glides forward while the light goes from golden hour to night
-  J.pano.style.opacity = clamp((p - .16) / .07);
-  J.pano.style.transform = `translateY(${(-panoShift * ease(clamp((p - .62) / .26))).toFixed(1)}px)`;
-  J.pano.style.visibility = p < .15 ? "hidden" : "visible";
-  const q = ease(clamp((p - .16) / .56));
-  const back = ease(clamp((p - .62) / .26)); // pulled back into the room
-  const k = 1 - back * .1;
-  J.layers.sky.style.transform = `scale(${(1.06 - q * .04) * k})`;
-  J.layers.hills.style.transform = `scale(${(1.04 + q * .08) * k})`;
-  J.layers.bridge.style.transform = `scale(${(1.08 + q * .38) * k})`;
-  J.layers.water.style.transform = `scale(${(1.06 + q * .24) * k})`;
-  J.layers.shore.style.transform = `scale(${(1.08 + q * .9) * k}) translateY(${(q * 6).toFixed(2)}%)`;
-  const night = ease(clamp((p - .36) / .26));
-  if (Math.abs(night - lastNight) > .004){
-    lastNight = night; const sp = J.pano.style;
-    for (const key in DUSK) sp.setProperty("--" + key, mix(DUSK[key], NIGHT[key], night));
-    sp.setProperty("--night", night.toFixed(3)); sp.setProperty("--day", (1 - night).toFixed(3));
-    sp.setProperty("--sunY", (+getComputedStyle(J.pano).getPropertyValue("--sunTop") - (1 - night) * 0.22 * innerHeight).toFixed(1) + "px");
-    J.wins.forEach(w => w.classList.toggle("on", night > w.dataset.th * .85 + .05));
-  }
-
-  // 3. Through the window
-  J.room.style.opacity = p > .62 ? 1 : 0;
-  J.room.style.transform = `scale(${Math.exp(Math.log(7) * (1 - back)).toFixed(3)})`;
-
-  // Captions
-  const vis = [win01(p, -1, .06, .03), win01(p, .085, .19), win01(p, .25, .38), win01(p, .43, .57), win01(p, .82, 2)];
+  J.shots.forEach((s, i) => {
+    const [a, b] = s.r, k = ease(clamp((p - a) / (b - a)));
+    const o = i === 0 ? 1 : clamp((p - a) / FADE);
+    const next = J.shots[i + 1], covered = next && p >= next.r[0] + FADE;
+    s.el.style.opacity = o;
+    s.el.style.visibility = (o <= 0 || covered) ? "hidden" : "visible";
+    if (o > 0 && !covered) s.el.style.transform = `scale(${(s.z[0] + (s.z[1] - s.z[0]) * k).toFixed(4)})`;
+  });
+  const vis = [win01(p, -1, .055, .03), win01(p, .08, .18), win01(p, .26, .36), win01(p, .52, .65), win01(p, .88, 2)];
   J.caps.forEach((c, i) => { const o = vis[i]; c.style.opacity = o; c.style.transform = `translate(-50%, calc(-50% + ${((1 - o) * 24).toFixed(1)}px))`; c.classList.toggle("on", o > .5); });
+  J.scrim.style.setProperty("--o", (.35 + Math.max(...vis) * .65).toFixed(3));
   J.hint.style.opacity = 1 - clamp(p / .02);
 }
 function onScroll(){ if (!ticking){ ticking = true; requestAnimationFrame(frame_); } }
@@ -973,7 +818,6 @@ $("#dcard").addEventListener("click", e => { const b = e.target.closest("[data-a
 
 /* ===== Boot ===== */
 $("#yr").textContent = new Date().getFullYear();
-buildMap($("#bigMap"), true);
 addEventListener("scroll", onScroll, {passive:true}); addEventListener("resize", () => requestAnimationFrame(() => { layout(); renderDistricts(); }));
 reduced.addEventListener?.("change", layout);
 (async () => {
