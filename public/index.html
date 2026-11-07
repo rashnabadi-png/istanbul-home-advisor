@@ -14,7 +14,6 @@
 <meta name="theme-color" content="#1D4E9E">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231D4E9E'/%3E%3Cpath d='M14 46V30l18-13 18 13v16H38V35H26v11z' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
 <style>
 /* Same palette and type as the chat (chat.html), so the panel feels part of the site. */
@@ -170,7 +169,8 @@ footer a{color:var(--muted)}
 
 /* Floating chat */
 .fab{position:fixed;z-index:40;inset-inline-end:max(18px,env(safe-area-inset-right,0px));bottom:max(18px,env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:10px;border:0;border-radius:999px;padding:14px 20px 14px 16px;background:var(--accent);color:var(--accent-ink);font-weight:600;box-shadow:0 14px 34px -12px rgba(15,35,64,.6);transition:transform .2s,opacity .2s}
-.fab svg{width:22px;height:22px}
+.fab > svg.ava{width:30px;height:30px}
+@media (max-width:1099px){.fab .lbl{display:none}}
 .fab.hide{opacity:0;transform:translateY(16px);pointer-events:none}
 .panel{position:fixed;z-index:50;inset-inline-end:18px;bottom:18px;width:min(420px,calc(100vw - 36px));height:min(680px,calc(100dvh - 36px));background:var(--bg);border:1px solid var(--line);border-radius:20px;box-shadow:0 30px 80px -24px rgba(15,35,64,.6);display:grid;grid-template-rows:auto 1fr;overflow:hidden;opacity:0;transform:translateY(20px) scale(.98);pointer-events:none;transition:opacity .2s,transform .2s;visibility:hidden}
 .panel.open{opacity:1;transform:none;pointer-events:auto;visibility:visible}
@@ -182,7 +182,67 @@ footer a{color:var(--muted)}
 .panel .bar a{margin-inline-start:auto}.panel .bar a + button{margin-inline-start:6px}
 .panel .bar svg{width:18px;height:18px}
 .panel iframe{border:0;width:100%;height:100%;background:var(--bg)}
+.panel #close .min{display:none}
+@media (min-width:1100px){.panel #close .x{display:none}.panel #close .min{display:block}}
 @media (max-width:560px){.panel{inset:0;width:100%;height:100dvh;border-radius:0;border:0}}
+
+/* Property tour: one photo at a time, glowing points to explore, arrows/tabs to change room */
+.ptour{padding-block:72px 56px}
+.viewer{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:22px;overflow:hidden;background:#15100D;box-shadow:0 30px 70px -40px rgba(15,35,64,.7);touch-action:pan-y}
+.frames img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.045);transition:opacity .7s ease,transform 1.2s cubic-bezier(.2,.7,.2,1);will-change:transform,opacity}
+.frames img.on{opacity:1;transform:scale(1.03) translate(var(--mx,0),var(--my,0))}
+.hots{position:absolute;inset:0}
+.hot{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border:0;padding:0;background:transparent;cursor:pointer;display:grid;place-items:center;opacity:0;animation:hotIn .5s ease forwards}
+.hot::before{content:"";position:absolute;inset:8px;border-radius:50%;background:rgba(255,255,255,.28);animation:pulse 2.2s ease-out infinite}
+.hot i{position:relative;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.35),0 4px 16px rgba(0,0,0,.45);display:grid;place-items:center}
+.hot.go i{width:30px;height:30px;background:#fff;color:#13212B}
+.hot.go i svg{width:16px;height:16px}
+.hot.sel i{background:#F2B76B}
+@keyframes pulse{0%{transform:scale(.6);opacity:1}100%{transform:scale(1.8);opacity:0}}
+@keyframes hotIn{to{opacity:1}}
+.tip{position:absolute;z-index:3;max-width:min(280px,70%);background:rgba(255,255,255,.96);color:#13212B;border-radius:14px;padding:10px 14px;font-size:.92rem;box-shadow:0 16px 40px -12px rgba(0,0,0,.5);transform:translate(-50%,calc(-100% - 22px));pointer-events:auto}
+.tip.below{transform:translate(-50%,22px)}
+.tip b{display:block;font-weight:600}
+.tip button{margin-top:8px;border:0;background:#1D4E9E;color:#fff;border-radius:999px;padding:6px 12px;font-weight:600;font-size:.84rem;cursor:pointer}
+.vbar{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:end;gap:12px;padding:40px 20px 16px;background:linear-gradient(to top,rgba(10,8,6,.6),rgba(10,8,6,0));color:#fff;pointer-events:none}
+.roomname{font:400 clamp(1.2rem,2.6vw,1.8rem)/1.1 var(--f-display)}
+:lang(ar) .roomname,:lang(fa) .roomname,:lang(ru) .roomname{font-family:var(--f-body);font-weight:700}
+.count{font-size:.84rem;opacity:.85;font-variant-numeric:tabular-nums}
+.vnav{position:absolute;top:50%;margin-top:-22px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.88);color:#13212B;display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 24px -8px rgba(0,0,0,.5)}
+.vnav svg{width:20px;height:20px}
+.vnav.prev{left:14px}.vnav.next{right:14px}
+.vnav:disabled{opacity:0;pointer-events:none}
+[dir="rtl"] .vnav svg{transform:scaleX(-1)}
+.vcta{position:absolute;left:50%;top:18%;transform:translateX(-50%);text-align:center;color:#fff;text-shadow:0 2px 18px rgba(0,0,0,.5);display:grid;gap:12px;justify-items:center;width:min(520px,90%)}
+.vcta[hidden]{display:none}
+.vcta p{font:400 clamp(1.3rem,3vw,2.2rem)/1.15 var(--f-display);margin:0}
+.rooms{display:flex;gap:10px;margin-top:14px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.rooms button{flex:1 0 132px;display:grid;gap:6px;border:2px solid transparent;background:transparent;border-radius:14px;padding:4px;text-align:start;color:var(--muted);font-size:.86rem;font-weight:500}
+.rooms button img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;display:block}
+.rooms button span{padding-inline:4px 2px}
+.rooms button[aria-selected="true"]{border-color:var(--accent);color:var(--ink)}
+@media (max-width:640px){.viewer{aspect-ratio:4/5;border-radius:18px}.vnav{width:38px;height:38px;margin-top:-19px}.vnav.prev{left:8px}.vnav.next{right:8px}.vcta{top:12%}}
+
+/* The advisor, docked open on wide screens and kept in view while you scroll */
+.ava{width:34px;height:34px;flex:none;display:block}
+.panel .bar .ava{width:38px;height:38px}
+.panel .bar .online{display:inline-flex;align-items:center;gap:6px}
+.panel .bar .online::before{content:"";width:8px;height:8px;border-radius:50%;background:#57D98C;box-shadow:0 0 0 3px rgba(87,217,140,.25)}
+@media (min-width:1100px){
+  body.docked{--dockw:440px}
+  body.docked main,body.docked footer,body.docked .top .wrap{padding-inline-end:var(--dockw)}
+  body.docked .top .wrap{max-width:calc(var(--wrap) + var(--dockw))}
+  body.docked .panel{top:78px;bottom:16px;height:auto;width:408px;inset-inline-end:16px;opacity:1;transform:none;pointer-events:auto;visibility:visible;border-radius:22px}
+  body.docked .fab,body.docked .top .btn[data-chat]{display:none}
+}
+@media (max-width:1099px){
+  .fab{inset-inline:max(12px,env(safe-area-inset-left,0px)) max(12px,env(safe-area-inset-right,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));padding:8px 10px 8px 8px;justify-content:flex-start;background:var(--surface);color:var(--ink);border:1px solid var(--line);font-weight:500;max-width:560px;margin-inline:auto}
+  .fab .ava{width:38px;height:38px}
+  .fab .fabtext{flex:1;text-align:start;color:var(--muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  .fab .go{width:38px;height:38px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;flex:none}
+  footer{padding-bottom:120px}
+}
+@media (min-width:1100px){.fab .fabtext{display:none}.fab .go{display:none}.fab .ava{width:28px;height:28px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 
 /* ===== Immersive journey: one tall section with a sticky stage; scroll progress (0→1) drives every shot. ===== */
@@ -192,7 +252,7 @@ body.immersive .top .langsel select{background:rgba(0,0,0,.18);border-color:rgba
 body.immersive .top .langsel select option{color:#13212B}
 body.immersive .top .langsel::after{border-color:rgba(255,255,255,.85)}
 .top{transition:background .3s,color .3s}
-.journey{position:relative;height:600vh;margin-top:-64px;background:#0B1A26}
+.journey{position:relative;height:240vh;margin-top:-64px;background:#0B1A26}
 .stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;color:#fff;contain:paint;background:#0B1A26}
 .tour-map{position:absolute;inset:0}
 .tour-map .maplibregl-ctrl-attrib{font:11px var(--f-body);background:rgba(0,0,0,.35)!important;color:rgba(255,255,255,.8)}
@@ -294,9 +354,7 @@ body.immersive .top .langsel::after{border-color:rgba(255,255,255,.85)}
 <main>
 <section class="journey" id="journey" aria-label="Istanbul">
   <div class="stage">
-    <!-- Satellite tour: opens on the overview image, then a live satellite map flies a camera path driven by the scroll:
-         overview → Bebek → pull back → Üsküdar (Asian side) → pull back → Levent & Maslak → back to the whole city. -->
-    <div class="tour-map" id="tourMap" aria-hidden="true"></div>
+    <!-- Opening: Istanbul from above. The headline gives way to the two continents as you scroll; the property tour follows. -->
     <img class="intro" id="intro" src="img/istanbul-satellite.webp" alt="" width="1672" height="941" fetchpriority="high" aria-hidden="true">
     <div class="geo eu" id="geoEu" data-t="m_eu" aria-hidden="true">EUROPE</div>
     <div class="geo as" id="geoAs" data-t="m_as" aria-hidden="true">ASIA</div>
@@ -304,10 +362,6 @@ body.immersive .top .langsel::after{border-color:rgba(255,255,255,.85)}
 
     <div class="cap c1"><span class="kicker" data-t="kicker">New-build homes for international buyers</span><h1 data-t="h1">Find the right home in Istanbul, with honest advice in your language.</h1><p data-t="sub"></p><div class="ctas"><button class="btn" type="button" data-chat data-t="cta_main">Start with the advisor</button></div></div>
     <div class="cap stop c2"><h2 data-t="j1_t">Two continents. One city.</h2><p data-t="j1_p"></p></div>
-    <div class="cap stop c3"><span class="kicker" data-t="side_eu">European side</span><h2 data-t="tb_t">Bebek</h2><p data-t="tb_p"></p></div>
-    <div class="cap stop c4"><span class="kicker" data-t="side_as">Asian side</span><h2 data-t="tu_t">Üsküdar</h2><p data-t="tu_p"></p></div>
-    <div class="cap stop c5"><span class="kicker" data-t="side_eu">European side</span><h2 data-t="tl_t">Levent &amp; Maslak</h2><p data-t="tl_p"></p></div>
-    <div class="cap c6"><h2 data-t="te_t">Where will you call home?</h2><p data-t="te_p"></p><div class="ctas"><button class="btn" type="button" data-chat data-t="te_cta">Find my home</button><a class="btn ghost light" href="#districts" data-t="j4_map">Explore the map</a></div></div>
     <div class="hint" id="hint"><span data-t="j_hint">Scroll to explore</span><i></i></div>
     <div class="progress" aria-hidden="true"><b id="prog"></b></div>
   </div>
@@ -320,6 +374,29 @@ body.immersive .top .langsel::after{border-color:rgba(255,255,255,.85)}
     <li><b>2</b><span data-t="stat_sides">sides of the city, Europe and Asia</span></li>
   </ul>
 </div></div>
+
+<section class="ptour" id="home-tour" aria-labelledby="h-tour">
+  <div class="wrap">
+    <div class="head"><span class="kicker" data-t="pt_kicker">Example home</span><h2 id="h-tour" data-t="pt_h">Step inside a Bosphorus home</h2><p data-t="pt_p">Tap the glowing points to look around and move from room to room.</p></div>
+    <div class="viewer" id="viewer">
+      <div class="frames" id="frames">
+        <img src="img/home/1-exterior.webp" alt="" width="1672" height="941" loading="lazy" decoding="async">
+        <img src="img/home/2-terrace.webp" alt="" width="1672" height="941" loading="lazy" decoding="async">
+        <img src="img/home/3-living.webp" alt="" width="1672" height="941" loading="lazy" decoding="async">
+        <img src="img/home/4-stairs.webp" alt="" width="1672" height="941" loading="lazy" decoding="async">
+        <img src="img/home/5-bedroom.webp" alt="" width="1672" height="941" loading="lazy" decoding="async">
+      </div>
+      <div class="hots" id="hots"></div>
+      <div class="tip" id="tip" role="status" hidden></div>
+      <div class="vbar"><span class="roomname" id="roomName"></span><span class="count" id="roomCount"></span></div>
+      <button class="vnav prev" id="vPrev" type="button" aria-label="Previous room"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button class="vnav next" id="vNext" type="button" aria-label="Next room"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+      <div class="vcta" id="vCta" hidden><p data-t="pt_cta_p">Want to wake up to a view like this?</p><button class="btn" type="button" data-chat data-t="pt_cta">Ask the advisor</button></div>
+    </div>
+    <div class="rooms" id="rooms" role="tablist" aria-label="Rooms"></div>
+    <p class="pnote" data-t="pt_note">Illustrative images of an example home. Ask the advisor for real photos and video tours of approved projects.</p>
+  </div>
+</section>
 
 <section class="band" id="services" aria-labelledby="h-svc">
   <div class="wrap">
@@ -419,18 +496,17 @@ body.immersive .top .langsel::after{border-color:rgba(255,255,255,.85)}
   </div>
 </footer>
 
-<button class="fab" id="fab" type="button" data-chat aria-label="Open chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><span data-t="fab">Chat with the advisor</span></button>
+<button class="fab" id="fab" type="button" data-chat aria-label="Open chat"><svg class="ava" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="avg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2A64C4"/><stop offset="1" stop-color="#0F7F80"/></linearGradient></defs><circle cx="32" cy="32" r="32" fill="url(#avg2)"/><path d="M17 44V30l15-11 15 11v14H37v-8H27v8z" fill="#fff"/><circle cx="46" cy="18" r="6" fill="#F2B76B" stroke="#fff" stroke-width="2.5"/></svg><span class="fabtext" data-t="fab_bar">Ask me anything about buying in Istanbul…</span><span class="lbl" data-t="fab">Chat with the advisor</span><span class="go" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
 
 <div class="panel" id="panel" role="dialog" aria-modal="false" aria-labelledby="panelTitle">
   <div class="bar">
-    <svg viewBox="0 0 64 64" style="width:30px;height:30px;flex:none" aria-hidden="true"><rect width="64" height="64" rx="14" fill="rgba(255,255,255,.18)"/><path d="M14 46V30l18-13 18 13v16H38V35H26v11z" fill="currentColor"/></svg>
-    <div><b id="panelTitle">Istanbul Home Advisor</b><span data-t="pv_online">Online now</span></div>
+    <svg class="ava" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="avg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2A64C4"/><stop offset="1" stop-color="#0F7F80"/></linearGradient></defs><circle cx="32" cy="32" r="32" fill="url(#avg)"/><path d="M17 44V30l15-11 15 11v14H37v-8H27v8z" fill="#fff"/><circle cx="46" cy="18" r="6" fill="#F2B76B" stroke="#fff" stroke-width="2.5"/></svg>
+    <div><b id="panelTitle">Istanbul Home Advisor</b><span class="online" data-t="pv_online">Online now</span></div>
     <a id="popout" href="chat.html" target="_blank" rel="noopener" aria-label="Open full screen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-8 8M10 6H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg></a>
-    <button id="close" type="button" aria-label="Close chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <button id="close" type="button" aria-label="Close chat"><svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><svg class="min" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"/></svg></button>
   </div>
 </div>
 
-<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js" defer></script>
 <script>
 /* Site text in 5 languages (same set as the chat). Arabic, Persian and Russian need a native-speaker check. */
 const T = {
@@ -600,7 +676,7 @@ function applyLang(code){
   $("#fab").setAttribute("aria-label", t("fab")); $("#close").setAttribute("aria-label", t("close")); $("#popout").setAttribute("aria-label", t("popout"));
   $("#popout").href = "chat.html?lang=" + L;
   try{ localStorage.setItem("iha_lang", L); }catch{}
-  renderFilters(); renderProjects(); renderDistricts();
+  renderFilters(); renderProjects(); renderDistricts(); if (typeof renderRoom === "function"){ renderRoomTabs(); renderRoom(); }
   if (frame) frame.contentWindow?.postMessage({type:"iha-lang", lang:L}, location.origin);
 }
 $("#lang").onchange = e => applyLang(e.target.value);
@@ -640,64 +716,83 @@ function renderProjects(){
 }
 $("#projectList").onclick = e => { const b = e.target.closest("[data-ask]"); if (b) openChat({type:"iha-project", id:b.dataset.ask}); };
 
-/* ===== Chat panel: the existing advisor (chat.html) in an iframe, loaded on first open ===== */
+/* ===== The advisor (chat.html in an iframe) =====
+   Wide screens: docked open beside the page and kept in view while scrolling; it can be minimised to a button (remembered).
+   Phones and tablets: a bar at the bottom that opens the advisor full screen. */
 let frame = null;
-function openChat(msg){
-  const panel = $("#panel");
-  if (!frame){
-    frame = document.createElement("iframe");
-    frame.title = "Istanbul Home Advisor chat"; frame.src = "chat.html?embed=1&lang=" + L;
-    frame.setAttribute("allow", "clipboard-write");
-    frame.addEventListener("load", () => frame.dataset.loaded = "1", {once:true});
-    panel.appendChild(frame);
-  }
-  if (msg) { const send = () => frame.contentWindow.postMessage(msg, location.origin);
-    if (frame.dataset.loaded) send(); else frame.addEventListener("load", send, {once:true}); }
-  panel.classList.add("open"); $("#fab").classList.add("hide");
-  if (matchMedia("(max-width:560px)").matches) document.body.style.overflow = "hidden";
-  setTimeout(() => $("#close").focus(), 50);
+const wideQ = matchMedia("(min-width:1100px)");
+const dockPref = () => { try{ return localStorage.getItem("iha_dock") !== "0"; }catch{ return true; } };
+const setDockPref = v => { try{ localStorage.setItem("iha_dock", v ? "1" : "0"); }catch{} };
+const docked = () => document.body.classList.contains("docked");
+function ensureFrame(){
+  if (frame) return frame;
+  frame = document.createElement("iframe");
+  frame.title = "Istanbul Home Advisor chat"; frame.src = "chat.html?embed=1&lang=" + L;
+  frame.setAttribute("allow", "clipboard-write");
+  frame.addEventListener("load", () => frame.dataset.loaded = "1", {once:true});
+  $("#panel").appendChild(frame);
+  return frame;
+}
+function tellChat(msg){ const f = ensureFrame(), send = () => f.contentWindow.postMessage(msg, location.origin);
+  if (f.dataset.loaded) send(); else f.addEventListener("load", send, {once:true}); }
+function openChat(msg, quiet){
+  ensureFrame();
+  if (wideQ.matches){ setDockPref(true); document.body.classList.add("docked"); }
+  $("#panel").classList.add("open"); $("#fab").classList.add("hide");
+  if (!wideQ.matches) document.body.style.overflow = "hidden";
+  if (msg) tellChat(msg); else if (!quiet) tellChat({type:"iha-focus"});
+  if (!quiet && !wideQ.matches) setTimeout(() => $("#close").focus(), 50);
 }
 function closeChat(){
+  if (wideQ.matches) setDockPref(false);
+  document.body.classList.remove("docked");
   $("#panel").classList.remove("open"); $("#fab").classList.remove("hide"); document.body.style.overflow = "";
-  $("#fab").focus();
+  $("#fab").focus({preventScroll:true});
 }
+function applyDock(){
+  if (wideQ.matches && dockPref()) openChat(null, true);
+  else { document.body.classList.remove("docked"); if (wideQ.matches) { $("#panel").classList.remove("open"); $("#fab").classList.remove("hide"); } }
+  document.body.style.overflow = ($("#panel").classList.contains("open") && !wideQ.matches) ? "hidden" : "";
+  requestAnimationFrame(() => { layout(); renderRoom(); renderDistricts(); });
+}
+wideQ.addEventListener?.("change", applyDock);
 document.addEventListener("click", e => { if (e.target.closest("[data-chat]")) openChat(); });
 $("#close").onclick = closeChat;
-addEventListener("keydown", e => { if (e.key==="Escape" && $("#panel").classList.contains("open")) closeChat(); });
+addEventListener("keydown", e => { if (e.key==="Escape" && $("#panel").classList.contains("open") && !docked()) closeChat(); });
 addEventListener("scroll", () => $("#top").classList.toggle("scrolled", scrollY > 8), {passive:true});
 
 
 /* ===== Extra text for the immersive journey and the district map ===== */
 const T2 = {
-en:{tb_t:"Bebek",tb_p:"A bay of waterside mansions, cafés and morning walks along the European shore.",tu_t:"Üsküdar",tu_p:"The Asian shore, with Maiden's Tower and views back across the water to the old city.",tl_t:"Levent & Maslak",tl_p:"Istanbul's business district, where many of the newest residential towers rise.",te_t:"Where will you call home?",te_p:"Tell the advisor what matters to you, and it finds approved homes in the right neighbourhood.",te_cta:"Find my home",j_hint:"Scroll to explore",j1_t:"Two continents. One city.",j1_p:"Istanbul stretches across Europe and Asia, joined by the Bosphorus.",
+en:{pt_kicker:"Example home",pt_h:"Step inside a Bosphorus home",pt_p:"Tap the glowing points to look around and move from room to room.",pt_note:"Illustrative images of an example home. Ask the advisor for real photos and video tours of approved projects.",pt_cta_p:"Want to wake up to a view like this?",pt_cta:"Ask the advisor",pt_go:"Go to",r_ext:"On the water",r_ter:"The terrace",r_liv:"Living room",r_sta:"Up the stairs",r_bed:"The main bedroom",h_living:"Living room opening straight onto the water",h_suite:"Bedrooms behind full-height glass",h_bridge:"Ortaköy Mosque and the bridge, next door",h_quay:"Private stone quay on the Bosphorus",h_in:"Step inside",h_glass:"Glass walls that fold away completely",h_stone:"Warm travertine terrace",h_olive:"Olive trees in stone planters",h_stairs:"Stairs to the bedrooms",h_library:"Built-in oak library",h_dining:"Dining for ten",h_garden:"Doors to a quiet garden courtyard",h_bed:"The main bedroom",h_lit:"Stone stairs with soft step lighting",h_chand:"Dining room below",h_view:"The Bosphorus Bridge, framed by the window",h_ferry:"Ferries passing all day",h_calm:"Calm, light materials",fab_bar:"Ask me anything about buying in Istanbul…",tb_t:"Bebek",tb_p:"A bay of waterside mansions, cafés and morning walks along the European shore.",tu_t:"Üsküdar",tu_p:"The Asian shore, with Maiden's Tower and views back across the water to the old city.",tl_t:"Levent & Maslak",tl_p:"Istanbul's business district, where many of the newest residential towers rise.",te_t:"Where will you call home?",te_p:"Tell the advisor what matters to you, and it finds approved homes in the right neighbourhood.",te_cta:"Find my home",j_hint:"Scroll to explore",j1_t:"Two continents. One city.",j1_p:"Istanbul stretches across Europe and Asia, joined by the Bosphorus.",
  j2_t:"Life along the Bosphorus",j2_p:"Bridges, waterside palaces and ferries crossing between continents, all day long.",
  j3_t:"As the city lights up",j3_p:"Some of Istanbul's most sought-after homes look out over this water.",
  j4_t:"This could be your view.",j4_p:"Tell the advisor what you are dreaming of, and it finds approved homes that match.",j4_cta:"Find my view",j4_map:"Explore the map",
  m_eu:"EUROPE",m_as:"ASIA",m_bs:"Black Sea",m_mar:"Sea of Marmara",m_bos:"Bosphorus",m_gh:"Golden Horn",
  d_h:"Explore by district",d_p:"Tap a district to see the approved projects there. Orange is the European side, teal the Asian side.",d_pick:"Pick a district on the map to see its projects.",
  d_count:"{n} approved projects",d_short:"Get a shortlist for this area",nav_map:"Map"},
-tr:{tb_t:"Bebek",tb_p:"Avrupa Yakası'nda yalılar, kafeler ve sabah yürüyüşleriyle bir koy.",tu_t:"Üsküdar",tu_p:"Kız Kulesi ve suyun karşısındaki tarihi yarımada manzarasıyla Anadolu Yakası.",tl_t:"Levent ve Maslak",tl_p:"En yeni konut kulelerinin yükseldiği İstanbul'un iş merkezi.",te_t:"Eviniz nerede olacak?",te_p:"Danışmana sizin için neyin önemli olduğunu anlatın; doğru semtte onaylı evleri bulsun.",te_cta:"Evimi bul",j_hint:"Keşfetmek için kaydırın",j1_t:"İki kıta. Tek şehir.",j1_p:"İstanbul, Boğaz'la birleşen Avrupa ve Asya'ya yayılır.",
+tr:{pt_kicker:"Örnek ev",pt_h:"Bir Boğaz evine girin",pt_p:"Etrafa bakmak ve odadan odaya geçmek için parlayan noktalara dokunun.",pt_note:"Örnek bir evin temsili görselleridir. Onaylı projelerin gerçek fotoğrafları ve video turları için danışmana sorun.",pt_cta_p:"Böyle bir manzaraya uyanmak ister misiniz?",pt_cta:"Danışmana sorun",pt_go:"Geç:",r_ext:"Su kenarında",r_ter:"Teras",r_liv:"Oturma odası",r_sta:"Merdivenden yukarı",r_bed:"Ana yatak odası",h_living:"Doğrudan suya açılan oturma odası",h_suite:"Boydan boya cam arkasında yatak odaları",h_bridge:"Hemen yanında Ortaköy Camii ve köprü",h_quay:"Boğaz'da özel taş rıhtım",h_in:"İçeri girin",h_glass:"Tamamen katlanan cam duvarlar",h_stone:"Sıcak traverten teras",h_olive:"Taş saksılarda zeytin ağaçları",h_stairs:"Yatak odalarına çıkan merdiven",h_library:"Gömme meşe kütüphane",h_dining:"On kişilik yemek alanı",h_garden:"Sakin bir avluya açılan kapılar",h_bed:"Ana yatak odası",h_lit:"Yumuşak basamak aydınlatmalı taş merdiven",h_chand:"Aşağıda yemek odası",h_view:"Pencerenin çerçevelediği Boğaz Köprüsü",h_ferry:"Gün boyu geçen vapurlar",h_calm:"Sakin, açık tonlu malzemeler",fab_bar:"İstanbul'da ev almakla ilgili her şeyi sorun…",tb_t:"Bebek",tb_p:"Avrupa Yakası'nda yalılar, kafeler ve sabah yürüyüşleriyle bir koy.",tu_t:"Üsküdar",tu_p:"Kız Kulesi ve suyun karşısındaki tarihi yarımada manzarasıyla Anadolu Yakası.",tl_t:"Levent ve Maslak",tl_p:"En yeni konut kulelerinin yükseldiği İstanbul'un iş merkezi.",te_t:"Eviniz nerede olacak?",te_p:"Danışmana sizin için neyin önemli olduğunu anlatın; doğru semtte onaylı evleri bulsun.",te_cta:"Evimi bul",j_hint:"Keşfetmek için kaydırın",j1_t:"İki kıta. Tek şehir.",j1_p:"İstanbul, Boğaz'la birleşen Avrupa ve Asya'ya yayılır.",
  j2_t:"Boğaz boyunca yaşam",j2_p:"Köprüler, yalılar ve kıtalar arasında gidip gelen vapurlar.",
  j3_t:"Şehrin ışıkları yanarken",j3_p:"İstanbul'un en çok aranan evlerinden bazıları bu manzaraya bakıyor.",
  j4_t:"Bu sizin manzaranız olabilir.",j4_p:"Danışmana hayalinizdeki evi anlatın; size uyan onaylı evleri bulsun.",j4_cta:"Manzaramı bul",j4_map:"Haritayı keşfet",
  m_eu:"AVRUPA",m_as:"ASYA",m_bs:"Karadeniz",m_mar:"Marmara Denizi",m_bos:"İstanbul Boğazı",m_gh:"Haliç",
  d_h:"İlçelere göre keşfedin",d_p:"Onaylı projeleri görmek için bir ilçeye dokunun. Turuncu Avrupa Yakası, turkuaz Anadolu Yakası.",d_pick:"Projelerini görmek için haritadan bir ilçe seçin.",
  d_count:"{n} onaylı proje",d_short:"Bu bölge için liste alın",nav_map:"Harita"},
-ar:{tb_t:"بيبك",tb_p:"خليج من القصور المطلة على الماء والمقاهي ونزهات الصباح على الضفة الأوروبية.",tu_t:"أسكودار",tu_p:"الضفة الآسيوية، مع برج الفتاة وإطلالة عبر الماء على المدينة القديمة.",tl_t:"ليفنت ومسلك",tl_p:"حي الأعمال في إسطنبول، حيث ترتفع كثير من أحدث الأبراج السكنية.",te_t:"أين سيكون منزلك؟",te_p:"أخبر المستشار بما يهمك، وسيجد منازل معتمدة في الحي المناسب.",te_cta:"اعثر على منزلي",j_hint:"مرّر للاستكشاف",j1_t:"قارتان. مدينة واحدة.",j1_p:"تمتد إسطنبول بين أوروبا وآسيا، ويصل بينهما البوسفور.",
+ar:{pt_kicker:"منزل نموذجي",pt_h:"ادخل منزلًا على البوسفور",pt_p:"اضغط على النقاط المضيئة لتتجول وتنتقل من غرفة إلى أخرى.",pt_note:"صور توضيحية لمنزل نموذجي. اطلب من المستشار صورًا حقيقية وجولات فيديو للمشاريع المعتمدة.",pt_cta_p:"هل تريد أن تستيقظ على إطلالة كهذه؟",pt_cta:"اسأل المستشار",pt_go:"انتقل إلى",r_ext:"على الماء",r_ter:"الشرفة",r_liv:"غرفة المعيشة",r_sta:"صعودًا على الدرج",r_bed:"غرفة النوم الرئيسية",h_living:"غرفة معيشة تنفتح مباشرة على الماء",h_suite:"غرف نوم خلف زجاج ممتد من الأرض إلى السقف",h_bridge:"جامع أورتاكوي والجسر بجوارك",h_quay:"رصيف حجري خاص على البوسفور",h_in:"تفضّل بالدخول",h_glass:"جدران زجاجية تنطوي بالكامل",h_stone:"شرفة دافئة من الترافرتين",h_olive:"أشجار زيتون في أحواض حجرية",h_stairs:"درج إلى غرف النوم",h_library:"مكتبة مدمجة من خشب البلوط",h_dining:"طاولة طعام لعشرة أشخاص",h_garden:"أبواب إلى فناء حديقة هادئ",h_bed:"غرفة النوم الرئيسية",h_lit:"درج حجري بإضاءة ناعمة",h_chand:"غرفة الطعام في الأسفل",h_view:"جسر البوسفور في إطار النافذة",h_ferry:"عبّارات تمر طوال اليوم",h_calm:"مواد هادئة وفاتحة",fab_bar:"اسألني أي شيء عن الشراء في إسطنبول…",tb_t:"بيبك",tb_p:"خليج من القصور المطلة على الماء والمقاهي ونزهات الصباح على الضفة الأوروبية.",tu_t:"أسكودار",tu_p:"الضفة الآسيوية، مع برج الفتاة وإطلالة عبر الماء على المدينة القديمة.",tl_t:"ليفنت ومسلك",tl_p:"حي الأعمال في إسطنبول، حيث ترتفع كثير من أحدث الأبراج السكنية.",te_t:"أين سيكون منزلك؟",te_p:"أخبر المستشار بما يهمك، وسيجد منازل معتمدة في الحي المناسب.",te_cta:"اعثر على منزلي",j_hint:"مرّر للاستكشاف",j1_t:"قارتان. مدينة واحدة.",j1_p:"تمتد إسطنبول بين أوروبا وآسيا، ويصل بينهما البوسفور.",
  j2_t:"الحياة على امتداد البوسفور",j2_p:"جسور وقصور على الماء وعبّارات تعبر بين القارتين طوال اليوم.",
  j3_t:"حين تضيء المدينة",j3_p:"بعض أكثر المنازل طلبًا في إسطنبول تطل على هذا الماء.",
  j4_t:"قد تكون هذه إطلالتك.",j4_p:"أخبر المستشار بما تحلم به، وسيجد منازل معتمدة تناسبك.",j4_cta:"اعثر على إطلالتي",j4_map:"استكشف الخريطة",
  m_eu:"أوروبا",m_as:"آسيا",m_bs:"البحر الأسود",m_mar:"بحر مرمرة",m_bos:"البوسفور",m_gh:"القرن الذهبي",
  d_h:"استكشف حسب المنطقة",d_p:"اضغط على منطقة لرؤية المشاريع المعتمدة فيها. البرتقالي للجانب الأوروبي، والفيروزي للجانب الآسيوي.",d_pick:"اختر منطقة على الخريطة لرؤية مشاريعها.",
  d_count:"{n} مشروعًا معتمدًا",d_short:"احصل على قائمة لهذه المنطقة",nav_map:"الخريطة"},
-fa:{tb_t:"ببک",tb_p:"خلیجی با عمارت‌های کنار آب، کافه‌ها و پیاده‌روی‌های صبحگاهی در ساحل اروپایی.",tu_t:"اسکودار",tu_p:"ساحل آسیایی، با برج دختر و منظرهٔ شهر قدیم آن سوی آب.",tl_t:"لونت و مسلک",tl_p:"منطقهٔ تجاری استانبول، جایی که بسیاری از جدیدترین برج‌های مسکونی ساخته می‌شوند.",te_t:"خانهٔ شما کجا خواهد بود؟",te_p:"به مشاور بگویید چه چیزی برایتان مهم است؛ خانه‌های تأییدشده را در محلهٔ مناسب پیدا می‌کند.",te_cta:"خانه‌ام را پیدا کن",j_hint:"برای کاوش اسکرول کنید",j1_t:"دو قاره. یک شهر.",j1_p:"استانبول میان اروپا و آسیا گسترده است و بسفر آن‌ها را به هم می‌پیوندد.",
+fa:{pt_kicker:"خانهٔ نمونه",pt_h:"به خانه‌ای در کنار بسفر قدم بگذارید",pt_p:"روی نقطه‌های درخشان بزنید تا اطراف را ببینید و از اتاقی به اتاق دیگر بروید.",pt_note:"تصاویر نمایشی یک خانهٔ نمونه است. عکس‌های واقعی و تور ویدیویی پروژه‌های تأییدشده را از مشاور بخواهید.",pt_cta_p:"دوست دارید با چنین منظره‌ای بیدار شوید؟",pt_cta:"از مشاور بپرسید",pt_go:"برو به",r_ext:"کنار آب",r_ter:"تراس",r_liv:"نشیمن",r_sta:"بالای پله‌ها",r_bed:"اتاق خواب اصلی",h_living:"نشیمنی که مستقیم به آب باز می‌شود",h_suite:"اتاق‌خواب‌ها پشت شیشه‌های قدی",h_bridge:"مسجد اورتاکوی و پل، همین کنار",h_quay:"اسکلهٔ سنگی اختصاصی روی بسفر",h_in:"بفرمایید داخل",h_glass:"دیوارهای شیشه‌ای که کاملاً جمع می‌شوند",h_stone:"تراس گرم تراورتن",h_olive:"درختان زیتون در گلدان‌های سنگی",h_stairs:"پله به اتاق‌خواب‌ها",h_library:"کتابخانهٔ توکار چوب بلوط",h_dining:"ناهارخوری ده‌نفره",h_garden:"درهایی به حیاطی آرام",h_bed:"اتاق خواب اصلی",h_lit:"پله‌های سنگی با نورپردازی ملایم",h_chand:"ناهارخوری در طبقهٔ پایین",h_view:"پل بسفر در قاب پنجره",h_ferry:"کشتی‌هایی که تمام روز می‌گذرند",h_calm:"مصالح آرام و روشن",fab_bar:"هر سؤالی دربارهٔ خرید در استانبول دارید بپرسید…",tb_t:"ببک",tb_p:"خلیجی با عمارت‌های کنار آب، کافه‌ها و پیاده‌روی‌های صبحگاهی در ساحل اروپایی.",tu_t:"اسکودار",tu_p:"ساحل آسیایی، با برج دختر و منظرهٔ شهر قدیم آن سوی آب.",tl_t:"لونت و مسلک",tl_p:"منطقهٔ تجاری استانبول، جایی که بسیاری از جدیدترین برج‌های مسکونی ساخته می‌شوند.",te_t:"خانهٔ شما کجا خواهد بود؟",te_p:"به مشاور بگویید چه چیزی برایتان مهم است؛ خانه‌های تأییدشده را در محلهٔ مناسب پیدا می‌کند.",te_cta:"خانه‌ام را پیدا کن",j_hint:"برای کاوش اسکرول کنید",j1_t:"دو قاره. یک شهر.",j1_p:"استانبول میان اروپا و آسیا گسترده است و بسفر آن‌ها را به هم می‌پیوندد.",
  j2_t:"زندگی در امتداد بسفر",j2_p:"پل‌ها، کاخ‌های کنار آب و کشتی‌هایی که تمام روز میان دو قاره رفت‌وآمد می‌کنند.",
  j3_t:"وقتی شهر روشن می‌شود",j3_p:"برخی از پرطرفدارترین خانه‌های استانبول رو به همین آب هستند.",
  j4_t:"این می‌تواند منظرهٔ شما باشد.",j4_p:"به مشاور بگویید رؤیایتان چیست؛ خانه‌های تأییدشدهٔ مناسب را پیدا می‌کند.",j4_cta:"منظره‌ام را پیدا کن",j4_map:"کاوش در نقشه",
  m_eu:"اروپا",m_as:"آسیا",m_bs:"دریای سیاه",m_mar:"دریای مرمره",m_bos:"بسفر",m_gh:"شاخ طلایی",
  d_h:"کاوش بر اساس منطقه",d_p:"روی یک منطقه بزنید تا پروژه‌های تأییدشدهٔ آن را ببینید. نارنجی بخش اروپایی و فیروزه‌ای بخش آسیایی است.",d_pick:"برای دیدن پروژه‌ها، یک منطقه را روی نقشه انتخاب کنید.",
  d_count:"{n} پروژهٔ تأییدشده",d_short:"برای این منطقه فهرست بگیرید",nav_map:"نقشه"},
-ru:{tb_t:"Бебек",tb_p:"Бухта с особняками у воды, кафе и утренними прогулками на европейском берегу.",tu_t:"Ускюдар",tu_p:"Азиатский берег с Девичьей башней и видом через воду на старый город.",tl_t:"Левент и Маслак",tl_p:"Деловой район Стамбула, где строятся многие новейшие жилые башни.",te_t:"Где будет ваш дом?",te_p:"Расскажите консультанту, что для вас важно, и он найдёт одобренные дома в подходящем районе.",te_cta:"Найти мой дом",j_hint:"Прокрутите, чтобы исследовать",j1_t:"Два континента. Один город.",j1_p:"Стамбул раскинулся в Европе и Азии, которые соединяет Босфор.",
+ru:{pt_kicker:"Пример дома",pt_h:"Загляните в дом на Босфоре",pt_p:"Нажимайте на светящиеся точки, чтобы осмотреться и переходить из комнаты в комнату.",pt_note:"Иллюстративные изображения примерного дома. Попросите у консультанта реальные фото и видеотуры одобренных проектов.",pt_cta_p:"Хотите просыпаться с таким видом?",pt_cta:"Спросить консультанта",pt_go:"Перейти:",r_ext:"У воды",r_ter:"Терраса",r_liv:"Гостиная",r_sta:"Вверх по лестнице",r_bed:"Главная спальня",h_living:"Гостиная выходит прямо к воде",h_suite:"Спальни за панорамным остеклением",h_bridge:"Мечеть Ортакёй и мост — по соседству",h_quay:"Собственный каменный причал на Босфоре",h_in:"Заходите",h_glass:"Стеклянные стены полностью складываются",h_stone:"Тёплая терраса из травертина",h_olive:"Оливковые деревья в каменных кашпо",h_stairs:"Лестница к спальням",h_library:"Встроенная библиотека из дуба",h_dining:"Обеденная зона на десять человек",h_garden:"Выход в тихий внутренний сад",h_bed:"Главная спальня",h_lit:"Каменная лестница с мягкой подсветкой",h_chand:"Столовая внизу",h_view:"Босфорский мост в раме окна",h_ferry:"Паромы проходят весь день",h_calm:"Спокойные светлые материалы",fab_bar:"Спросите всё о покупке жилья в Стамбуле…",tb_t:"Бебек",tb_p:"Бухта с особняками у воды, кафе и утренними прогулками на европейском берегу.",tu_t:"Ускюдар",tu_p:"Азиатский берег с Девичьей башней и видом через воду на старый город.",tl_t:"Левент и Маслак",tl_p:"Деловой район Стамбула, где строятся многие новейшие жилые башни.",te_t:"Где будет ваш дом?",te_p:"Расскажите консультанту, что для вас важно, и он найдёт одобренные дома в подходящем районе.",te_cta:"Найти мой дом",j_hint:"Прокрутите, чтобы исследовать",j1_t:"Два континента. Один город.",j1_p:"Стамбул раскинулся в Европе и Азии, которые соединяет Босфор.",
  j2_t:"Жизнь вдоль Босфора",j2_p:"Мосты, дворцы у воды и паромы, весь день курсирующие между континентами.",
  j3_t:"Когда город зажигает огни",j3_p:"Из окон самых востребованных домов Стамбула видна именно эта вода.",
  j4_t:"Это может быть ваш вид.",j4_p:"Расскажите консультанту, о чём мечтаете, и он подберёт подходящие одобренные дома.",j4_cta:"Найти мой вид",j4_map:"Открыть карту",
@@ -747,96 +842,87 @@ function buildMap(svg, withLabels){
   }
 }
 
-/* ===== Scroll engine: satellite tour ===== */
+/* ===== Scroll engine: opening ===== */
 const clamp = (x, a=0, b=1) => Math.min(b, Math.max(a, x));
-const smooth = x => x * x * (3 - 2 * x);
-const win01 = (p, a, b, f=.03) => clamp(Math.min((p - a) / f, (b - p) / f)); // fade in after a, out before b
-// Satellite imagery: Esri World Imagery. Before launch, use a keyed plan (ArcGIS Location Platform free tier) or swap the URL for another provider.
-const TOUR_TILES = {url:"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", attribution:"Imagery © Esri, Maxar, Earthstar Geographics"};
-const OVERVIEW = {lon:29.06, lat:41.1, lonSpan:.62}; // roughly what the opening image shows
-// Camera keyframes along the scroll (p = 0…1). "zoom" -1 means: the overview zoom for this screen.
-const KEYS = [
-  {p:0,   lon:29.06,  lat:41.10,  zoom:-1,   pitch:0,  bearing:0},
-  {p:.10, lon:29.06,  lat:41.10,  zoom:-1,   pitch:0,  bearing:0},
-  {p:.24, lon:29.0462,lat:41.0772,zoom:15.4, pitch:58, bearing:-28},  // Bebek bay
-  {p:.33, lon:29.0466,lat:41.0778,zoom:15.6, pitch:60, bearing:-8},
-  {p:.42, lon:29.03,  lat:41.055, zoom:12.2, pitch:20, bearing:0},    // pull back
-  {p:.52, lon:29.0080,lat:41.0218,zoom:15.2, pitch:58, bearing:-115}, // Üsküdar shore and Maiden's Tower, looking west to the old city
-  {p:.61, lon:29.0072,lat:41.0214,zoom:15.4, pitch:60, bearing:-95},
-  {p:.70, lon:29.02,  lat:41.06,  zoom:12.3, pitch:20, bearing:0},    // pull back
-  {p:.80, lon:29.011, lat:41.0785,zoom:15.0, pitch:62, bearing:12},   // Levent & Maslak
-  {p:.87, lon:29.012, lat:41.0815,zoom:15.1, pitch:62, bearing:30},
-  {p:.98, lon:29.06,  lat:41.10,  zoom:-1,   pitch:0,  bearing:0},
-];
-const PLACES = [{lon:29.0435,lat:41.0768,k:"tb_t",a:.23,b:.35},{lon:29.0041,lat:41.0211,k:"tu_t",a:.51,b:.63},{lon:29.011,lat:41.0795,k:"tl_t",a:.79,b:.89}];
-const J = {journey:$("#journey"), stage:$(".stage"), mapEl:$("#tourMap"), intro:$("#intro"), eu:$("#geoEu"), as:$("#geoAs"), scrim:$("#scrim"),
-  caps:[...document.querySelectorAll(".journey .cap")], hint:$("#hint"), body:document.body, map:null, pins:[]};
+const win01 = (p, a, b, f=.06) => clamp(Math.min((p - a) / f, (b - p) / f));
+const J = {journey:$("#journey"), stage:$(".stage"), intro:$("#intro"), eu:$("#geoEu"), as:$("#geoAs"), scrim:$("#scrim"),
+  caps:[...document.querySelectorAll(".journey .cap")], hint:$("#hint"), body:document.body};
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
 let lastP = -1, ticking = false;
-function overviewZoom(){
-  const W = J.stage.clientWidth, H = J.stage.clientHeight, imgAspect = 1672 / 941;
-  const lonVisible = OVERVIEW.lonSpan * Math.min(1, (W / H) / imgAspect); // object-fit: cover crops the sides on tall screens
-  return Math.log2(360 * W / (512 * lonVisible));
-}
-function camAt(p){
-  let i = 0; while (i < KEYS.length - 2 && p > KEYS[i + 1].p) i++;
-  const a = KEYS[i], b = KEYS[i + 1], k = smooth(clamp((p - a.p) / (b.p - a.p))), z0 = overviewZoom();
-  const za = a.zoom < 0 ? z0 : a.zoom, zb = b.zoom < 0 ? z0 : b.zoom;
-  // Move the centre in step with the zoom so the target stays steady while diving in or rising out.
-  // With u = map units per pixel (2^-zoom), m = (u(za) - u(z)) / (u(za) - u(zb)) moves the centre early when diving in and late when rising out.
-  const zoom = za + (zb - za) * k, u = z => Math.pow(2, -z);
-  const m = Math.abs(zb - za) < .01 ? k : (u(za) - u(zoom)) / (u(za) - u(zb));
-  let db = b.bearing - a.bearing; if (db > 180) db -= 360; if (db < -180) db += 360;
-  return {center:[a.lon + (b.lon - a.lon) * m, a.lat + (b.lat - a.lat) * m], zoom, pitch:a.pitch + (b.pitch - a.pitch) * k, bearing:a.bearing + db * k};
-}
-function initMap(){
-  if (J.map || reduced.matches || !window.maplibregl) return;
-  const z0 = overviewZoom();
-  J.map = new maplibregl.Map({container:J.mapEl, interactive:false, attributionControl:false, renderWorldCopies:false, maxPitch:70, fadeDuration:150,
-    pixelRatio:Math.min(devicePixelRatio || 1, 2), maxTileCacheSize:1500, center:[OVERVIEW.lon, OVERVIEW.lat], zoom:z0,
-    style:{version:8, sources:{sat:{type:"raster", tiles:[TOUR_TILES.url], tileSize:256, maxzoom:19, attribution:TOUR_TILES.attribution}},
-      layers:[{id:"bg", type:"background", paint:{"background-color":"#0B1A26"}}, {id:"sat", type:"raster", source:"sat", paint:{"raster-fade-duration":150}}]}});
-  J.map.addControl(new maplibregl.AttributionControl({compact:true}), "bottom-left");
-  J.pins = PLACES.map(pl => { const el = document.createElement("div"); el.className = "pin-place"; el.innerHTML = "<i></i>";
-    return {pl, el, m:new maplibregl.Marker({element:el, anchor:"center"}).setLngLat([pl.lon, pl.lat]).addTo(J.map)}; });
-  J.map.on("load", () => { lastP = -1; frame_(); prefetch(); });
-}
-// Warm the browser cache with the tiles each stop needs, so the dives stay sharp on a first visit.
-function prefetch(){
-  const seen = new Set(), go = (lon, lat, z) => {
-    const n = 2 ** z, x = Math.floor((lon + 180) / 360 * n), y = Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * n);
-    for (let dx = -2; dx <= 2; dx++) for (let dy = -3; dy <= 1; dy++){ const u = TOUR_TILES.url.replace("{z}", z).replace("{x}", x + dx).replace("{y}", y + dy); if (!seen.has(u)){ seen.add(u); new Image().src = u; } }
-  };
-  KEYS.filter(k => k.zoom > 13).forEach((k, i) => setTimeout(() => { go(k.lon, k.lat, Math.round(k.zoom) + 1); go(k.lon, k.lat, Math.round(k.zoom)); }, 400 * i));
-}
-function layout(){ initMap(); if (J.map) J.map.resize(); lastP = -1; frame_(); }
+function layout(){ lastP = -1; frame_(); }
 function frame_(){
   ticking = false;
   const r = J.journey.getBoundingClientRect();
   J.body.classList.toggle("immersive", !reduced.matches && r.bottom > 64);
   if (reduced.matches) return;
   const p = clamp(-r.top / (r.height - innerHeight));
-  if (Math.abs(p - lastP) < .0002) return; lastP = p;
+  if (Math.abs(p - lastP) < .0005) return; lastP = p;
   J.stage.style.setProperty("--p", p);
-  if (J.map) J.map.jumpTo(camAt(p));
-  // Opening image: holds, then gently pushes in and dissolves into the live map as the first dive starts (and returns at the end).
-  const io = Math.max(1 - clamp((p - .1) / .05), clamp((p - .955) / .025));
-  J.intro.style.opacity = J.map ? io : 1;
-  J.intro.style.transform = `scale(${1 + clamp((p - .1) / .05) * .25})`;
-  const geo = Math.min(clamp((p - .03) / .025), 1 - clamp((p - .1) / .03)); // after the headline, while the image is still showing
+  J.intro.style.transform = `scale(${(1 + p * .08).toFixed(4)})`; // a gentle drift only, so the image stays sharp
+  const geo = clamp((p - .3) / .15);
   J.eu.style.opacity = J.as.style.opacity = geo;
-  J.eu.style.transform = `translateX(${(-1 + geo) * 30}px)`; J.as.style.transform = `translateX(${(1 - geo) * 30}px)`;
-  const vis = [win01(p, -1, .045), win01(p, .05, .11), win01(p, .25, .36), win01(p, .53, .64), win01(p, .81, .9), win01(p, .965, 2)];
+  J.eu.style.transform = `translateX(${(-1 + geo) * 40}px)`; J.as.style.transform = `translateX(${(1 - geo) * 40}px)`;
+  const vis = [win01(p, -1, .26), win01(p, .4, 2)];
   J.caps.forEach((c, i) => { const o = vis[i], stop = c.classList.contains("stop");
     c.style.opacity = o; c.style.transform = stop ? `translate(-50%, ${((1 - o) * 24).toFixed(1)}px)` : `translate(-50%, calc(-50% + ${((1 - o) * 24).toFixed(1)}px))`; c.classList.toggle("on", o > .5); });
-  J.pins.forEach(({pl, el}) => el.classList.toggle("on", p > pl.a && p < pl.b));
-  const big = Math.max(vis[0], vis[5]), small = Math.max(vis[1], vis[2], vis[3], vis[4]);
-  J.scrim.style.setProperty("--o", (.25 + big * .75 + small * .25).toFixed(3));
-  J.scrim.classList.toggle("low", small > big);
-  J.hint.style.opacity = 1 - clamp(p / .02);
+  J.scrim.style.setProperty("--o", (.35 + vis[0] * .65).toFixed(3));
+  J.scrim.classList.toggle("low", vis[1] > vis[0]);
+  J.hint.style.opacity = 1 - clamp(p / .06);
 }
 function onScroll(){ if (!ticking){ ticking = true; requestAnimationFrame(frame_); } }
-window.addEventListener("load", layout);
+
+/* ===== Property tour ===== */
+const ROOMS = [
+  {k:"r_ext", hots:[{x:.5,y:.63,k:"h_living",go:1},{x:.5,y:.38,k:"h_suite"},{x:.885,y:.2,k:"h_bridge"},{x:.28,y:.83,k:"h_quay"}]},
+  {k:"r_ter", hots:[{x:.5,y:.5,k:"h_in",go:2},{x:.19,y:.44,k:"h_glass"},{x:.5,y:.87,k:"h_stone"},{x:.9,y:.58,k:"h_olive"}]},
+  {k:"r_liv", hots:[{x:.86,y:.44,k:"h_stairs",go:3},{x:.12,y:.36,k:"h_library"},{x:.58,y:.5,k:"h_dining"},{x:.42,y:.42,k:"h_garden"}]},
+  {k:"r_sta", hots:[{x:.51,y:.32,k:"h_bed",go:4},{x:.62,y:.66,k:"h_lit"},{x:.12,y:.6,k:"h_chand"}]},
+  {k:"r_bed", hots:[{x:.6,y:.3,k:"h_view"},{x:.73,y:.5,k:"h_ferry"},{x:.27,y:.6,k:"h_calm"}], cta:true}];
+const PT = {imgs:[...document.querySelectorAll("#frames img")], hots:$("#hots"), tip:$("#tip"), viewer:$("#viewer"), room:0, sel:-1};
+const GO_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+// object-fit: cover crops the photo on tall viewers (phones): place each point where it actually lands.
+function hotPos(h){
+  const W = PT.viewer.clientWidth, H = PT.viewer.clientHeight, s = Math.max(W / 1672, H / 941);
+  return [(W - 1672 * s) / 2 + h.x * 1672 * s, (H - 941 * s) / 2 + h.y * 941 * s, W, H];
+}
+function renderRoom(){
+  const R = ROOMS[PT.room];
+  PT.imgs.forEach((im, i) => { im.classList.toggle("on", i === PT.room); if (Math.abs(i - PT.room) <= 1) im.loading = "eager"; });
+  PT.hots.innerHTML = ""; PT.tip.hidden = true; PT.sel = -1;
+  R.hots.forEach((h, i) => { const [x, y, W, H] = hotPos(h); if (x < 18 || x > W - 18 || y < 18 || y > H - 18) return;
+    const b = document.createElement("button"); b.type = "button"; b.className = "hot" + (h.go != null ? " go" : ""); b.style.left = x + "px"; b.style.top = y + "px";
+    b.style.animationDelay = (.25 + i * .12) + "s"; b.dataset.i = i; b.setAttribute("aria-label", t(h.k)); b.innerHTML = "<i>" + (h.go != null ? GO_ICON : "") + "</i>";
+    PT.hots.appendChild(b); });
+  $("#roomName").textContent = t(R.k); $("#roomCount").textContent = `${PT.room + 1} / ${ROOMS.length}`;
+  $("#vPrev").disabled = PT.room === 0; $("#vNext").disabled = PT.room === ROOMS.length - 1;
+  $("#vCta").hidden = !R.cta;
+  document.querySelectorAll("#rooms button").forEach((b, i) => b.setAttribute("aria-selected", i === PT.room));
+}
+function goRoom(i){ if (i < 0 || i >= ROOMS.length || i === PT.room) return; PT.room = i; renderRoom(); }
+function showTip(i){
+  const h = ROOMS[PT.room].hots[i], [x, y, W] = hotPos(h); PT.sel = i;
+  document.querySelectorAll(".hot").forEach(b => b.classList.toggle("sel", +b.dataset.i === i));
+  PT.tip.innerHTML = `<b>${esc(t(h.k))}</b>` + (h.go != null ? `<button type="button" data-go="${h.go}">${esc(t("pt_go"))} ${esc(t(ROOMS[h.go].k))} →</button>` : "");
+  PT.tip.style.left = clamp(x, 150, W - 150) + "px"; PT.tip.style.top = y + "px"; PT.tip.classList.toggle("below", y < 130); PT.tip.hidden = false;
+}
+function renderRoomTabs(){
+  $("#rooms").innerHTML = ROOMS.map((R, i) => `<button type="button" role="tab" aria-selected="${i === PT.room}" data-r="${i}"><img src="${PT.imgs[i].getAttribute("src")}" alt="" loading="lazy"><span>${esc(t(R.k))}</span></button>`).join("");
+}
+PT.hots.addEventListener("click", e => { const b = e.target.closest(".hot"); if (!b) return; const i = +b.dataset.i, h = ROOMS[PT.room].hots[i];
+  if (h.go != null && PT.sel === i) goRoom(h.go); else showTip(i); });
+PT.hots.addEventListener("mouseover", e => { const b = e.target.closest(".hot"); if (b && matchMedia("(hover:hover)").matches) showTip(+b.dataset.i); });
+PT.tip.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b) goRoom(+b.dataset.go); });
+$("#vPrev").onclick = () => goRoom(PT.room - 1); $("#vNext").onclick = () => goRoom(PT.room + 1);
+$("#rooms").addEventListener("click", e => { const b = e.target.closest("[data-r]"); if (b) goRoom(+b.dataset.r); });
+PT.viewer.addEventListener("click", e => { if (!e.target.closest(".hot,.tip,.vnav,.vcta")) { PT.tip.hidden = true; PT.sel = -1; document.querySelectorAll(".hot.sel").forEach(b => b.classList.remove("sel")); } });
+PT.viewer.addEventListener("keydown", e => { if (e.key === "ArrowRight") goRoom(PT.room + (document.dir === "rtl" ? -1 : 1)); if (e.key === "ArrowLeft") goRoom(PT.room + (document.dir === "rtl" ? 1 : -1)); });
+// Swipe between rooms on touch screens
+let sx = null; PT.viewer.addEventListener("touchstart", e => sx = e.touches[0].clientX, {passive:true});
+PT.viewer.addEventListener("touchend", e => { if (sx == null) return; const dx = e.changedTouches[0].clientX - sx; sx = null; if (Math.abs(dx) > 50) goRoom(PT.room + ((dx < 0) !== (document.dir === "rtl") ? 1 : -1)); });
+// A slight look-around as the pointer moves
+PT.viewer.addEventListener("pointermove", e => { if (e.pointerType !== "mouse" || reduced.matches) return; const r = PT.viewer.getBoundingClientRect();
+  const im = PT.imgs[PT.room]; im.style.setProperty("--mx", ((.5 - (e.clientX - r.left) / r.width) * 1.6).toFixed(2) + "%"); im.style.setProperty("--my", ((.5 - (e.clientY - r.top) / r.height) * 1.2).toFixed(2) + "%"); });
+addEventListener("resize", () => requestAnimationFrame(renderRoom));
 
 /* ===== District map ===== */
 const DISTRICTS = [
@@ -895,7 +981,7 @@ reduced.addEventListener?.("change", layout);
   }catch{ P = []; }
   if (P.length) $("#statN").textContent = (Math.floor(P.length/10)*10) + "+";
   if (CONFIG.whatsapp){ const w = $("#wa"); w.href = "https://wa.me/" + String(CONFIG.whatsapp).replace(/\D/g,""); w.hidden = false; }
-  renderProjects(); renderDistricts(); layout();
+  renderProjects(); renderDistricts(); renderRoomTabs(); renderRoom(); applyDock();
 })();
 </script>
 </body>
