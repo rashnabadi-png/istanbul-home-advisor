@@ -4,561 +4,590 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Istanbul Home Advisor</title>
+<meta name="description" content="New-build homes in Istanbul for international buyers. Tell our advisor what you need and get a shortlist of vetted projects, with honest advice in English, Turkish, Arabic, Persian and Russian.">
+<link rel="canonical" href="https://istanbulhomeadvisor.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Istanbul Home Advisor">
+<meta property="og:title" content="Istanbul Home Advisor">
+<meta property="og:description" content="Vetted new-build homes in Istanbul, with honest advice in your language.">
+<meta property="og:url" content="https://istanbulhomeadvisor.com/">
+<meta name="theme-color" content="#1D4E9E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231D4E9E'/%3E%3Cpath d='M14 46V30l18-13 18 13v16H38V35H26v11z' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: one conversation column, like a messaging app; answers are tapped as reply chips, projects appear inside the chat only when the advisor has enough to recommend. */
+/* Same palette and type as the chat (chat.html), so the panel feels part of the site. */
 :root{
   --bg:#EEF3F4; --surface:#FFFFFF; --sunk:#E3EBEE; --ink:#13212B; --muted:#5A6B76; --line:#D3DDE1;
-  --accent:#1D4E9E; --accent-ink:#FFFFFF; --tile:#0F7F80; --warn:#9A5400; --warn-bg:#FBEFD9; --risk:#A1302B; --risk-bg:#F8E1DF; --ok:#1E6B3C; --ok-bg:#DDF1E3;
-  --f-display:"Young Serif",Georgia,"Times New Roman",serif; --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --accent:#1D4E9E; --accent-ink:#FFFFFF; --tile:#0F7F80; --tile-bg:#DCEFEF; --warm:#B5652B; --night:#0F2340; --night-ink:#EAF0F8;
+  --f-display:"Young Serif",Georgia,"Times New Roman",serif; --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:16px; --wrap:1120px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0E171D; --surface:#15212A; --sunk:#1C2B35; --ink:#E6EEF2; --muted:#93A6B2; --line:#2A3B46;
-  --accent:#7EA8F2; --accent-ink:#0B1726; --tile:#4FC0BE; --warn:#F0B661; --warn-bg:#3A2B12; --risk:#F2928B; --risk-bg:#3D1C1A; --ok:#7FD39D; --ok-bg:#163423; color-scheme:dark}}
+  --accent:#7EA8F2; --accent-ink:#0B1726; --tile:#4FC0BE; --tile-bg:#163234; --warm:#E9A06A; --night:#0A1520; --night-ink:#E6EEF2; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0E171D; --surface:#15212A; --sunk:#1C2B35; --ink:#E6EEF2; --muted:#93A6B2; --line:#2A3B46;
-  --accent:#7EA8F2; --accent-ink:#0B1726; --tile:#4FC0BE; --warn:#F0B661; --warn-bg:#3A2B12; --risk:#F2928B; --risk-bg:#3D1C1A; --ok:#7FD39D; --ok-bg:#163423; color-scheme:dark}
-html,body{height:100%}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+  --accent:#7EA8F2; --accent-ink:#0B1726; --tile:#4FC0BE; --tile-bg:#163234; --warm:#E9A06A; --night:#0A1520; --night-ink:#E6EEF2; color-scheme:dark}
 *{box-sizing:border-box}
-button,input,textarea{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.app{height:100%;display:grid;grid-template-rows:auto 1fr auto;max-width:820px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:14px 10px;border-bottom:1px solid var(--line)}
-.brand{min-width:0;display:grid}
-.brand h1{font-family:var(--f-display);font-weight:400;font-size:1.4rem;margin:0}
-.brand span{color:var(--muted);font-size:.82rem}
-.spacer{flex:1}
-.lang{display:flex;gap:4px;flex-wrap:wrap}
-.lang button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:.78rem;cursor:pointer}
-.lang button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.log{overflow-y:auto;padding-block:18px;display:flex;flex-direction:column;gap:12px;min-height:0}
-.msg{max-width:86%;padding:10px 14px;border-radius:16px;white-space:pre-wrap;overflow-wrap:anywhere}
-.msg.bot{background:var(--surface);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
-[dir="rtl"] .msg.bot{border-bottom-left-radius:16px;border-bottom-right-radius:4px}
-[dir="rtl"] .msg.me{border-bottom-right-radius:16px;border-bottom-left-radius:4px}
-.msg.me{background:var(--accent);color:var(--accent-ink);align-self:flex-end;border-bottom-right-radius:4px}
-.msg.note{align-self:center;max-width:none;color:var(--muted);font-size:.82rem;padding:2px 8px}
-.msg .why{display:block;color:var(--muted);font-size:.84rem;margin-top:4px}
-.progress{align-self:center;font-family:var(--f-mono);font-size:.72rem;color:var(--muted);letter-spacing:.04em}
-.recs{align-self:stretch;display:grid;gap:10px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:7px}
-.card h3{margin:0;font-size:1.02rem;text-wrap:balance}
-.where{color:var(--muted);font-size:.85rem}
-.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px 14px;font-size:.86rem}
-.facts div span{display:block;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.price{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:500}
-.fit{font-size:.86rem;background:var(--sunk);border-radius:10px;padding:6px 10px}
-.src{font-size:.74rem;color:var(--muted)}
-.badges{display:flex;gap:6px;flex-wrap:wrap}
-.badge{font-size:.72rem;padding:2px 8px;border-radius:999px;background:var(--sunk)}
-.badge.ok{background:var(--ok-bg);color:var(--ok)} .badge.warn{background:var(--warn-bg);color:var(--warn)} .badge.risk{background:var(--risk-bg);color:var(--risk)}
-.cardacts{display:flex;gap:8px;flex-wrap:wrap}
-.replies{display:flex;gap:8px;flex-wrap:wrap;padding-block:10px 4px}
-.reply{border:1px solid var(--tile);color:var(--tile);background:var(--surface);border-radius:999px;padding:7px 14px;cursor:pointer;font-weight:600;font-size:.88rem}
-.reply.alt{border-color:var(--line);color:var(--muted);font-weight:500}
-.reply[aria-pressed="true"]{background:var(--tile);color:#fff}
-.dock{border-top:1px solid var(--line);padding-block:6px 12px;background:var(--bg)}
-.composer{display:flex;gap:8px}
-.composer textarea,.composer input{flex:1;resize:none;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:10px 12px;min-height:44px;max-height:120px;min-width:0}
-.btn{border:0;border-radius:12px;padding:10px 16px;font-weight:600;cursor:pointer;background:var(--accent);color:var(--accent-ink)}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;overflow-x:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+.wrap{max-width:var(--wrap);margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left,0px))}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;line-height:1.15;margin:0;text-wrap:balance}
+:lang(ar) h1,:lang(ar) h2,:lang(ar) h3,:lang(fa) h1,:lang(fa) h2,:lang(fa) h3,:lang(ru) h1,:lang(ru) h2,:lang(ru) h3{font-family:var(--f-body);font-weight:700}
+p{margin:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:12px 22px;font-weight:600;text-decoration:none;background:var(--accent);color:var(--accent-ink);transition:transform .15s,filter .15s}
+.btn:hover{filter:brightness(1.08)} .btn:active{transform:scale(.98)}
 .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
-.btn.small{padding:6px 12px;font-size:.82rem;border-radius:10px}
-.btn:disabled{opacity:.5;cursor:default}
-.foot{font-size:.72rem;color:var(--muted);padding-top:6px}
-.consent{display:flex;gap:8px;align-items:flex-start;font-size:.84rem;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
-@media (max-width:560px){.msg{max-width:94%}.brand span{display:none}}
-.foot a.privacy{color:var(--muted);white-space:nowrap}
-</style>
+.btn.wa{background:#1E7B4B;color:#fff}
+.btn svg{width:18px;height:18px;flex:none}
 
+/* Header */
+.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid transparent;transition:border-color .2s}
+.top.scrolled{border-bottom-color:var(--line)}
+.top .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;min-width:0}
+.logo svg{width:32px;height:32px;flex:none}
+.logo b{font-family:var(--f-display);font-weight:400;font-size:1.15rem;white-space:nowrap}
+nav.links{display:flex;gap:22px;margin-inline-start:auto}
+nav.links a{text-decoration:none;color:var(--muted);font-size:.93rem;font-weight:500}
+nav.links a:hover{color:var(--ink)}
+.langsel{position:relative}
+.langsel select{appearance:none;-webkit-appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 30px 7px 12px;font:inherit;font-size:.85rem;cursor:pointer}
+.langsel::after{content:"";position:absolute;inset-inline-end:12px;top:50%;width:6px;height:6px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:translateY(-70%) rotate(45deg);pointer-events:none}
+.top .btn{padding:9px 16px;font-size:.9rem}
+@media (max-width:900px){nav.links{display:none}.langsel{margin-inline-start:auto}}
+.top .btn .short{display:none}
+@media (max-width:520px){.top .btn .long{display:none}.top .btn .short{display:block}.top .btn{padding:9px 11px}.logo b{font-size:1rem}}
+@media (max-width:380px){.logo b{display:none}}
+
+/* Hero */
+.hero{position:relative;padding-block:56px 0;overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.kicker{display:inline-block;font-size:.8rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--tile);margin-bottom:14px}
+:lang(ar) .kicker,:lang(fa) .kicker{letter-spacing:0}
+.hero h1{font-size:clamp(2.1rem,5.2vw,3.6rem)}
+.hero p.sub{color:var(--muted);font-size:1.12rem;margin-top:18px;max-width:34em}
+.hero .ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.stats{display:flex;gap:28px;flex-wrap:wrap;margin-top:34px;padding:0;list-style:none}
+.stats li{display:grid}
+.stats b{font-family:var(--f-display);font-weight:400;font-size:1.6rem;line-height:1.1}
+.stats span{color:var(--muted);font-size:.86rem}
+@media (max-width:520px){.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stats b{font-size:1.4rem}.stats span{font-size:.78rem;line-height:1.35}}
+.preview{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 24px 60px -30px rgba(15,35,64,.45);display:grid;gap:10px;max-width:420px;justify-self:end;width:100%}
+.preview .ph{display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.preview .ph i{width:9px;height:9px;border-radius:50%;background:#2FAE6A;flex:none}
+.preview .ph b{font-weight:600;font-size:.92rem}
+.preview .ph span{color:var(--muted);font-size:.8rem;margin-inline-start:auto}
+.bub{padding:9px 13px;border-radius:14px;font-size:.92rem;max-width:88%}
+.bub.bot{background:var(--sunk)}
+.bub.me{background:var(--accent);color:var(--accent-ink);justify-self:end}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips span{border:1px solid var(--line);border-radius:999px;padding:4px 11px;font-size:.82rem;color:var(--accent)}
+.preview .btn{margin-top:4px}
+.skyline{display:block;width:100%;height:auto;margin-top:48px;color:var(--night)}
+@media (max-width:860px){.hero .wrap{grid-template-columns:1fr}.preview{justify-self:start}}
+
+/* Sections */
+section{padding-block:76px}
+.band{background:var(--night);color:var(--night-ink)}
+.band .muted{color:color-mix(in srgb,var(--night-ink) 72%,transparent)}
+.head{max-width:40em;margin-bottom:36px}
+.head h2{font-size:clamp(1.7rem,3.6vw,2.5rem)}
+.head p{color:var(--muted);margin-top:12px;font-size:1.05rem}
+.band .head p{color:color-mix(in srgb,var(--night-ink) 72%,transparent)}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.svc{color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px;display:grid;gap:10px;align-content:start;text-align:start;transition:border-color .15s,transform .15s}
+.svc:hover{border-color:var(--accent);transform:translateY(-2px)}
+.svc .ic{width:44px;height:44px;border-radius:12px;background:var(--tile-bg);color:var(--tile);display:grid;place-items:center}
+.svc .ic svg{width:24px;height:24px}
+.svc h3{font-size:1.2rem}
+.svc p{color:var(--muted);font-size:.94rem}
+.svc .go{color:var(--accent);font-weight:600;font-size:.9rem;margin-top:4px}
+@media (max-width:980px){.grid4{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.grid4{grid-template-columns:1fr}}
+
+/* Projects */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+.filters button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 15px;font-size:.88rem}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.projects{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
+.pcard .art{height:92px;position:relative;background:linear-gradient(135deg,var(--c1),var(--c2))}
+.pcard .art svg{position:absolute;inset:auto 0 0 0;width:100%;height:70px;color:rgba(255,255,255,.22)}
+.pcard .art .side{position:absolute;top:12px;inset-inline-start:12px;background:rgba(255,255,255,.92);color:#13212B;border-radius:999px;padding:2px 10px;font-size:.76rem;font-weight:600}
+.pcard .body{padding:16px 18px 18px;display:grid;gap:8px;flex:1;align-content:start}
+.pcard h3{font-size:1.15rem}
+.pcard .loc{color:var(--muted);font-size:.88rem}
+.pcard .row{display:flex;justify-content:space-between;gap:12px;align-items:baseline;padding-top:10px;border-top:1px solid var(--line);margin-top:4px}
+.pcard .row span{color:var(--muted);font-size:.8rem}
+.pcard .row b{font-size:1.08rem;font-variant-numeric:tabular-nums}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tags span{background:var(--sunk);border-radius:6px;padding:2px 8px;font-size:.76rem;color:var(--muted)}
+.pcard button{margin:0 18px 18px;border:1px solid var(--line);background:transparent;border-radius:999px;padding:9px;font-weight:600;font-size:.9rem;color:var(--accent)}
+.pcard button:hover{border-color:var(--accent)}
+.pnote{color:var(--muted);font-size:.84rem;margin-top:18px}
+.more{margin-top:22px}
+@media (max-width:980px){.projects{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:600px){.projects{grid-template-columns:1fr}}
+
+/* Steps */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;counter-reset:s;padding:0;margin:0;list-style:none}
+.steps li{counter-increment:s;display:grid;gap:8px;align-content:start}
+.steps li::before{content:counter(s,decimal-leading-zero);font-family:var(--f-display);font-size:2.4rem;line-height:1;color:var(--warm)}
+.steps h3{font-size:1.25rem}
+@media (max-width:760px){.steps{grid-template-columns:1fr}}
+
+/* Why */
+.why{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.why div{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;padding:20px;border-radius:var(--r);background:var(--surface);border:1px solid var(--line)}
+.why svg{width:22px;height:22px;color:var(--tile);grid-row:span 2;margin-top:3px}
+.why h3{font-size:1.1rem;font-family:var(--f-body);font-weight:600}
+.why p{color:var(--muted);font-size:.94rem}
+@media (max-width:700px){.why{grid-template-columns:1fr}}
+
+/* FAQ */
+.faq{max-width:780px}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{list-style:none;cursor:pointer;padding:18px 0;font-weight:600;font-size:1.05rem;display:flex;justify-content:space-between;gap:16px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-size:1.4rem;line-height:1;color:var(--muted);transition:transform .2s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{color:var(--muted);padding-bottom:18px}
+
+/* Contact */
+.contact{display:grid;grid-template-columns:1.2fr 1fr;gap:32px;align-items:center}
+.contact .ctas{display:flex;gap:12px;flex-wrap:wrap}
+@media (max-width:760px){.contact{grid-template-columns:1fr}}
+
+footer{padding-block:32px 110px;border-top:1px solid var(--line);color:var(--muted);font-size:.86rem}
+footer .wrap{display:flex;gap:10px 24px;flex-wrap:wrap;justify-content:space-between}
+footer a{color:var(--muted)}
+
+/* Floating chat */
+.fab{position:fixed;z-index:40;inset-inline-end:max(18px,env(safe-area-inset-right,0px));bottom:max(18px,env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:10px;border:0;border-radius:999px;padding:14px 20px 14px 16px;background:var(--accent);color:var(--accent-ink);font-weight:600;box-shadow:0 14px 34px -12px rgba(15,35,64,.6);transition:transform .2s,opacity .2s}
+.fab svg{width:22px;height:22px}
+.fab.hide{opacity:0;transform:translateY(16px);pointer-events:none}
+.panel{position:fixed;z-index:50;inset-inline-end:18px;bottom:18px;width:min(420px,calc(100vw - 36px));height:min(680px,calc(100dvh - 36px));background:var(--bg);border:1px solid var(--line);border-radius:20px;box-shadow:0 30px 80px -24px rgba(15,35,64,.6);display:grid;grid-template-rows:auto 1fr;overflow:hidden;opacity:0;transform:translateY(20px) scale(.98);pointer-events:none;transition:opacity .2s,transform .2s;visibility:hidden}
+.panel.open{opacity:1;transform:none;pointer-events:auto;visibility:visible}
+.panel .bar{display:flex;align-items:center;gap:10px;padding:12px 12px 12px 16px;background:var(--accent);color:var(--accent-ink)}
+.panel .bar div{display:grid;line-height:1.25;min-width:0}
+.panel .bar b{font-weight:600}
+.panel .bar span{font-size:.78rem;opacity:.85}
+.panel .bar a,.panel .bar button{margin-inline-start:auto;border:0;background:rgba(255,255,255,.16);color:inherit;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;flex:none}
+.panel .bar a{margin-inline-start:auto}.panel .bar a + button{margin-inline-start:6px}
+.panel .bar svg{width:18px;height:18px}
+.panel iframe{border:0;width:100%;height:100%;background:var(--bg)}
+@media (max-width:560px){.panel{inset:0;width:100%;height:100dvh;border-radius:0;border:0}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
 </head>
 <body>
-<div class="app">
-  <header>
-    <div class="brand"><h1 id="brandName">Istanbul Home Advisor</h1><span id="tagline">New-build homes for international buyers</span></div>
-    <div class="spacer"></div>
-    <div class="lang" id="lang" aria-label="Language"></div>
-    <button class="btn small ghost" id="restart" type="button">Start over</button>
-  </header>
-  <div class="log" id="log" aria-live="polite"></div>
-  <div class="dock">
-    <div class="replies" id="replies"></div>
-    <form class="composer" id="composer">
-      <textarea id="input" rows="1" placeholder="Type an answer or ask anything…" aria-label="Your message"></textarea>
-      <button class="btn" id="send" type="submit">Send</button>
-      <button class="btn ghost" id="stop" type="button" hidden>Stop</button>
-    </form>
-    <input id="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px">
-    <p class="foot"><span id="foot">Prices are asking prices from listed sources and dates; an agent confirms everything before you reserve. General information only, not legal or financial advice.</span> <a href="privacy.html" target="_blank" rel="noopener" class="privacy">Privacy / KVKK</a></p>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <a class="logo" href="#" aria-label="Istanbul Home Advisor">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="var(--accent)"/><path d="M14 46V30l18-13 18 13v16H38V35H26v11z" fill="var(--accent-ink)"/></svg>
+      <b>Istanbul Home Advisor</b>
+    </a>
+    <nav class="links" aria-label="Main">
+      <a href="#services" data-t="nav_services">Services</a>
+      <a href="#projects" data-t="nav_projects">Projects</a>
+      <a href="#how" data-t="nav_how">How it works</a>
+      <a href="#faq" data-t="nav_faq">FAQ</a>
+      <a href="#contact" data-t="nav_contact">Contact</a>
+    </nav>
+    <label class="langsel"><span class="sr" hidden>Language</span>
+      <select id="lang" aria-label="Language">
+        <option value="en">English</option><option value="tr">Türkçe</option><option value="ar">العربية</option><option value="fa">فارسی</option><option value="ru">Русский</option>
+      </select>
+    </label>
+    <button class="btn" type="button" data-chat><span class="long" data-t="cta_short">Ask the advisor</span><svg class="short" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></button>
+  </div>
+</header>
+
+<main>
+<section class="hero" aria-labelledby="h1">
+  <div class="wrap">
+    <div>
+      <span class="kicker" data-t="kicker">New-build homes for international buyers</span>
+      <h1 id="h1" data-t="h1">Find the right home in Istanbul, with honest advice in your language.</h1>
+      <p class="sub" data-t="sub">Tell our advisor what you need. It shortlists vetted new-build projects that fit your budget and goals, then a real agent confirms prices and paperwork before you commit.</p>
+      <div class="ctas">
+        <button class="btn" type="button" data-chat data-t="cta_main">Start with the advisor</button>
+        <a class="btn ghost" href="#projects" data-t="cta_browse">Browse projects</a>
+      </div>
+      <ul class="stats">
+        <li><b id="statN">170+</b><span data-t="stat_projects">vetted projects</span></li>
+        <li><b>5</b><span data-t="stat_langs">languages</span></li>
+        <li><b>2</b><span data-t="stat_sides">sides of the city, Europe and Asia</span></li>
+      </ul>
+    </div>
+    <div class="preview" aria-hidden="true">
+      <div class="ph"><i></i><b data-t="pv_name">Your advisor</b><span data-t="pv_online">Online now</span></div>
+      <div class="bub bot" data-t="pv_q">Hi! What brings you to Istanbul?</div>
+      <div class="chips"><span data-t="svc_cit_t">Citizenship</span><span data-t="svc_rent_t">Rental income</span><span data-t="svc_fam_t">Living with family</span></div>
+      <div class="bub me" data-t="pv_a">Rental income, around $300k</div>
+      <div class="bub bot" data-t="pv_r">Great. A few questions so I can shortlist projects that fit…</div>
+      <button class="btn" type="button" data-chat data-t="pv_try" tabindex="-1">Try it now</button>
+    </div>
+  </div>
+  <svg class="skyline" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path fill="currentColor" d="M0 120V96h60v-8h40v-14h22v14h30V80h18V60l9-14 9 14v20h16v-6h26v-18h6V20l3-8 3 8v36h6v18h22v-22h36v-8l20-18 20 18v8h36v26h14V46l3-8 3 8v28h20v-18h30v20h40v-12h24v-26l12-26 12 26v26h20v18h44v-16h50v-10l26-22 26 22v10h20v-24h4V22l3-8 3 8v32h4v34h40v-14h30v20h40V70l32-26 32 26v6h20v-30l3-8 3 8v30h16v12h40v-8h50v-20h12V52l3-8 3 8v28h10v-6h40v14h60v-10h30v16h40V120z"/></svg>
+</section>
+
+<section class="band" id="services" aria-labelledby="h-svc">
+  <div class="wrap">
+    <div class="head"><h2 id="h-svc" data-t="svc_h">What are you looking for?</h2><p data-t="svc_p">Pick a goal and the advisor asks only the questions that matter for it.</p></div>
+    <div class="grid4">
+      <button class="svc" type="button" data-chat>
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M8 17h8"/></svg></span>
+        <h3 data-t="svc_cit_t">Citizenship</h3><p data-t="svc_cit_p">Projects that may qualify for citizenship by investment, checked against the current rules by a licensed lawyer.</p><span class="go" data-t="svc_go">Ask the advisor →</span>
+      </button>
+      <button class="svc" type="button" data-chat>
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span>
+        <h3 data-t="svc_rent_t">Rental income</h3><p data-t="svc_rent_p">Homes in areas with steady tenant demand: near metro lines, universities and business districts.</p><span class="go" data-t="svc_go">Ask the advisor →</span>
+      </button>
+      <button class="svc" type="button" data-chat>
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span>
+        <h3 data-t="svc_fam_t">Living with family</h3><p data-t="svc_fam_p">Safe, green compounds close to international schools, hospitals and good transport.</p><span class="go" data-t="svc_go">Ask the advisor →</span>
+      </button>
+      <button class="svc" type="button" data-chat>
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span>
+        <h3 data-t="svc_hol_t">Holiday home</h3><p data-t="svc_hol_p">Sea views and seaside living for the months you spend in Istanbul, easy to rent out when you are away.</p><span class="go" data-t="svc_go">Ask the advisor →</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<section id="projects" aria-labelledby="h-proj">
+  <div class="wrap">
+    <div class="head"><h2 id="h-proj" data-t="proj_h">A few of the projects we track</h2><p data-t="proj_p">Every project is researched and approved by our team before the advisor recommends it.</p></div>
+    <div class="filters" id="filters" role="group" aria-label="Filter"></div>
+    <div class="projects" id="projectList" aria-live="polite"></div>
+    <p class="pnote" data-t="proj_note">Starting prices are asking prices from listed sources, with their dates. An agent confirms the current price before you reserve.</p>
+    <div class="more"><button class="btn" type="button" data-chat data-t="proj_more">Get your personal shortlist</button></div>
+  </div>
+</section>
+
+<section class="band" id="how" aria-labelledby="h-how">
+  <div class="wrap">
+    <div class="head"><h2 id="h-how" data-t="how_h">How it works</h2><p data-t="how_p">From first question to keys, without the pressure.</p></div>
+    <ol class="steps">
+      <li><h3 data-t="how1_t">Tell us what you need</h3><p class="muted" data-t="how1_p">Answer a few quick questions in your language: your goal, budget, area and timing.</p></li>
+      <li><h3 data-t="how2_t">Get a shortlist</h3><p class="muted" data-t="how2_p">The advisor matches you with vetted projects and explains why each one fits.</p></li>
+      <li><h3 data-t="how3_t">Talk to a real agent</h3><p class="muted" data-t="how3_p">An agent confirms prices and availability, arranges visits or video tours, and guides you to the title deed.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section aria-labelledby="h-why">
+  <div class="wrap">
+    <div class="head"><h2 id="h-why" data-t="why_h">Why buyers trust us</h2></div>
+    <div class="why">
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg><h3 data-t="why1_t">Researched, dated information</h3><p data-t="why1_p">Every price shows its source and date. Sold-out projects are marked, never pushed.</p></div>
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14M5 12h10M5 16h6"/><path d="M17 14l2 2 3-4"/></svg><h3 data-t="why2_t">Your language</h3><p data-t="why2_p">English, Turkish, Arabic, Persian and Russian, from the first question to the paperwork.</p></div>
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg><h3 data-t="why3_t">Careful with legal questions</h3><p data-t="why3_p">Rules for foreign buyers change. We flag what has changed, and a licensed lawyer confirms your case.</p></div>
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><h3 data-t="why4_t">No pressure</h3><p data-t="why4_p">Use the advisor for free. You only share your contact details if you want an agent to call you.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" aria-labelledby="h-faq" style="padding-top:20px">
+  <div class="wrap">
+    <div class="head"><h2 id="h-faq" data-t="faq_h">Common questions</h2></div>
+    <div class="faq">
+      <details><summary data-t="faq1_q">Can foreigners buy property in Istanbul?</summary><p data-t="faq1_a">Yes. Citizens of most countries can buy property in Turkey, with some limits on certain areas and nationalities. We check this for you before you reserve.</p></details>
+      <details><summary data-t="faq2_q">Does buying a home give me Turkish citizenship?</summary><p data-t="faq2_a">Some purchases can qualify for citizenship by investment, but the rules and checks have become stricter. Eligibility is confirmed case by case by a licensed lawyer before you buy.</p></details>
+      <details><summary data-t="faq3_q">Do I need to come to Istanbul to buy?</summary><p data-t="faq3_a">Not always. Many steps can be done remotely with a power of attorney, but we recommend visiting before you buy. We can arrange video tours first.</p></details>
+      <details><summary data-t="faq4_q">What does the advisor cost?</summary><p data-t="faq4_a">The advisor is free to use. Any service fees are explained to you in writing before you commit to anything.</p></details>
+      <details><summary data-t="faq5_q">What happens to my personal data?</summary><p data-t="faq5_a">We only save your details if you agree, under Turkey's personal data protection law (KVKK). You can ask us to delete them at any time.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="contact" aria-labelledby="h-contact">
+  <div class="wrap contact">
+    <div class="head" style="margin:0"><h2 id="h-contact" data-t="contact_h">Ready to start?</h2><p data-t="contact_p">Ask the advisor anything, any time. When you are ready, an agent will take it from there.</p></div>
+    <div class="ctas">
+      <button class="btn" type="button" data-chat data-t="cta_main">Start with the advisor</button>
+      <a class="btn wa" id="wa" href="#" target="_blank" rel="noopener" hidden><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.2z"/></svg><span data-t="wa">WhatsApp us</span></a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="yr">2026</span> Istanbul Home Advisor · <span data-t="foot">General information only, not legal or financial advice.</span></span>
+    <a href="privacy.html" data-t="privacy">Privacy / KVKK</a>
+  </div>
+</footer>
+
+<button class="fab" id="fab" type="button" data-chat aria-label="Open chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><span data-t="fab">Chat with the advisor</span></button>
+
+<div class="panel" id="panel" role="dialog" aria-modal="false" aria-labelledby="panelTitle">
+  <div class="bar">
+    <svg viewBox="0 0 64 64" style="width:30px;height:30px;flex:none" aria-hidden="true"><rect width="64" height="64" rx="14" fill="rgba(255,255,255,.18)"/><path d="M14 46V30l18-13 18 13v16H38V35H26v11z" fill="currentColor"/></svg>
+    <div><b id="panelTitle">Istanbul Home Advisor</b><span data-t="pv_online">Online now</span></div>
+    <a id="popout" href="chat.html" target="_blank" rel="noopener" aria-label="Open full screen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-8 8M10 6H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg></a>
+    <button id="close" type="button" aria-label="Close chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
 </div>
 
 <script>
-/* ===== Configuration: edit these ===== */
-const CONFIG = { brand:"Istanbul Home Advisor", whatsapp:"", dataCheckedOn:"November 2026" };
-
-/* ===== Legal & buying knowledge base (owner-approved text; dated) ===== */
-const KB_CHECKED = "1 November 2026";
-const KB = `
-CITIZENSHIP BY REAL ESTATE (checked ${KB_CHECKED})
-- Minimum investment: USD 400,000 in real estate (one property or several combined). Each property must be valued by a licensed appraiser (valuation report); the appraised value, not the asking price, counts.
-- The buyer must not sell the property for 3 years; this is written on the title deed.
-- Payment must be made in foreign currency and converted through a Turkish bank (foreign currency purchase document, "DAB"). The money used for the threshold cannot be a mortgage from a Turkish bank.
-- The seller must be a Turkish citizen or a Turkish company.
-- Spouse and children under 18 can be included.
-- Since August 2026 authorities have revoked thousands of citizenships obtained with inflated valuations, and several developers and appraisers are under investigation. Buyers should rely only on independent valuations and documented payments.
-- Turkey's "secure payment system" for property sales (payment held until the deed transfer) had its mandatory start postponed to 1 October 2026; confirm the current status with your agent or lawyer.
-
-RESIDENCE PERMIT
-- Buying property can support a short-term residence permit. The property value rules and the list of neighbourhoods closed to new foreign residents change; an agent checks the specific address before you buy.
-
-TITLE DEEDS (TAPU)
-- "Kat mülkiyeti" = full condominium title (building completed and registered). "Kat irtifakı" = construction-servitude title used for off-plan or not-yet-registered buildings; it is converted after completion.
-- Title deed transfer fee is usually 4% of the declared value, by law split between buyer and seller, though developers often ask the buyer to pay it or advertise it as included or exempt — confirm in the contract.
-- Under-declaring the price on the deed is illegal and makes citizenship applications fail. Never agree to "pay the rest in cash".
-
-TAXES AND COSTS ON NEW HOMES
-- VAT on new residential units depends on size, location and buyer status (rates from 1% to 20% apply). Some foreign buyers can get a VAT exemption when paying in foreign currency. Confirm the rate for the exact unit.
-- Typical extra costs: valuation report, notary and translation, utility subscriptions, annual property tax, building maintenance fee (aidat).
-
-BUYING STEPS (typical)
-1) Choose a unit and get the price list and payment plan in writing. 2) Reservation or deposit. 3) Sales contract (notarised for off-plan). 4) Valuation report. 5) Payment through a Turkish bank. 6) Title deed transfer at the land registry. 7) For citizenship: application through the land registry certificate and the immigration office.
-`;
-
-
-
-/* ===== Interface text (English is the source; other languages load from i18n.json) ===== */
-const EN = {
-  tagline:"New-build homes for international buyers", restart:"Start over", send:"Send", stop:"Stop",
-  placeholder:"Type an answer or ask anything…", placeholderAnswer:"Type your answer…",
-  foot:"Prices are asking prices from listed sources and dates; an agent confirms everything before you reserve. General information only, not legal or financial advice.",
-  langSwitched:"Switched to English — starting the conversation again.",
-  start:"Hello and welcome! I'm your Istanbul property advisor. I'll ask you a few short questions, one at a time, so I can suggest homes that really fit you. You can type a question at any point.\n\nFirst, what brings you to Istanbul property?",
-  o_citizenship:"Turkish citizenship", o_rental:"Rental income", o_living:"A home to live in", o_holiday:"A holiday home", o_investment:"Investment / resale profit", o_project:"I have a project in mind", o_legal:"Legal & buying questions", o_explore:"Just exploring",
-  cit_know:"Great choice — many of our clients buy for citizenship. Do you already know the main rules?", o_know_yes:"Yes, I know them", o_know_no:"Please explain briefly",
-  cit_explain:"In short:\n• You need real estate worth at least USD 400,000, confirmed by a licensed valuation report (one home or several combined).\n• You keep it for at least 3 years.\n• You pay in foreign currency through a Turkish bank, without a Turkish mortgage for that amount.\n• Your spouse and children under 18 can be included.\n\n(General information checked {date}, not legal advice.)\n\nWho would apply with you?",
-  cit_family:"Who would be included in the application?", o_fam_single:"Just me", o_fam_couple:"Me and my spouse", o_fam_family:"Spouse and children under 18", o_unsure:"Not sure yet",
-  cit_combine:"Would you prefer one property of $400k+, or are you open to combining two or three smaller units (often better for renting out)?", o_one:"One property", o_combine:"Open to combining", o_either_agent:"Whatever an agent recommends",
-  cit_timeline:"How soon do you want to start the citizenship application?", o_asap:"As soon as possible", o_6m:"Within 6 months", o_12m:"Within a year", o_later:"No rush",
-  rent_kind:"What kind of renting do you have in mind?", o_short:"Short-term / Airbnb", o_long:"Long-term tenants", o_advise:"Not sure — advise me",
-  rent_manage:"Would you like us to manage the tenants and the property for you after the purchase?", o_managed:"Yes, fully managed", o_self:"I'll manage it myself", o_maybe_later:"Maybe later",
-  rent_tenant:"Who would your ideal tenants be? Pick any, then tap Done.", o_business:"Business professionals", o_students:"Students", o_families:"Families", o_tourists:"Tourists",
-  live_who:"Lovely. Who will be living in the home?", o_single:"Just me", o_couple:"A couple", o_family:"Family with children", o_retire:"Retiring here",
-  live_school:"Do you need good international or private schools nearby?", o_school_yes:"Yes, very important", o_nice:"Nice to have", o_no:"No",
-  live_work:"Where will you (or your partner) work or spend most days? This helps me keep commutes short.", o_levent:"Levent / Maslak business area", o_atasehir:"Ataşehir / Asian side centre", o_remote:"Remote / from home", o_notdecided:"Not decided",
-  live_ready:"Do you need to move in soon?", o_ready_only:"Yes, ready homes only", o_can_wait:"I can wait 1–2 years",
-  hol_use:"Nice! How much of the year would you spend in Istanbul?", o_weeks:"A few weeks", o_months:"1–3 months", o_half:"Half the year",
-  hol_rent:"Would you like to rent it out while you're away?", o_yes:"Yes", o_maybe:"Maybe",
-  inv_horizon:"How long do you plan to hold the investment before selling?", o_h_short:"1–3 years", o_h_mid:"3–5 years", o_h_long:"5+ years",
-  inv_risk:"Which suits you better?", o_offplan:"Early off-plan (lower price, more waiting)", o_near:"Near completion (balanced)", o_ready_deed:"Ready with title deed (lowest risk)",
-  exp_intro:"No problem — Istanbul has two sides. The European side has the main business districts (Levent, Maslak, Şişli) and the historic centre; the Asian side is often calmer and greener, with Ataşehir's finance district and a long Marmara sea coast (Kadıköy, Maltepe, Kartal).\n\nWhat matters most to you in a home? Pick any, then tap Done.",
-  o_value:"Good value for money", o_view:"Sea or Bosphorus view", o_metro:"Close to metro / city life", o_green:"Quiet, green, family-friendly",
-  nationality:"Which country are you from? (It helps me with the buying process and any special rules.)", ph_country:"e.g. Iran, Saudi Arabia, Germany…",
-  budget:"What total budget are you considering, in US dollars?", budget_cit:"What total budget are you considering? For citizenship it needs to be at least $400,000 in total.",
-  b_u250:"Under $250,000", "b_250-400":"$250,000 – $400,000", "b_400-600":"$400,000 – $600,000", "b_600-1m":"$600,000 – $1M", "b_1-2m":"$1M – $2M", "b_2m+":"Over $2M", o_type:"I'd rather type it",
-  budget_type:"Please type your budget (for example: 350k or 1.2 million).", ph_budget:"e.g. 500k",
-  payment:"How would you like to pay?", o_cash:"Cash (often 10–20% discount)", o_plan:"Instalments with the developer",
-  side:"Which side of the city do you prefer?", o_european:"European side", o_asian:"Asian side", o_any:"No preference", o_area:"A specific area",
-  area:"Which area or district? (e.g. Şişli, Beşiktaş, Kadıköy, Başakşehir)", ph_area:"District or neighbourhood",
-  rooms:"What size of home are you looking for?", o_r1:"Studio / 1+1", o_r2:"2+1", o_r3:"3+1", o_r4:"4+1 or larger", o_villa:"Villa", o_flex:"Flexible",
-  timing:"When would you like the home to be ready?", o_now:"Ready now", o_year:"Within a year", o_offok:"Off-plan is fine",
-  priorities:"Last one: what matters most? Pick any, then tap Done.", o_p_view:"Sea / Bosphorus view", o_p_metro:"Near metro", o_p_green:"Green & quiet", o_p_fac:"Social facilities (pool, gym)", o_p_airport:"Near the airport", o_p_value:"Best price",
-  done:"Done", skip:"Skip", nopref:"No preference", progress:"Question {n} of 7 · about your purchase",
-  proj_name:"Which project are you thinking of? Type its name.", ph_project:"Project name",
-  legal_topic:"Of course. Which topic?", o_l_cit:"Citizenship rules", o_l_deed:"Title deeds (tapu)", o_l_tax:"Taxes & fees", o_l_res:"Residence permit", o_l_steps:"Buying step by step", o_l_pay:"Safe payment",
-  l_cit:"Citizenship by property: at least USD 400,000 of real estate (one or several properties), confirmed by a licensed valuation report; kept for 3 years; paid in foreign currency through a Turkish bank; bought from a Turkish citizen or company. Spouse and children under 18 can be included. Since August 2026 the authorities have revoked many citizenships obtained with inflated valuations, so independent valuations and clean payment records matter.",
-  l_deed:"Title deeds: \"kat mülkiyeti\" is full ownership of a finished, registered flat. \"Kat irtifakı\" is the title used before a building is completed and registered; it is converted later. The deed transfer fee is usually 4% of the declared value — by law split between buyer and seller, though developers often set their own rule. Never agree to declare a lower price on the deed.",
-  l_tax:"Taxes and fees: VAT on new homes ranges from 1% to 20% depending on size, location and buyer status (some foreign buyers paying in foreign currency can be exempt). Add the deed fee (usually 4%, split), valuation report, notary and translation, utility connections, yearly property tax and the building maintenance fee.",
-  l_res:"Residence permit: owning property can support a short-term residence permit. Minimum values and the neighbourhoods closed to new foreign residents change, so an agent checks the exact address before you buy.",
-  l_steps:"Buying step by step: 1) choose a unit and get the price list and payment plan in writing; 2) reservation deposit; 3) sales contract (notarised for off-plan); 4) valuation report; 5) payment through a Turkish bank; 6) title deed transfer at the land registry; 7) for citizenship, the application follows the deed.",
-  l_pay:"Safe payment: pay only to the developer's or seller's bank account, keep every receipt, and get a foreign-currency purchase document from the bank. Turkey's secure payment system for property sales (money held until the deed transfers) had its mandatory start set for 1 October 2026 — your agent confirms how it applies to your purchase.",
-  l_disclaimer:"(General information checked {date}. Rules change — for your own case, our agent or a licensed lawyer will confirm.)",
-  a_another_legal:"Another legal topic", a_find_homes:"Find homes for me", a_agent:"Talk to an agent",
-  summary:"Thanks! So you're looking for {goal}, {budget}, {side}{ready}.", summary_ready:", ready to move in",
-  g_citizenship:"citizenship", g_rental:"rental income", g_living:"a home to live in", g_holiday:"a holiday home", g_investment:"investment", g_explore:"a home", g_default:"a home",
-  open_budget:"open budget", s_european:"European side", s_asian:"Asian side", s_any:"either side",
-  top:"Here are the {n} projects that fit you best:", none:"I couldn't find a project that matches everything you asked for. Small changes often help — for example a wider budget, the other side of the city, or allowing off-plan homes.",
-  a_widen:"Widen my budget", a_anyside:"Either side is fine", a_offplan:"Off-plan is fine", a_more:"Show 3 more", a_compare:"Compare these", a_change:"Change my answers", a_prices:"Send me price lists",
-  more_head:"Here are 3 more:", no_more:"That's all the close matches. An agent can look for more, including resale homes.",
-  compare_q:"Which one would you like to know more about?", price_req:"price on request",
-  change_msg:"Sure — let's adjust. I'll keep your purpose and ask the other questions again.",
-  card_from:"From", card_homes:"Homes", card_delivery:"Delivery", card_why:"Why it fits: {x}", card_src:"Price source: {x}", card_more:"Tell me more", card_prices:"Send me the price list", card_ask_agent:"Ask an agent", side_word:"side",
-  badge_ready:"Ready", badge_cit:"Citizenship-level price", badge_combine:"Combine units for citizenship", badge_resale:"Resale only", badge_review:"Developer being re-verified", badge_confirm:"Details to confirm",
-  why_in:"in {x}", why_ready:"ready to move in", why_starts:"starts at {x}", why_cit:"price meets the $400k citizenship level", why_combine:"units can be combined for citizenship",
-  why_good_rental:"good for rental income", why_good_family:"good for family living", why_good_luxury:"lifestyle", why_good_investment:"good for investment", why_good_citizenship:"good for citizenship",
-  why_has1:"has 1+1 units", why_has2:"has 2+1 units", why_has3:"has 3+1 units", why_has4:"has large units", why_hasvilla:"has villas",
-  why_view:"water views", why_metro:"near public transport", why_green:"green setting", why_fac:"pool & gym", why_school:"schools nearby", why_levent:"short commute to Levent/Maslak", why_atasehir:"short commute to Ataşehir", why_short:"suited to short-term rental",
-  proj_notfound:"I couldn't find \"{q}\" in our list. It may be spelled differently — an agent can check it for you. Meanwhile, shall I suggest similar projects?",
-  proj_yes:"Yes — {name} is one of the projects we offer.", proj_pending:"{name} is on our list, and an agent is confirming its latest details. Would you like them to send you the information?",
-  proj_t2:"{name} isn't one of the projects we're currently offering. I can suggest similar homes that we can help you buy — would you like that?", proj_t3:"We don't currently work on {name}, but I can suggest current alternatives. Shall we?",
-  a_flow_q:"Yes, ask me a few questions", a_askproj:"Ask a question about it", a_similar:"Find similar projects", a_alts:"Yes, suggest alternatives",
-  lead_offer:"Would you like one of our agents to send you the latest price lists and floor plans on WhatsApp, and arrange viewings?", a_yes_please:"Yes please", a_not_yet:"Not yet",
-  not_yet_msg:"No problem. Feel free to ask me anything about these homes, the areas or the buying process.", a_legal:"Legal questions", a_new_search:"Start a new search", a_ask_another:"Ask another question", a_keep:"Keep exploring",
-  lead_name:"Great. What's your name?", ph_name:"Your name", lead_phone:"What's your WhatsApp number, with country code?", ph_phone:"+90 …",
-  lead_view:"Would you like to see the homes in person or start with a video tour?", o_v_visit:"In person — I'll visit", o_v_video:"Video tour first", o_v_here:"I'm already in Istanbul",
-  lead_when:"When is a good time to contact you?", o_morning:"Morning", o_afternoon:"Afternoon", o_evening:"Evening", o_anytime:"Any time",
-  consent:"Last thing: may we store these details to contact you about property? We follow Turkey's data protection law (KVKK), use them only for this, and delete them on request.", o_agree:"Yes, I agree", o_decline:"No, don't store them",
-  declined_wa:"No problem — nothing has been saved. You can message us directly on WhatsApp: {wa}", declined:"No problem — nothing has been saved. You can contact the agency directly whenever you're ready.",
-  thanks:"Thank you, {name}! An agent will message you on WhatsApp with price lists for your shortlist.", save_fail_wa:"I couldn't save your details on this page. Please message us on WhatsApp at {wa} and mention this chat.", save_fail:"I couldn't save your details on this page. Please contact the agency directly and mention this chat.",
-  me_more:"Tell me more about {name}", me_prices:"Send me the price list for {name}", ask_project:"Ask about this project…",
-  typing:"Typing…", ai_off:"I can't answer typed questions on this page right now, but the buttons will guide you, and an agent can answer anything else.",
-  e_not_granted:"The assistant needs your permission to answer typed questions. The buttons still work.", e_disabled:"Typed questions aren't available for your account. The buttons still work.", e_rate:"Too many questions at once — please wait a minute.", e_session:"Please sign in again to keep chatting.", e_other:"Something went wrong. Please try again.",
-  load_fail:"The project list couldn't load. Reload the page to try again."
+/* Site text in 5 languages (same set as the chat). Arabic, Persian and Russian need a native-speaker check. */
+const T = {
+en:{nav_services:"Services",nav_projects:"Projects",nav_how:"How it works",nav_faq:"FAQ",nav_contact:"Contact",cta_short:"Ask the advisor",
+ kicker:"New-build homes for international buyers",h1:"Find the right home in Istanbul, with honest advice in your language.",
+ sub:"Tell our advisor what you need. It shortlists vetted new-build projects that fit your budget and goals, then a real agent confirms prices and paperwork before you commit.",
+ cta_main:"Start with the advisor",cta_browse:"Browse projects",stat_projects:"vetted projects",stat_langs:"languages",stat_sides:"sides of the city, Europe and Asia",
+ pv_name:"Your advisor",pv_online:"Online now",pv_q:"Hi! What brings you to Istanbul?",pv_a:"Rental income, around $300k",pv_r:"Great. A few questions so I can shortlist projects that fit…",pv_try:"Try it now",
+ svc_h:"What are you looking for?",svc_p:"Pick a goal and the advisor asks only the questions that matter for it.",svc_go:"Ask the advisor →",
+ svc_cit_t:"Citizenship",svc_cit_p:"Projects that may qualify for citizenship by investment, checked against the current rules by a licensed lawyer.",
+ svc_rent_t:"Rental income",svc_rent_p:"Homes in areas with steady tenant demand: near metro lines, universities and business districts.",
+ svc_fam_t:"Living with family",svc_fam_p:"Safe, green compounds close to international schools, hospitals and good transport.",
+ svc_hol_t:"Holiday home",svc_hol_p:"Sea views and seaside living for the months you spend in Istanbul, easy to rent out when you are away.",
+ proj_h:"A few of the projects we track",proj_p:"Every project is researched and approved by our team before the advisor recommends it.",
+ proj_note:"Starting prices are asking prices from listed sources, with their dates. An agent confirms the current price before you reserve.",proj_more:"Get your personal shortlist",
+ f_all:"All",f_cit:"Citizenship",f_rent:"Rental income",f_fam:"Family",f_lux:"Luxury",f_bud:"Budget",
+ side_eu:"European side",side_as:"Asian side",from:"From",ask:"Ask about this project",ready:"Ready to move in",building:"Under construction",offplan:"Off-plan",
+ how_h:"How it works",how_p:"From first question to keys, without the pressure.",
+ how1_t:"Tell us what you need",how1_p:"Answer a few quick questions in your language: your goal, budget, area and timing.",
+ how2_t:"Get a shortlist",how2_p:"The advisor matches you with vetted projects and explains why each one fits.",
+ how3_t:"Talk to a real agent",how3_p:"An agent confirms prices and availability, arranges visits or video tours, and guides you to the title deed.",
+ why_h:"Why buyers trust us",why1_t:"Researched, dated information",why1_p:"Every price shows its source and date. Sold-out projects are marked, never pushed.",
+ why2_t:"Your language",why2_p:"English, Turkish, Arabic, Persian and Russian, from the first question to the paperwork.",
+ why3_t:"Careful with legal questions",why3_p:"Rules for foreign buyers change. We flag what has changed, and a licensed lawyer confirms your case.",
+ why4_t:"No pressure",why4_p:"Use the advisor for free. You only share your contact details if you want an agent to call you.",
+ faq_h:"Common questions",
+ faq1_q:"Can foreigners buy property in Istanbul?",faq1_a:"Yes. Citizens of most countries can buy property in Turkey, with some limits on certain areas and nationalities. We check this for you before you reserve.",
+ faq2_q:"Does buying a home give me Turkish citizenship?",faq2_a:"Some purchases can qualify for citizenship by investment, but the rules and checks have become stricter. Eligibility is confirmed case by case by a licensed lawyer before you buy.",
+ faq3_q:"Do I need to come to Istanbul to buy?",faq3_a:"Not always. Many steps can be done remotely with a power of attorney, but we recommend visiting before you buy. We can arrange video tours first.",
+ faq4_q:"What does the advisor cost?",faq4_a:"The advisor is free to use. Any service fees are explained to you in writing before you commit to anything.",
+ faq5_q:"What happens to my personal data?",faq5_a:"We only save your details if you agree, under Turkey's personal data protection law (KVKK). You can ask us to delete them at any time.",
+ contact_h:"Ready to start?",contact_p:"Ask the advisor anything, any time. When you are ready, an agent will take it from there.",wa:"WhatsApp us",
+ foot:"General information only, not legal or financial advice.",privacy:"Privacy / KVKK",fab:"Chat with the advisor",close:"Close chat",popout:"Open full screen"},
+tr:{nav_services:"Hizmetler",nav_projects:"Projeler",nav_how:"Nasıl çalışır",nav_faq:"SSS",nav_contact:"İletişim",cta_short:"Danışmana sorun",
+ kicker:"Yabancı alıcılar için yeni konut projeleri",h1:"İstanbul'da doğru evi, kendi dilinizde dürüst tavsiyeyle bulun.",
+ sub:"Danışmanımıza ne aradığınızı anlatın. Bütçenize ve hedefinize uyan, incelenmiş yeni projeleri listeler; karar vermeden önce gerçek bir danışman fiyatları ve evrakları teyit eder.",
+ cta_main:"Danışmanla başlayın",cta_browse:"Projelere göz atın",stat_projects:"incelenmiş proje",stat_langs:"dil",stat_sides:"yaka: Avrupa ve Asya",
+ pv_name:"Danışmanınız",pv_online:"Şu an çevrimiçi",pv_q:"Merhaba! İstanbul'da ne arıyorsunuz?",pv_a:"Kira geliri, yaklaşık 300 bin $",pv_r:"Harika. Size uygun projeleri seçebilmem için birkaç soru…",pv_try:"Hemen deneyin",
+ svc_h:"Ne arıyorsunuz?",svc_p:"Bir hedef seçin; danışman yalnızca o hedef için önemli soruları sorar.",svc_go:"Danışmana sorun →",
+ svc_cit_t:"Vatandaşlık",svc_cit_p:"Yatırım yoluyla vatandaşlığa uygun olabilecek projeler; güncel kurallara göre lisanslı bir avukat tarafından kontrol edilir.",
+ svc_rent_t:"Kira geliri",svc_rent_p:"Kiracı talebi sürekli olan bölgelerde konutlar: metro hatlarına, üniversitelere ve iş merkezlerine yakın.",
+ svc_fam_t:"Aileyle yaşam",svc_fam_p:"Uluslararası okullara, hastanelere ve ulaşıma yakın, güvenli ve yeşil siteler.",
+ svc_hol_t:"Tatil evi",svc_hol_p:"İstanbul'da geçirdiğiniz aylar için deniz manzaralı yaşam; yokken kiraya vermesi kolay.",
+ proj_h:"Takip ettiğimiz projelerden bazıları",proj_p:"Danışman bir projeyi önermeden önce ekibimiz onu araştırır ve onaylar.",
+ proj_note:"Başlangıç fiyatları, kaynak ve tarihleriyle birlikte ilan edilen fiyatlardır. Rezervasyondan önce güncel fiyatı bir danışman teyit eder.",proj_more:"Size özel listenizi alın",
+ f_all:"Tümü",f_cit:"Vatandaşlık",f_rent:"Kira geliri",f_fam:"Aile",f_lux:"Lüks",f_bud:"Uygun fiyat",
+ side_eu:"Avrupa Yakası",side_as:"Anadolu Yakası",from:"Başlangıç",ask:"Bu projeyi sorun",ready:"Teslime hazır",building:"İnşaat halinde",offplan:"Proje aşamasında",
+ how_h:"Nasıl çalışır",how_p:"İlk sorudan anahtar teslimine, baskı olmadan.",
+ how1_t:"İhtiyacınızı anlatın",how1_p:"Kendi dilinizde birkaç kısa soruyu yanıtlayın: hedef, bütçe, bölge ve zaman.",
+ how2_t:"Listenizi alın",how2_p:"Danışman sizi incelenmiş projelerle eşleştirir ve her birinin neden uygun olduğunu açıklar.",
+ how3_t:"Gerçek bir danışmanla görüşün",how3_p:"Danışman fiyat ve müsaitliği teyit eder, ziyaret veya video tur ayarlar ve tapuya kadar size eşlik eder.",
+ why_h:"Alıcılar neden bize güveniyor",why1_t:"Araştırılmış, tarihli bilgi",why1_p:"Her fiyatın kaynağı ve tarihi görünür. Satışı biten projeler işaretlenir, asla zorlanmaz.",
+ why2_t:"Kendi dilinizde",why2_p:"İlk sorudan evraklara kadar İngilizce, Türkçe, Arapça, Farsça ve Rusça.",
+ why3_t:"Hukuki konularda dikkatli",why3_p:"Yabancı alıcılara ilişkin kurallar değişir. Değişiklikleri belirtiriz; durumunuzu lisanslı bir avukat teyit eder.",
+ why4_t:"Baskı yok",why4_p:"Danışmanı ücretsiz kullanın. İletişim bilgilerinizi yalnızca bir danışmanın sizi aramasını isterseniz paylaşırsınız.",
+ faq_h:"Sık sorulan sorular",
+ faq1_q:"Yabancılar İstanbul'da mülk alabilir mi?",faq1_a:"Evet. Çoğu ülkenin vatandaşları Türkiye'de mülk alabilir; bazı bölgeler ve uyruklar için sınırlamalar vardır. Rezervasyondan önce bunu sizin için kontrol ederiz.",
+ faq2_q:"Ev almak Türk vatandaşlığı sağlar mı?",faq2_a:"Bazı alımlar yatırım yoluyla vatandaşlığa uygun olabilir, ancak kurallar ve kontroller sıkılaştı. Uygunluk, satın almadan önce lisanslı bir avukat tarafından duruma göre teyit edilir.",
+ faq3_q:"Satın almak için İstanbul'a gelmem gerekir mi?",faq3_a:"Her zaman değil. Birçok adım vekaletname ile uzaktan yapılabilir, ancak satın almadan önce gelmenizi öneririz. Önce video tur ayarlayabiliriz.",
+ faq4_q:"Danışmanın ücreti nedir?",faq4_a:"Danışman ücretsizdir. Herhangi bir hizmet bedeli, bir taahhütte bulunmadan önce size yazılı olarak açıklanır.",
+ faq5_q:"Kişisel verilerime ne olur?",faq5_a:"Bilgilerinizi yalnızca onay verirseniz, KVKK kapsamında kaydederiz. İstediğiniz zaman silinmesini talep edebilirsiniz.",
+ contact_h:"Başlamaya hazır mısınız?",contact_p:"Danışmana istediğiniz zaman her şeyi sorun. Hazır olduğunuzda bir danışman devam eder.",wa:"WhatsApp'tan yazın",
+ foot:"Yalnızca genel bilgidir; hukuki veya mali tavsiye değildir.",privacy:"Gizlilik / KVKK",fab:"Danışmanla sohbet edin",close:"Sohbeti kapat",popout:"Tam ekran aç"},
+ar:{nav_services:"الخدمات",nav_projects:"المشاريع",nav_how:"كيف نعمل",nav_faq:"الأسئلة الشائعة",nav_contact:"تواصل معنا",cta_short:"اسأل المستشار",
+ kicker:"منازل جديدة للمشترين الأجانب",h1:"اعثر على المنزل المناسب في إسطنبول، مع نصيحة صادقة بلغتك.",
+ sub:"أخبر مستشارنا بما تحتاجه. سيختار لك مشاريع جديدة موثوقة تناسب ميزانيتك وأهدافك، ثم يؤكد وكيل حقيقي الأسعار والأوراق قبل أن تلتزم.",
+ cta_main:"ابدأ مع المستشار",cta_browse:"تصفح المشاريع",stat_projects:"مشروعًا موثوقًا",stat_langs:"لغات",stat_sides:"جانبا المدينة: الأوروبي والآسيوي",
+ pv_name:"مستشارك",pv_online:"متصل الآن",pv_q:"مرحبًا! ما الذي تبحث عنه في إسطنبول؟",pv_a:"دخل إيجاري، حوالي 300 ألف دولار",pv_r:"رائع. بعض الأسئلة لأختار لك المشاريع المناسبة…",pv_try:"جرّبه الآن",
+ svc_h:"ما الذي تبحث عنه؟",svc_p:"اختر هدفك، وسيسألك المستشار فقط الأسئلة المهمة له.",svc_go:"اسأل المستشار ←",
+ svc_cit_t:"الجنسية",svc_cit_p:"مشاريع قد تكون مؤهلة للجنسية عبر الاستثمار، يتحقق منها محامٍ مرخّص وفق القواعد الحالية.",
+ svc_rent_t:"دخل إيجاري",svc_rent_p:"منازل في مناطق عليها طلب مستمر من المستأجرين: قرب المترو والجامعات ومراكز الأعمال.",
+ svc_fam_t:"العيش مع العائلة",svc_fam_p:"مجمعات آمنة وخضراء قرب المدارس الدولية والمستشفيات والمواصلات.",
+ svc_hol_t:"منزل لقضاء العطلات",svc_hol_p:"إطلالات بحرية للأشهر التي تقضيها في إسطنبول، وسهل التأجير في غيابك.",
+ proj_h:"بعض المشاريع التي نتابعها",proj_p:"يبحث فريقنا كل مشروع ويوافق عليه قبل أن يوصي به المستشار.",
+ proj_note:"أسعار البدء هي الأسعار المعلنة من المصادر مع تواريخها. يؤكد الوكيل السعر الحالي قبل الحجز.",proj_more:"احصل على قائمتك الخاصة",
+ f_all:"الكل",f_cit:"الجنسية",f_rent:"دخل إيجاري",f_fam:"العائلة",f_lux:"فاخر",f_bud:"اقتصادي",
+ side_eu:"الجانب الأوروبي",side_as:"الجانب الآسيوي",from:"يبدأ من",ask:"اسأل عن هذا المشروع",ready:"جاهز للسكن",building:"قيد الإنشاء",offplan:"على المخطط",
+ how_h:"كيف نعمل",how_p:"من السؤال الأول حتى استلام المفاتيح، دون ضغط.",
+ how1_t:"أخبرنا بما تحتاجه",how1_p:"أجب عن بعض الأسئلة السريعة بلغتك: هدفك وميزانيتك والمنطقة والتوقيت.",
+ how2_t:"احصل على قائمة مختصرة",how2_p:"يطابقك المستشار مع مشاريع موثوقة ويشرح لماذا يناسبك كل منها.",
+ how3_t:"تحدث مع وكيل حقيقي",how3_p:"يؤكد الوكيل الأسعار والتوفر، وينظم الزيارات أو الجولات بالفيديو، ويرافقك حتى سند الملكية.",
+ why_h:"لماذا يثق بنا المشترون",why1_t:"معلومات مدروسة ومؤرخة",why1_p:"كل سعر يظهر مصدره وتاريخه. المشاريع المباعة بالكامل مُعلَّمة ولا نروّج لها.",
+ why2_t:"بلغتك",why2_p:"الإنجليزية والتركية والعربية والفارسية والروسية، من السؤال الأول حتى الأوراق.",
+ why3_t:"حذر في المسائل القانونية",why3_p:"قواعد المشترين الأجانب تتغير. ننبهك إلى ما تغيّر، ويؤكد محامٍ مرخّص حالتك.",
+ why4_t:"دون ضغط",why4_p:"استخدم المستشار مجانًا. لا تشارك بيانات التواصل إلا إذا أردت أن يتصل بك وكيل.",
+ faq_h:"أسئلة شائعة",
+ faq1_q:"هل يمكن للأجانب شراء عقار في إسطنبول؟",faq1_a:"نعم. يمكن لمواطني معظم الدول شراء عقار في تركيا، مع بعض القيود على مناطق وجنسيات معينة. نتحقق من ذلك لك قبل الحجز.",
+ faq2_q:"هل يمنحني شراء منزل الجنسية التركية؟",faq2_a:"قد تؤهل بعض المشتريات للجنسية عبر الاستثمار، لكن القواعد والتدقيق أصبحت أكثر صرامة. يؤكد محامٍ مرخّص الأهلية لكل حالة قبل الشراء.",
+ faq3_q:"هل يجب أن آتي إلى إسطنبول للشراء؟",faq3_a:"ليس دائمًا. يمكن إنجاز كثير من الخطوات عن بُعد بوكالة رسمية، لكننا ننصح بالزيارة قبل الشراء. يمكننا ترتيب جولات بالفيديو أولًا.",
+ faq4_q:"كم تكلفة المستشار؟",faq4_a:"المستشار مجاني. أي رسوم خدمة تُشرح لك كتابيًا قبل أن تلتزم بأي شيء.",
+ faq5_q:"ماذا يحدث لبياناتي الشخصية؟",faq5_a:"لا نحفظ بياناتك إلا بموافقتك، وفق قانون حماية البيانات الشخصية التركي (KVKK). يمكنك طلب حذفها في أي وقت.",
+ contact_h:"هل أنت مستعد للبدء؟",contact_p:"اسأل المستشار أي شيء في أي وقت. وعندما تكون جاهزًا، يتابع معك وكيل.",wa:"راسلنا على واتساب",
+ foot:"معلومات عامة فقط، وليست نصيحة قانونية أو مالية.",privacy:"الخصوصية / KVKK",fab:"تحدث مع المستشار",close:"إغلاق المحادثة",popout:"فتح بملء الشاشة"},
+fa:{nav_services:"خدمات",nav_projects:"پروژه‌ها",nav_how:"روند کار",nav_faq:"پرسش‌ها",nav_contact:"تماس",cta_short:"از مشاور بپرسید",
+ kicker:"خانه‌های نوساز برای خریداران خارجی",h1:"خانهٔ مناسب در استانبول را با مشاوره‌ای صادقانه به زبان خودتان پیدا کنید.",
+ sub:"به مشاور ما بگویید چه می‌خواهید. پروژه‌های نوساز بررسی‌شده‌ای را که با بودجه و هدف شما جور است انتخاب می‌کند و پیش از هر تعهدی، یک مشاور واقعی قیمت‌ها و مدارک را تأیید می‌کند.",
+ cta_main:"با مشاور شروع کنید",cta_browse:"دیدن پروژه‌ها",stat_projects:"پروژهٔ بررسی‌شده",stat_langs:"زبان",stat_sides:"سوی شهر، اروپایی و آسیایی",
+ pv_name:"مشاور شما",pv_online:"اکنون آنلاین",pv_q:"سلام! برای چه به استانبول می‌آیید؟",pv_a:"درآمد اجاره، حدود ۳۰۰ هزار دلار",pv_r:"عالی. چند سؤال تا پروژه‌های مناسب را انتخاب کنم…",pv_try:"همین حالا امتحان کنید",
+ svc_h:"دنبال چه هستید؟",svc_p:"یک هدف انتخاب کنید؛ مشاور فقط سؤال‌های مهم برای همان هدف را می‌پرسد.",svc_go:"از مشاور بپرسید ←",
+ svc_cit_t:"شهروندی",svc_cit_p:"پروژه‌هایی که ممکن است برای شهروندی از راه سرمایه‌گذاری واجد شرایط باشند و وکیل دارای مجوز آن‌ها را با قوانین فعلی بررسی می‌کند.",
+ svc_rent_t:"درآمد اجاره",svc_rent_p:"خانه‌هایی در مناطق پرتقاضا برای مستأجر: نزدیک مترو، دانشگاه‌ها و مراکز تجاری.",
+ svc_fam_t:"زندگی با خانواده",svc_fam_p:"مجتمع‌های امن و سرسبز نزدیک مدارس بین‌المللی، بیمارستان‌ها و حمل‌ونقل.",
+ svc_hol_t:"خانهٔ تعطیلات",svc_hol_p:"چشم‌انداز دریا برای ماه‌هایی که در استانبول هستید؛ اجاره دادنش در نبودتان آسان است.",
+ proj_h:"چند پروژه از پروژه‌هایی که دنبال می‌کنیم",proj_p:"تیم ما هر پروژه را پیش از پیشنهاد مشاور بررسی و تأیید می‌کند.",
+ proj_note:"قیمت‌های شروع، قیمت‌های اعلام‌شده از منابع همراه با تاریخ آن‌هاست. پیش از رزرو، مشاور قیمت فعلی را تأیید می‌کند.",proj_more:"فهرست ویژهٔ خودتان را بگیرید",
+ f_all:"همه",f_cit:"شهروندی",f_rent:"درآمد اجاره",f_fam:"خانواده",f_lux:"لوکس",f_bud:"اقتصادی",
+ side_eu:"بخش اروپایی",side_as:"بخش آسیایی",from:"از",ask:"دربارهٔ این پروژه بپرسید",ready:"آمادهٔ سکونت",building:"در حال ساخت",offplan:"پیش‌فروش",
+ how_h:"روند کار",how_p:"از اولین سؤال تا تحویل کلید، بدون فشار.",
+ how1_t:"بگویید چه می‌خواهید",how1_p:"به چند سؤال کوتاه به زبان خودتان پاسخ دهید: هدف، بودجه، منطقه و زمان.",
+ how2_t:"فهرست کوتاه بگیرید",how2_p:"مشاور شما را با پروژه‌های بررسی‌شده تطبیق می‌دهد و توضیح می‌دهد چرا هر کدام مناسب است.",
+ how3_t:"با یک مشاور واقعی صحبت کنید",how3_p:"مشاور قیمت و موجودی را تأیید می‌کند، بازدید یا تور ویدیویی ترتیب می‌دهد و تا سند همراهتان است.",
+ why_h:"چرا خریداران به ما اعتماد می‌کنند",why1_t:"اطلاعات بررسی‌شده و تاریخ‌دار",why1_p:"منبع و تاریخ هر قیمت نمایش داده می‌شود. پروژه‌های فروخته‌شده علامت دارند و هرگز تحمیل نمی‌شوند.",
+ why2_t:"به زبان شما",why2_p:"انگلیسی، ترکی، عربی، فارسی و روسی، از اولین سؤال تا مدارک.",
+ why3_t:"دقیق در مسائل حقوقی",why3_p:"قوانین خرید خارجی‌ها تغییر می‌کند. تغییرات را اعلام می‌کنیم و وکیل دارای مجوز پروندهٔ شما را تأیید می‌کند.",
+ why4_t:"بدون فشار",why4_p:"از مشاور رایگان استفاده کنید. فقط اگر بخواهید مشاوری با شما تماس بگیرد اطلاعات تماس می‌دهید.",
+ faq_h:"پرسش‌های رایج",
+ faq1_q:"آیا خارجی‌ها می‌توانند در استانبول ملک بخرند؟",faq1_a:"بله. شهروندان بیشتر کشورها می‌توانند در ترکیه ملک بخرند، با برخی محدودیت‌ها برای مناطق و ملیت‌های خاص. پیش از رزرو این را برایتان بررسی می‌کنیم.",
+ faq2_q:"آیا خرید خانه شهروندی ترکیه می‌دهد؟",faq2_a:"برخی خریدها ممکن است برای شهروندی از راه سرمایه‌گذاری واجد شرایط باشند، اما قوانین و بررسی‌ها سخت‌گیرانه‌تر شده‌اند. واجد شرایط بودن پیش از خرید، مورد به مورد توسط وکیل دارای مجوز تأیید می‌شود.",
+ faq3_q:"آیا برای خرید باید به استانبول بیایم؟",faq3_a:"نه همیشه. بسیاری از مراحل با وکالت‌نامه از راه دور انجام می‌شود، اما توصیه می‌کنیم پیش از خرید بازدید کنید. ابتدا می‌توانیم تور ویدیویی ترتیب دهیم.",
+ faq4_q:"هزینهٔ مشاور چقدر است؟",faq4_a:"استفاده از مشاور رایگان است. هر هزینهٔ خدماتی پیش از هر تعهدی به‌صورت کتبی برایتان توضیح داده می‌شود.",
+ faq5_q:"با اطلاعات شخصی من چه می‌شود؟",faq5_a:"فقط با رضایت شما و طبق قانون حفاظت از داده‌های شخصی ترکیه (KVKK) اطلاعاتتان را ذخیره می‌کنیم. هر زمان بخواهید می‌توانید حذف آن را درخواست کنید.",
+ contact_h:"آماده‌اید شروع کنید؟",contact_p:"هر زمان هر سؤالی دارید از مشاور بپرسید. وقتی آماده بودید، یک مشاور ادامه می‌دهد.",wa:"در واتساپ پیام دهید",
+ foot:"فقط اطلاعات عمومی است، نه مشاورهٔ حقوقی یا مالی.",privacy:"حریم خصوصی / KVKK",fab:"گفت‌وگو با مشاور",close:"بستن گفت‌وگو",popout:"باز کردن تمام‌صفحه"},
+ru:{nav_services:"Услуги",nav_projects:"Проекты",nav_how:"Как это работает",nav_faq:"Вопросы",nav_contact:"Контакты",cta_short:"Спросить консультанта",
+ kicker:"Новостройки для иностранных покупателей",h1:"Найдите подходящий дом в Стамбуле с честным советом на вашем языке.",
+ sub:"Расскажите консультанту, что вам нужно. Он подберёт проверенные новостройки под ваш бюджет и цели, а настоящий агент подтвердит цены и документы до того, как вы примете решение.",
+ cta_main:"Начать с консультантом",cta_browse:"Смотреть проекты",stat_projects:"проверенных проектов",stat_langs:"языков",stat_sides:"берега: европейский и азиатский",
+ pv_name:"Ваш консультант",pv_online:"Сейчас онлайн",pv_q:"Здравствуйте! Что вы ищете в Стамбуле?",pv_a:"Доход от аренды, около $300 тыс.",pv_r:"Отлично. Несколько вопросов, чтобы подобрать подходящие проекты…",pv_try:"Попробовать",
+ svc_h:"Что вы ищете?",svc_p:"Выберите цель, и консультант задаст только важные для неё вопросы.",svc_go:"Спросить консультанта →",
+ svc_cit_t:"Гражданство",svc_cit_p:"Проекты, которые могут подходить для гражданства за инвестиции; лицензированный юрист проверяет их по действующим правилам.",
+ svc_rent_t:"Доход от аренды",svc_rent_p:"Жильё в районах со стабильным спросом арендаторов: рядом с метро, университетами и деловыми центрами.",
+ svc_fam_t:"Жизнь с семьёй",svc_fam_p:"Безопасные зелёные комплексы рядом с международными школами, больницами и транспортом.",
+ svc_hol_t:"Дом для отдыха",svc_hol_p:"Вид на море на те месяцы, что вы проводите в Стамбуле; легко сдавать, когда вас нет.",
+ proj_h:"Некоторые проекты, которые мы отслеживаем",proj_p:"Наша команда изучает и одобряет каждый проект, прежде чем консультант его порекомендует.",
+ proj_note:"Стартовые цены — это цены предложения из указанных источников с датами. Агент подтверждает актуальную цену до бронирования.",proj_more:"Получить личную подборку",
+ f_all:"Все",f_cit:"Гражданство",f_rent:"Аренда",f_fam:"Семья",f_lux:"Люкс",f_bud:"Бюджет",
+ side_eu:"Европейская сторона",side_as:"Азиатская сторона",from:"От",ask:"Спросить об этом проекте",ready:"Готов к заселению",building:"Строится",offplan:"На этапе котлована",
+ how_h:"Как это работает",how_p:"От первого вопроса до ключей, без давления.",
+ how1_t:"Расскажите, что вам нужно",how1_p:"Ответьте на несколько коротких вопросов на своём языке: цель, бюджет, район и сроки.",
+ how2_t:"Получите подборку",how2_p:"Консультант подберёт проверенные проекты и объяснит, почему каждый вам подходит.",
+ how3_t:"Поговорите с живым агентом",how3_p:"Агент подтвердит цены и наличие, организует просмотры или видеотуры и проведёт вас до получения титула (тапу).",
+ why_h:"Почему покупатели нам доверяют",why1_t:"Проверенная информация с датами",why1_p:"У каждой цены указаны источник и дата. Распроданные проекты отмечены и никогда не навязываются.",
+ why2_t:"На вашем языке",why2_p:"Английский, турецкий, арабский, персидский и русский — от первого вопроса до документов.",
+ why3_t:"Осторожно с юридическими вопросами",why3_p:"Правила для иностранных покупателей меняются. Мы сообщаем об изменениях, а лицензированный юрист подтверждает ваш случай.",
+ why4_t:"Без давления",why4_p:"Пользуйтесь консультантом бесплатно. Контакты вы оставляете, только если хотите, чтобы агент вам позвонил.",
+ faq_h:"Частые вопросы",
+ faq1_q:"Могут ли иностранцы купить недвижимость в Стамбуле?",faq1_a:"Да. Граждане большинства стран могут покупать недвижимость в Турции, с некоторыми ограничениями для отдельных районов и национальностей. Мы проверим это до бронирования.",
+ faq2_q:"Даёт ли покупка жилья турецкое гражданство?",faq2_a:"Некоторые покупки могут подходить для гражданства за инвестиции, но правила и проверки стали строже. Право на него подтверждает лицензированный юрист в каждом конкретном случае до покупки.",
+ faq3_q:"Нужно ли приезжать в Стамбул для покупки?",faq3_a:"Не всегда. Многие шаги можно пройти удалённо по доверенности, но мы советуем приехать до покупки. Сначала можем организовать видеотуры.",
+ faq4_q:"Сколько стоит консультант?",faq4_a:"Консультант бесплатный. Любые сборы за услуги объясняются письменно до того, как вы примете какие-либо обязательства.",
+ faq5_q:"Что происходит с моими персональными данными?",faq5_a:"Мы сохраняем ваши данные только с вашего согласия, по турецкому закону о защите персональных данных (KVKK). Вы можете попросить удалить их в любое время.",
+ contact_h:"Готовы начать?",contact_p:"Спрашивайте консультанта о чём угодно в любое время. Когда будете готовы, агент продолжит.",wa:"Написать в WhatsApp",
+ foot:"Только общая информация, не юридическая и не финансовая консультация.",privacy:"Конфиденциальность / KVKK",fab:"Чат с консультантом",close:"Закрыть чат",popout:"Открыть на весь экран"}
 };
-const LANGS = [["en","English","English"],["tr","Türkçe","Turkish"],["ar","العربية","Arabic"],["fa","فارسی","Persian"],["ru","Русский","Russian"]];
-let I18N = {};
-let L = "en";
-function t(k, vars){ let s = (I18N[L] && I18N[L][k]) || EN[k] || k; if (vars) for (const [a,b] of Object.entries(vars)) s = s.split("{"+a+"}").join(b); return s; }
-const langName = () => LANGS.find(x=>x[0]===L)[2];
-
-/* ===== Data and state ===== */
-let P = [], NAMES = {tier1x:[], tier2:[], tier3:[]};
-let ctl = null;
-const A = {}; const turns = []; let step = null;
+const LANG_CODES = ["en","tr","ar","fa","ru"];
+let L = "en", P = [], CONFIG = {brand:"Istanbul Home Advisor", whatsapp:""}, filter = "all";
 const $ = s => document.querySelector(s);
+const t = k => (T[L] && T[L][k]) || T.en[k] || k;
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const money = n => n ? "$" + Math.round(n).toLocaleString("en-US") : "";
 
-/* ===== Conversation script (options: [textKey, value]) ===== */
-const BUDGETS = {"u250":[0,250000],"250-400":[250000,400000],"400-600":[400000,600000],"600-1m":[600000,1000000],"1-2m":[1000000,2000000],"2m+":[2000000,1e12]};
-const FAM = [["o_fam_single","single"],["o_fam_couple","couple"],["o_fam_family","family"],["o_unsure","unsure"]];
-const S = {
-  start:{say:"start", options:[["o_citizenship","citizenship"],["o_rental","rental"],["o_living","living"],["o_holiday","holiday"],["o_investment","investment"],["o_project","project"],["o_legal","legal"],["o_explore","explore"]],
-    next:v=>({citizenship:"cit_know",rental:"rent_kind",living:"live_who",holiday:"hol_use",investment:"inv_horizon",project:"proj_name",legal:"legal_topic",explore:"exp_intro"}[v])},
-  cit_know:{say:"cit_know", options:[["o_know_yes","yes"],["o_know_no","no"]], next:v=> v==="no" ? "cit_explain" : "cit_family"},
-  cit_explain:{say:"cit_explain", options:FAM, key:"family", next:"cit_combine"},
-  cit_family:{say:"cit_family", options:FAM, key:"family", next:"cit_combine"},
-  cit_combine:{say:"cit_combine", options:[["o_one","one"],["o_combine","combine"],["o_either_agent","either"]], key:"combine", next:"cit_timeline"},
-  cit_timeline:{say:"cit_timeline", options:[["o_asap","asap"],["o_6m","6m"],["o_12m","12m"],["o_later","later"]], key:"citTime", next:v=>{ if (v==="asap"||v==="6m") A.timing="ready"; return "nationality"; }},
-  rent_kind:{say:"rent_kind", options:[["o_short","short"],["o_long","long"],["o_advise","unsure"]], key:"rentKind", next:"rent_manage"},
-  rent_manage:{say:"rent_manage", options:[["o_managed","yes"],["o_self","no"],["o_maybe_later","maybe"]], key:"manage", next:"rent_tenant"},
-  rent_tenant:{say:"rent_tenant", options:[["o_business","business"],["o_students","students"],["o_families","families"],["o_tourists","tourists"]], multi:true, key:"tenants", next:"nationality"},
-  live_who:{say:"live_who", options:[["o_single","single"],["o_couple","couple"],["o_family","family"],["o_retire","retire"]], key:"household", next:v=> v==="family" ? "live_school" : "live_work"},
-  live_school:{say:"live_school", options:[["o_school_yes","yes"],["o_nice","nice"],["o_no","no"]], key:"schools", next:"live_work"},
-  live_work:{say:"live_work", options:[["o_levent","levent"],["o_atasehir","atasehir"],["o_remote","remote"],["o_notdecided","unsure"]], key:"work", next:"live_ready"},
-  live_ready:{say:"live_ready", options:[["o_ready_only","ready"],["o_can_wait","any"]], key:"timing", next:"nationality"},
-  hol_use:{say:"hol_use", options:[["o_weeks","weeks"],["o_months","months"],["o_half","half"]], key:"stay", next:"hol_rent"},
-  hol_rent:{say:"hol_rent", options:[["o_yes","yes"],["o_no","no"],["o_maybe","maybe"]], key:"rentAway", next:"nationality"},
-  inv_horizon:{say:"inv_horizon", options:[["o_h_short","short"],["o_h_mid","mid"],["o_h_long","long"]], key:"horizon", next:"inv_risk"},
-  inv_risk:{say:"inv_risk", options:[["o_offplan","offplan"],["o_near","near"],["o_ready_deed","ready"]], key:"risk", next:v=>{ if (v==="ready") A.timing="ready"; return "nationality"; }},
-  exp_intro:{say:"exp_intro", options:[["o_value","value"],["o_view","view"],["o_metro","metro"],["o_green","green"]], multi:true, key:"priorities", next:"nationality"},
-  nationality:{say:"nationality", input:true, key:"country", ph:"ph_country", next:"budget"},
-  budget:{say:()=> A.goal==="citizenship" ? "budget_cit" : "budget",
-    options:()=>Object.keys(BUDGETS).filter(k=> A.goal!=="citizenship" || !["u250","250-400"].includes(k) || A.combine==="combine").map(k=>["b_"+k,k]).concat([["o_type","type"]]), key:"budget",
-    next:v=> v==="type" ? "budget_type" : "payment"},
-  budget_type:{say:"budget_type", input:true, key:"budgetText", ph:"ph_budget", next:"payment"},
-  payment:{say:"payment", options:[["o_cash","cash"],["o_plan","plan"],["o_unsure","unsure"]], key:"payment", next:"side"},
-  side:{say:"side", options:[["o_european","european"],["o_asian","asian"],["o_any","any"],["o_area","area"]], key:"side", next:v=> v==="area" ? "area" : "rooms"},
-  area:{say:"area", input:true, key:"area", ph:"ph_area", next:"rooms"},
-  rooms:{say:"rooms", options:[["o_r1","1"],["o_r2","2"],["o_r3","3"],["o_r4","4"],["o_villa","villa"],["o_flex","any"]], key:"rooms", next:"timing", skip:()=> A.goal==="citizenship" && A.combine==="combine"},
-  timing:{say:"timing", options:[["o_now","ready"],["o_year","year"],["o_offok","any"]], key:"timing", next:"priorities", skip:()=> !!A.timing},
-  priorities:{say:"priorities", options:[["o_p_view","view"],["o_p_metro","metro"],["o_p_green","green"],["o_p_fac","facilities"],["o_p_airport","airport"],["o_p_value","value"]], multi:true, key:"priorities", next:"recommend", skip:()=> !!A.priorities},
-  proj_name:{say:"proj_name", input:true, key:"projectQuery", ph:"ph_project", next:"proj_answer"},
-  legal_topic:{say:"legal_topic", options:[["o_l_cit","cit"],["o_l_deed","deed"],["o_l_tax","tax"],["o_l_res","res"],["o_l_steps","steps"],["o_l_pay","pay"]], key:"legal", next:"legal_answer"},
-};
-const PROGRESS = ["nationality","budget","payment","side","rooms","timing","priorities"];
-
-/* ===== Recommendation engine ===== */
-function budgetRange(){
-  if (A.budget && BUDGETS[A.budget]) return BUDGETS[A.budget];
-  const s = String(A.budgetText||"").toLowerCase().replace(/[,\s]/g,"").replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g,d=>"۰۱۲۳۴۵۶۷۸۹".indexOf(d));
-  const m = s.match(/([\d.]+)(k|m|million|milyon|млн|тыс|thousand|bin|هزار|میلیون|مليون|ألف|الف)?/); if (!m) return null;
-  let n = parseFloat(m[1]); const u = m[2]||"";
-  if (/^(m|million|milyon|млн|میلیون|مليون)/.test(u)) n*=1e6; else if (u) n*=1e3; else if (n < 10000) n*=1000;
-  return [n*0.6, n*1.1];
-}
-const hasRooms = (p,r) => { const s = (p.unitTypes+" "+p.type).toLowerCase(); if (r==="villa") return /villa/.test(s); if (r==="4") return /[4-9]\+\d/.test(s); if (r==="1") return /1\+1|studio|1\+0/.test(s); return s.includes(r+"+1"); };
-function rank(){
-  const br = budgetRange(); const pri = A.priorities||[]; const out = [];
-  for (const p of P){
-    let s = {high:4, medium:2, low:-1}[p.conf] ?? -2; const why = [];
-    const txt = (p.desc+" "+p.views+" "+p.fac+" "+p.transport+" "+p.district+" "+p.hood).toLowerCase();
-    if (A.side && A.side!=="any" && A.side!=="area" && !String(p.side).toLowerCase().includes(A.side)) continue;
-    if (A.area){ const a = A.area.toLowerCase(); if ((p.district+" "+p.hood).toLowerCase().includes(a)) { s+=5; why.push(t("why_in",{x:p.district})); } else s-=3; }
-    if (A.timing==="ready"){ if (!/ready|delivered|completed/i.test(p.status+" "+p.delivery)) continue; why.push(t("why_ready")); }
-    if (br){ if (!p.fromUSD) s-=2; else if (p.fromUSD < br[0]*0.7 || p.fromUSD > br[1]) continue; else { s+=3; why.push(t("why_starts",{x:money(p.fromUSD)})); } }
-    if (A.goal==="citizenship"){ if (/^no\b/i.test(p.cit)) continue; if (/^yes/i.test(p.cit)) { s+=3; why.push(t("why_cit")); } else if (/bundle/i.test(p.cit) && A.combine!=="one") { s+=1; why.push(t("why_combine")); } else if (A.combine==="one") s-=3; }
-    const bf = (p.bestFor||[]).join(" ").toLowerCase();
-    const tag = {citizenship:"citizenship", rental:"rental", living:"family", holiday:"luxury", investment:"investment"}[A.goal];
-    if (tag && bf.includes(tag)) { s+=2; why.push(t("why_good_"+tag)); }
-    if (A.rooms && A.rooms!=="any"){ if (hasRooms(p,A.rooms)) { s+=2; why.push(t("why_has"+A.rooms)); } else s-=2; }
-    if (pri.includes("view") && /sea|bosphorus|deniz|boğaz|lake/.test(txt)) { s+=2; why.push(t("why_view")); }
-    if (pri.includes("metro") && /metro|marmaray|metrobus|tram/.test(txt)) { s+=2; why.push(t("why_metro")); }
-    if (pri.includes("green") && /green|forest|park|garden|quiet/.test(txt)) { s+=1; why.push(t("why_green")); }
-    if (pri.includes("facilities") && /pool|gym|spa|fitness/.test(txt)) { s+=1; why.push(t("why_fac")); }
-    if (pri.includes("airport") && /airport/.test(txt)) s+=1;
-    if (A.schools==="yes" && /school|college|kolej|university/.test(txt)) { s+=2; why.push(t("why_school")); }
-    if (A.work==="levent" && /levent|maslak|şişli|sisli|beşiktaş|besiktas|kağıthane|kagithane|sarıyer|sariyer/.test(txt)) { s+=2; why.push(t("why_levent")); }
-    if (A.work==="atasehir" && /ataşehir|atasehir|kadıköy|kadikoy|ümraniye|umraniye|üsküdar|uskudar/.test(txt)) { s+=2; why.push(t("why_atasehir")); }
-    if (A.rentKind==="short" && /airbnb|tourist|taksim|beyoğlu|beyoglu|sultanahmet/.test(txt)) { s+=2; why.push(t("why_short")); }
-    if (A.risk==="offplan" && /off-plan|under construction/i.test(p.status)) s+=2;
-    if (p.risk.includes("developer-investigation")) s-=6;
-    if (p.risk.includes("no-developer-stock")) s-=3;
-    out.push({p, s, why:[...new Set(why)].slice(0,3)});
-  }
-  return out.sort((a,b)=>b.s-a.s);
-}
-
-/* ===== UI ===== */
-function scrollDown(){ const l = $("#log"); requestAnimationFrame(()=> l.scrollTop = l.scrollHeight); }
-function addMsg(kind, text){ const d = document.createElement("div"); d.className = "msg "+kind; d.dir = "auto"; d.textContent = text; $("#log").append(d); scrollDown(); return d; }
-function card(r){
-  const p = r.p, b = [];
-  if (/ready|delivered|completed/i.test(p.status)) b.push(`<span class="badge ok">${t("badge_ready")}</span>`); else if (p.status) b.push(`<span class="badge">${esc(p.status)}</span>`);
-  if (/^yes/i.test(p.cit)) b.push(`<span class="badge ok">${t("badge_cit")}</span>`); else if (/bundle/i.test(p.cit)) b.push(`<span class="badge warn">${t("badge_combine")}</span>`);
-  if (p.risk.includes("no-developer-stock")) b.push(`<span class="badge warn">${t("badge_resale")}</span>`);
-  if (p.risk.includes("developer-investigation")) b.push(`<span class="badge risk">${t("badge_review")}</span>`);
-  if (p.conf==="low") b.push(`<span class="badge warn">${t("badge_confirm")}</span>`);
-  return `<article class="card" data-id="${esc(p.id)}" dir="auto">
-    <h3 dir="ltr">${esc(p.name)}</h3>
-    <div class="where" dir="ltr">${esc([p.district,p.hood].filter(Boolean).join(" · "))}${p.dev? " · "+esc(p.dev):""}</div>
-    <div class="badges">${b.join("")}</div>
-    <div class="facts"><div><span>${t("card_from")}</span><b class="price">${esc(money(p.fromUSD) || t("price_req"))}</b></div><div><span>${t("card_homes")}</span><bdi>${esc(p.unitTypes||"—")}</bdi></div><div><span>${t("card_delivery")}</span><bdi>${esc(p.delivery||p.status||"—")}</bdi></div></div>
-    ${r.why.length? `<div class="fit">${esc(t("card_why",{x:r.why.join(L==="ar"||L==="fa"?"، ":", ")}))}</div>`:""}
-    ${p.priceSrc? `<div class="src">${esc(t("card_src",{x:p.priceSrc}))}</div>`:""}
-    <div class="cardacts"><button class="btn small ghost more" type="button">${t("card_more")}</button><button class="btn small ghost agent" type="button">${t("card_prices")}</button></div>
-  </article>`;
-}
-function showCards(list){ const d = document.createElement("div"); d.className = "recs"; d.innerHTML = list.map(card).join(""); $("#log").append(d); scrollDown(); }
-function setReplies(opts, multi){
-  const r = $("#replies"); r.innerHTML = "";
-  (opts||[]).forEach(([key, value, cls]) => { const b = document.createElement("button"); b.type="button"; b.className="reply"+(cls?" "+cls:""); b.textContent=t(key); b.dataset.v=value; if (multi) b.setAttribute("aria-pressed","false"); r.append(b); });
-  if (multi){ const d = document.createElement("button"); d.type="button"; d.className="reply"; d.textContent=t("done"); d.dataset.done="1"; r.append(d); }
-}
-const val = x => typeof x === "function" ? x() : x;
-function setPh(k){ $("#input").placeholder = t(k || "placeholder"); }
-
-/* ===== Flow engine ===== */
-function go(id){
-  step = id; const st = S[id]; if (!st) return;
-  if (st.skip && st.skip()) return go(typeof st.next==="function" ? st.next(A[st.key]) : st.next);
-  addMsg("bot", t(val(st.say), {date:KB_CHECKED}));
-  const n = PROGRESS.indexOf(id); if (n >= 0){ const p = document.createElement("div"); p.className="progress"; p.textContent = t("progress",{n:n+1}); $("#log").append(p); }
-  if (st.input){ setReplies([["skip","__skip","alt"]]); setPh(st.ph || "placeholderAnswer"); $("#input").focus(); }
-  else setReplies(val(st.options), st.multi);
-}
-function answer(value, label){
-  const st = S[step]; if (!st) return;
-  addMsg("me", label);
-  if (st.key) A[st.key] = value;
-  if (step==="start") A.goal = value;
-  setPh();
-  const nxt = typeof st.next==="function" ? st.next(value) : st.next;
-  if (nxt==="recommend") return recommend();
-  if (nxt==="proj_answer") return projectAnswer(value);
-  if (nxt==="legal_answer") return legalAnswer(value);
-  setTimeout(()=>go(nxt), 250);
-}
-function recommend(){
-  step = "results"; const r = rank(); const top = r.slice(0,3);
-  if (!top.length){ addMsg("bot", t("none")); setReplies([["a_widen","widen"],["a_anyside","anyside"],["a_offplan","offplan"],["a_agent","lead"]]); return; }
-  addMsg("bot", summaryLine() + "\n\n" + t("top",{n:top.length}));
-  showCards(top); window._ranked = r; window._shown = 3;
-  setReplies([["a_more","more"],["a_compare","compare"],["a_change","change"],["a_prices","lead"]]);
-}
-function summaryLine(){
-  const goal = t("g_"+(A.goal||"default"));
-  const bud = A.budget && BUDGETS[A.budget] ? t("b_"+A.budget) : (A.budgetText || t("open_budget"));
-  const side = A.area ? A.area : t("s_"+({european:"european",asian:"asian"}[A.side]||"any"));
-  return t("summary",{goal, budget:bud, side, ready: A.timing==="ready" ? t("summary_ready") : ""});
-}
-function projectAnswer(q){
-  step = "after"; const hits = lookupName(q);
-  if (!hits.length){ addMsg("bot", t("proj_notfound",{q})); setReplies([["a_flow_q","flow"],["a_agent","lead"]]); return; }
-  const h = hits[0];
-  if (h.tier===1){ const p = P.find(x=>x.id===h.id);
-    if (p){ addMsg("bot", t("proj_yes",{name:p.name}) + (L==="en" && p.desc ? "\n\n"+p.desc : "")); showCards([{p, s:0, why:[]}]); setReplies([["a_askproj","askproj"],["a_similar","flow"],["card_prices","lead"]]); return; }
-    addMsg("bot", t("proj_pending",{name:h.name})); }
-  else addMsg("bot", t(h.tier===2 ? "proj_t2" : "proj_t3", {name:h.name}));
-  setReplies([["a_alts","flow"],["a_agent","lead"]]);
-}
-function legalAnswer(topic){
-  step = "after";
-  addMsg("bot", t("l_"+topic) + "\n\n" + t("l_disclaimer",{date:KB_CHECKED}));
-  setReplies([["a_another_legal","legal"],["a_find_homes","flow"],["a_agent","lead"]]);
-}
-
-/* ===== Lead capture, one question at a time ===== */
-const LEAD = [{k:"name", q:"lead_name", ph:"ph_name"},{k:"phone", q:"lead_phone", ph:"ph_phone"},
-  {k:"viewing", q:"lead_view", opts:[["o_v_visit","visit"],["o_v_video","video"],["o_v_here","here"]]},
-  {k:"when", q:"lead_when", opts:[["o_morning","morning"],["o_afternoon","afternoon"],["o_evening","evening"],["o_anytime","any"]]}];
-let leadI = -1; let lead = {};
-function startLead(){ leadI = 0; step = "lead"; askLead(); }
-function askLead(){ const Q = LEAD[leadI]; if (!Q) return askConsent(); addMsg("bot", t(Q.q)); if (Q.opts) setReplies(Q.opts); else { setReplies([]); setPh(Q.ph); $("#input").focus(); } }
-function leadAnswer(v, label){ addMsg("me", label); lead[LEAD[leadI].k] = v; leadI++; setTimeout(askLead, 200); }
-function askConsent(){ step = "consent"; setPh(); addMsg("bot", t("consent")); setReplies([["o_agree","agree"],["o_decline","decline"]]); }
-async function finishLead(agree){
-  step = "after"; setPh();
-  if (!agree){ addMsg("bot", CONFIG.whatsapp ? t("declined_wa",{wa:CONFIG.whatsapp}) : t("declined")); setReplies([["a_keep","flow"]]); return; }
-  const rec = {...lead, language:langName(), answers:{...A}, shortlist:(window._ranked||[]).slice(0, window._shown||3).map(r=>r.p.id+" "+r.p.name), consent:"KVKK contact consent v1 ("+L+")", at:new Date().toISOString(),
-    questions: turns.filter(x=>x.role==="user").slice(-3).map(x=>x.content.slice(0,300))};
-  try{
-    const r = await fetch("/api/lead", {method:"POST", headers:{"content-type":"application/json"},
-      body:JSON.stringify({...rec, consentGiven:true, consentText:rec.consent, website:($("#hp")||{}).value||""})});
-    if (!r.ok) throw 0;
-    addMsg("bot", t("thanks",{name:lead.name||""}));
-  }catch{ addMsg("bot", CONFIG.whatsapp ? t("save_fail_wa",{wa:CONFIG.whatsapp}) : t("save_fail")); }
-  setReplies([["a_ask_another","ask"],["a_new_search","restart"]]);
-}
-
-/* ===== Name lookup ===== */
-const norm = s => String(s||"").toLocaleLowerCase("tr").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/ı/g,"i").replace(/[^a-z0-9]+/g," ").trim();
-function lookupName(q){
-  const n = norm(q); if (n.length < 3) return [];
-  const hit = name => { const m = norm(name); return m && (m.includes(n) || (m.length > 4 && n.includes(m))); };
-  const out = [];
-  P.forEach(p => { if (hit(p.name)||hit(p.listName)) out.push({tier:1,id:p.id,name:p.name}); });
-  NAMES.tier1x.forEach(([id,name]) => { if (hit(name)) out.push({tier:1,id,name}); });
-  NAMES.tier2.forEach(([id,name]) => { if (hit(name)) out.push({tier:2,id,name}); });
-  NAMES.tier3.forEach(([id,name]) => { if (hit(name)) out.push({tier:3,id,name}); });
-  return out.slice(0,8);
-}
-
-/* ===== Typed questions go to Claude (via our server; the API key never reaches the browser) ===== */
-async function askClaude(text){
-  if (CONFIG.ai !== true){ const m = text.match(/\((IST-[AEX]-\d+)\)\.$/); const p = m && P.find(x=>x.id===m[1]); return p ? moreLocal(p) : localAnswer(text); }
-  turns.push({role:"user", content:text});
-  const out = addMsg("bot", t("typing"));
-  $("#send").disabled = true; $("#stop").hidden = false; ctl = new AbortController();
-  try{
-    const cur = step && S[step] ? EN[val(S[step].say)] : "";
-    const shown = (window._ranked||[]).slice(0, window._shown||0).map(r=>r.p.id+" "+r.p.name);
-    const r = await fetch("/api/chat", {method:"POST", headers:{"content-type":"application/json"}, signal:ctl.signal,
-      body:JSON.stringify({lang:langName(), messages:turns.slice(-10), answers:A, shown, current:cur||""})});
-    const j = await r.json().catch(()=>({}));
-    if (!r.ok || !j.text) throw {code: r.status===429 ? "rate_limited" : "other"};
-    out.textContent = j.text; turns.push({role:"assistant", content:j.text}); scrollDown();
-  }catch(e){
-    out.remove(); turns.pop();
-    const code = e && e.name==="AbortError" ? "cancelled" : e && e.code;
-    const m = {rate_limited:"e_rate", cancelled:""}[code] ?? "e_other"; if (m) addMsg("note", t(m));
-  }finally{ $("#send").disabled = false; $("#stop").hidden = true; }
-}
-
-/* ===== Input handling ===== */
-function onReply(btn){
-  const v = btn.dataset.v, label = btn.textContent;
-  if (step==="lead") return leadAnswer(v, label);
-  if (step==="consent"){ addMsg("me", label); return finishLead(v==="agree"); }
-  if (step==="results"||step==="after"){ addMsg("me", label); return afterAction(v); }
-  const st = S[step]; if (!st) return;
-  if (st.multi){
-    if (btn.dataset.done){ const sel = [...$("#replies").querySelectorAll('[aria-pressed="true"]')]; return answer(sel.map(b=>b.dataset.v), sel.length ? sel.map(b=>b.textContent).join(L==="ar"||L==="fa"?"، ":", ") : t("nopref")); }
-    btn.setAttribute("aria-pressed", btn.getAttribute("aria-pressed")!=="true"); return;
-  }
-  if (v==="__skip") return answer(null, t("skip"));
-  answer(v, label);
-}
-function afterAction(v){
-  const r = window._ranked||[];
-  if (v==="more"){ const next = r.slice(window._shown, window._shown+3); if (!next.length){ addMsg("bot",t("no_more")); setReplies([["a_agent","lead"],["a_change","change"]]); return; } addMsg("bot",t("more_head")); showCards(next); window._shown += next.length; setReplies([["a_more","more"],["a_compare","compare"],["a_prices","lead"]]); return; }
-  if (v==="compare"){ const list = r.slice(0, window._shown).map(x=>x.p);
-    addMsg("bot", list.map(p=>`• ${p.name}: ${t("card_from")} ${money(p.fromUSD)||t("price_req")} · ${p.district} · ${p.status||""}${p.delivery?" ("+p.delivery+")":""} · ${p.unitTypes||""}`).join("\n") + "\n\n" + t("compare_q"));
-    const r2 = $("#replies"); r2.innerHTML = "";
-    list.slice(0,4).forEach(p=>{ const b = document.createElement("button"); b.type="button"; b.className="reply"; b.textContent=p.name.slice(0,28); b.dataset.v="p:"+p.id; r2.append(b); });
-    const b = document.createElement("button"); b.type="button"; b.className="reply"; b.textContent=t("a_prices"); b.dataset.v="lead"; r2.append(b); return; }
-  if (v.startsWith("p:")){ const p = P.find(x=>x.id===v.slice(2)); if (p) return askClaude(`Tell me more about ${p.name} (${p.id}).`); }
-  if (v==="change"){ for (const k of Object.keys(A)) if (k!=="goal") delete A[k]; addMsg("bot",t("change_msg")); return go("budget"); }
-  if (v==="widen"){ delete A.budget; delete A.budgetText; return recommend(); }
-  if (v==="anyside"){ A.side="any"; delete A.area; return recommend(); }
-  if (v==="offplan"){ A.timing="any"; return recommend(); }
-  if (v==="lead") return startLead();
-  if (v==="notyet"){ addMsg("bot",t("not_yet_msg")); setReplies([["a_more","more"],["a_legal","legal"],["a_new_search","restart"]]); return; }
-  if (v==="legal") return go("legal_topic");
-  if (v==="flow"){ A.goal = A.goal && A.goal!=="project" && A.goal!=="legal" ? A.goal : "explore"; return go(A.goal==="explore" ? "exp_intro" : "nationality"); }
-  if (v==="askproj"){ setReplies([]); setPh("ask_project"); $("#input").focus(); return; }
-  if (v==="ask"){ setReplies([]); $("#input").focus(); return; }
-  if (v==="restart") return restart();
-}
-function onText(text){
-  text = text.trim(); if (!text) return;
-  if (step==="lead"){ if (LEAD[leadI] && !LEAD[leadI].opts) return leadAnswer(text, text); }
-  const st = S[step];
-  if (st && st.input) return answer(text, text);
-  if (step==="budget" && /[\d٠-٩۰-۹]/.test(text)){ A.budget = null; A.budgetText = text; addMsg("me", text); return go("payment"); }
-  addMsg("me", text); askClaude(text);
-}
-
-/* ===== No-AI mode: answer typed messages from our own data only ===== */
-const TOPICS = [
-  ["cit", /citizen|passport|vatanda|pasaport|جنسي|جواز|شهروند|تابعیت|پاسپورت|граждан|паспорт/i],
-  ["res", /residen|ikamet|إقامة|اقامة|اقامت|вид на жительство|внж|резиден/i],
-  ["deed", /deed|tapu|title|طابو|سند|право собствен/i],
-  ["tax", /tax|vat\b|kdv|vergi|harç|ضريب|مالیات|налог|ндс|пошлин/i],
-  ["pay", /payment|pay\b|transfer|ödeme|havale|دفع|تحويل|پرداخت|оплат|перевод/i],
-  ["steps", /step|process|how (do|to|can) (i )?buy|adım|süreç|nasıl|خطوات|مراحل|چطور|چگونه|шаг|процесс|как купить/i],
-];
-const GENERIC = new Set("istanbul residence residences residential park city tower towers evleri evler konutlari konaklari villa villas villalari project projects apartment apartments home homes house houses sea view new with near what price prices about tell more the and for".split(" "));
-function findProject(text){
-  const words = norm(text).split(" ").filter(Boolean);
-  for (let n = Math.min(4, words.length); n >= 1; n--)
-    for (let i = 0; i + n <= words.length; i++){
-      const ws = words.slice(i, i+n), q = ws.join(" ");
-      if (q.length < 4 || ws.every(w => GENERIC.has(w) || w.length < 3)) continue;
-      if (n === 1 && q.length < 5) continue;
-      if (lookupName(q).length) return q;
-    }
-  return null;
-}
-function localAnswer(text){
-  const q = findProject(text);
-  if (q) return projectAnswer(q);
-  const topic = TOPICS.find(([, re]) => re.test(text));
-  if (topic) return legalAnswer(topic[0]);
-  addMsg("bot", t("ai_off"));
-  if (!S[step] || !(S[step].options || S[step].input)) setReplies([["a_find_homes","flow"],["a_legal","legal"],["a_agent","lead"]]);
-}
-function moreLocal(p){
-  const parts = [p.desc, (p.ksp||[]).filter(Boolean).join(" · "), p.pay && ("Payment: " + p.pay), p.delivery && ("Delivery: " + p.delivery), p.priceSrc && ("Price source: " + p.priceSrc)].filter(Boolean);
-  addMsg("bot", parts.join("\n\n") || t("proj_pending",{name:p.name}));
-}
-function restart(){
-  for (const k of Object.keys(A)) delete A[k]; turns.length = 0; window._ranked = null; window._shown = 0; leadI = -1; lead = {};
-  $("#log").innerHTML = ""; setPh(); go("start");
-}
-function applyLang(code, announce){
-  L = code; const rtl = L==="ar" || L==="fa";
-  document.documentElement.lang = L; document.documentElement.dir = rtl ? "rtl" : "ltr";
-  [...$("#lang").children].forEach(x=>x.setAttribute("aria-pressed", x.dataset.l===L));
-  $("#tagline").textContent = t("tagline"); $("#restart").textContent = t("restart"); $("#send").textContent = t("send"); $("#stop").textContent = t("stop"); $("#foot").textContent = t("foot");
+/* ===== Language ===== */
+function applyLang(code){
+  L = LANG_CODES.includes(code) ? code : "en";
+  document.documentElement.lang = L; document.documentElement.dir = (L==="ar"||L==="fa") ? "rtl" : "ltr";
+  document.querySelectorAll("[data-t]").forEach(el => el.textContent = t(el.dataset.t));
+  $("#lang").value = L;
+  $("#fab").setAttribute("aria-label", t("fab")); $("#close").setAttribute("aria-label", t("close")); $("#popout").setAttribute("aria-label", t("popout"));
+  $("#popout").href = "chat.html?lang=" + L;
   try{ localStorage.setItem("iha_lang", L); }catch{}
-  restart();
-  if (announce) { const n = document.createElement("div"); n.className = "msg note"; n.textContent = t("langSwitched"); $("#log").prepend(n); }
+  renderFilters(); renderProjects();
+  if (frame) frame.contentWindow?.postMessage({type:"iha-lang", lang:L}, location.origin);
 }
+$("#lang").onchange = e => applyLang(e.target.value);
+
+/* ===== Projects (same approved data as the chat) ===== */
+const FILTERS = [["all","f_all"],["citizenship","f_cit"],["rental income","f_rent"],["family living","f_fam"],["luxury","f_lux"],["budget","f_bud"]];
+const TAG = {"citizenship":"f_cit","rental income":"f_rent","family living":"f_fam","luxury":"f_lux","budget":"f_bud"};
+const GRADS = [["#1D4E9E","#0F7F80"],["#0F2340","#1D4E9E"],["#0F7F80","#2E9C8A"],["#B5652B","#7A3E5C"],["#3B4F8C","#7A3E5C"],["#0F2340","#0F7F80"]];
+function renderFilters(){
+  $("#filters").innerHTML = FILTERS.map(([v,k]) => `<button type="button" data-f="${v}" aria-pressed="${v===filter}">${esc(t(k))}</button>`).join("");
+}
+$("#filters").onclick = e => { const b = e.target.closest("button"); if (!b) return; filter = b.dataset.f; renderFilters(); renderProjects(); };
+const clean = n => String(n||"").replace(/\s*\(.*?\)\s*/g," ").trim();
+const money = n => n ? "$" + Math.round(n).toLocaleString("en-US") : "";
+const statusText = s => /ready/i.test(s) ? t("ready") : /off-plan/i.test(s) ? t("offplan") : /construction/i.test(s) ? t("building") : "";
+function featured(){
+  // Only well-researched projects that are actively selling, have a price and no risk flag; then spread across price levels.
+  let c = P.filter(p => p.conf==="high" && p.sales==="Selling" && p.fromUSD && !(p.risk||[]).length);
+  if (filter!=="all") c = c.filter(p => (p.bestFor||[]).includes(filter));
+  c.sort((a,b) => a.fromUSD - b.fromUSD);
+  if (c.length <= 6) return c;
+  const out = [], seen = new Set();
+  for (let i=0;i<6;i++){ let j = Math.round(i*(c.length-1)/5); while (seen.has(j)) j++; seen.add(j); out.push(c[j]); }
+  if (!out.some(p => p.side==="Asian")) { const a = c.find(p => p.side==="Asian"); if (a) out[3] = a; }
+  return out.sort((a,b) => a.fromUSD - b.fromUSD);
+}
+function renderProjects(){
+  if (!P.length) { $("#projectList").innerHTML = ""; return; }
+  $("#projectList").innerHTML = featured().map((p,i) => { const g = GRADS[i % GRADS.length]; const st = statusText(p.status);
+    return `<article class="pcard">
+      <div class="art" style="--c1:${g[0]};--c2:${g[1]}"><span class="side">${esc(p.side==="Asian" ? t("side_as") : t("side_eu"))}</span>
+        <svg viewBox="0 0 300 70" preserveAspectRatio="none" aria-hidden="true"><path fill="currentColor" d="M0 70V50h30V30h24v20h20V14h30v36h16V38h22v12h26V22h34v28h18V8h28v42h20V34h32v36z"/></svg></div>
+      <div class="body"><h3>${esc(clean(p.name))}</h3><p class="loc">${esc(clean(p.district))}${st ? " · " + esc(st) : ""}</p>
+        <div class="tags">${(p.bestFor||[]).filter(b=>TAG[b]).slice(0,3).map(b=>`<span>${esc(t(TAG[b]))}</span>`).join("")}</div>
+        <div class="row"><span>${esc(t("from"))}</span><b>${esc(money(p.fromUSD))}</b></div></div>
+      <button type="button" data-ask="${esc(p.id)}">${esc(t("ask"))}</button></article>`; }).join("");
+}
+$("#projectList").onclick = e => { const b = e.target.closest("[data-ask]"); if (b) openChat({type:"iha-project", id:b.dataset.ask}); };
+
+/* ===== Chat panel: the existing advisor (chat.html) in an iframe, loaded on first open ===== */
+let frame = null;
+function openChat(msg){
+  const panel = $("#panel");
+  if (!frame){
+    frame = document.createElement("iframe");
+    frame.title = "Istanbul Home Advisor chat"; frame.src = "chat.html?embed=1&lang=" + L;
+    frame.setAttribute("allow", "clipboard-write");
+    frame.addEventListener("load", () => frame.dataset.loaded = "1", {once:true});
+    panel.appendChild(frame);
+  }
+  if (msg) { const send = () => frame.contentWindow.postMessage(msg, location.origin);
+    if (frame.dataset.loaded) send(); else frame.addEventListener("load", send, {once:true}); }
+  panel.classList.add("open"); $("#fab").classList.add("hide");
+  if (matchMedia("(max-width:560px)").matches) document.body.style.overflow = "hidden";
+  setTimeout(() => $("#close").focus(), 50);
+}
+function closeChat(){
+  $("#panel").classList.remove("open"); $("#fab").classList.remove("hide"); document.body.style.overflow = "";
+  $("#fab").focus();
+}
+document.addEventListener("click", e => { if (e.target.closest("[data-chat]")) openChat(); });
+$("#close").onclick = closeChat;
+addEventListener("keydown", e => { if (e.key==="Escape" && $("#panel").classList.contains("open")) closeChat(); });
+addEventListener("scroll", () => $("#top").classList.toggle("scrolled", scrollY > 8), {passive:true});
 
 /* ===== Boot ===== */
-function init(){
-  document.title = CONFIG.brand; $("#brandName").textContent = CONFIG.brand;
-  $("#lang").innerHTML = LANGS.map(([c,label])=>`<button type="button" data-l="${c}" lang="${c}" aria-pressed="false">${label}</button>`).join("");
-  $("#lang").onclick = e => { const b = e.target.closest("button"); if (b && b.dataset.l !== L) applyLang(b.dataset.l, true); };
-  $("#replies").onclick = e => { const b = e.target.closest(".reply"); if (b) onReply(b); };
-  $("#log").onclick = e => { const c = e.target.closest(".card"); if (!c) return; const p = P.find(x=>x.id===c.dataset.id); if (!p) return;
-    if (e.target.closest(".more")){ addMsg("me", t("me_more",{name:p.name})); askClaude(`Tell me more about ${p.name} (${p.id}).`); }
-    if (e.target.closest(".agent")){ addMsg("me", t("me_prices",{name:p.name})); lead.interest = p.id+" "+p.name; startLead(); } };
-  $("#composer").onsubmit = e => { e.preventDefault(); const v = $("#input").value; $("#input").value = ""; onText(v); };
-  $("#input").onkeydown = e => { if (e.key==="Enter" && !e.shiftKey){ e.preventDefault(); $("#composer").requestSubmit(); } };
-  $("#stop").onclick = () => ctl?.abort();
-  $("#restart").onclick = restart;
-}
-async function load(){
+$("#yr").textContent = new Date().getFullYear();
+(async () => {
   let saved = null; try{ saved = localStorage.getItem("iha_lang"); }catch{}
+  const asked = new URLSearchParams(location.search).get("lang");
   const nav = (navigator.language||"en").slice(0,2);
-  const want = saved || (LANGS.some(x=>x[0]===nav) ? nav : "en");
+  applyLang(LANG_CODES.includes(asked) ? asked : saved || (LANG_CODES.includes(nav) ? nav : "en"));
   try{
-    const [d, c] = await Promise.all([
-      fetch("/api/data").then(r=>{ if (!r.ok) throw 0; return r.json(); })
-        .catch(()=>Promise.all([fetch("data.json").then(r=>r.json()), fetch("names.json").then(r=>r.json())]).then(([projects,names])=>({projects,names}))),
-      fetch("i18n.json").then(r=>r.json()).catch(()=>({}))]);
-    P = d.projects; if (d.names) NAMES = d.names; if (d.config) Object.assign(CONFIG, d.config); I18N = c || {};
-    document.title = CONFIG.brand; $("#brandName").textContent = CONFIG.brand;
-  }
-  catch{ addMsg("note", t("load_fail")); }
-  applyLang(want, false);
-}
-init(); load();
-
+    const d = await fetch("/api/data").then(r => { if (!r.ok) throw 0; return r.json(); })
+      .catch(() => fetch("data.json").then(r => r.json()).then(projects => ({projects})));
+    P = d.projects || []; if (d.config) Object.assign(CONFIG, d.config);
+  }catch{ P = []; }
+  if (P.length) $("#statN").textContent = (Math.floor(P.length/10)*10) + "+";
+  if (CONFIG.whatsapp){ const w = $("#wa"); w.href = "https://wa.me/" + String(CONFIG.whatsapp).replace(/\D/g,""); w.hidden = false; }
+  renderProjects();
+})();
 </script>
-
 </body>
 </html>

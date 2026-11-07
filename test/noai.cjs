@@ -3,7 +3,7 @@ const { chromium } = require('playwright');
   const b = await chromium.launch(); const p = await b.newPage(); const errs=[];
   p.on('pageerror', e => errs.push(e.message));
   await p.route('**/fonts.googleapis.com/**', r=>r.abort());
-  await p.goto('http://localhost:3000/'); await p.waitForTimeout(800);
+  await p.goto('http://localhost:3000/chat.html'); await p.waitForTimeout(800);
   const ask = async (lang, q) => { if (lang) { await p.click(`#lang button[data-l="${lang}"]`); await p.waitForTimeout(300); }
     await p.fill('#input', q); await p.press('#input','Enter'); await p.waitForTimeout(400);
     const m = await p.$$eval('.msg.bot', n=>n.at(-1).textContent.slice(0,110)); const c = await p.$$eval('.card h3', n=>n.map(x=>x.textContent).slice(-1));

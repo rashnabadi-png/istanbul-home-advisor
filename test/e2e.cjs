@@ -3,7 +3,7 @@ const { chromium } = require('playwright');
   const b = await chromium.launch(); const p = await b.newPage(); const errs=[];
   p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type()==='error') errs.push(m.text()); });
   await p.route('**/fonts.googleapis.com/**', r=>r.abort());
-  await p.goto('http://localhost:3000/'); await p.waitForTimeout(800);
+  await p.goto("http://localhost:3000/chat.html"); await p.waitForTimeout(800);
   console.log('TITLE', await p.title(), '|', await p.textContent('#brandName'));
   // Persian typed question
   await p.click('#lang button[data-l="fa"]'); await p.waitForTimeout(400);

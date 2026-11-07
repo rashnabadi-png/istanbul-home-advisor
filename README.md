@@ -1,10 +1,15 @@
-# Istanbul Home Advisor — public chat bot
+# Istanbul Home Advisor — website + chat bot
 
-A chat page for foreign buyers (5 languages) that recommends approved Tier 1 projects from the Google Sheet,
+**Website** (`public/index.html`, the homepage at istanbulhomeadvisor.com): hero, services, featured projects (pulled live from the
+same approved data as the bot), how it works, FAQ, contact, all in the same 5 languages. Every "Ask the advisor" button, and
+"Ask about this project" on each card, opens the bot in a chat panel (full screen on phones). The site's language choice is passed to
+the bot. WhatsApp button appears once `WHATSAPP_NUMBER` is set in Vercel.
+
+**Bot** (`public/chat.html`, also works on its own at /chat.html): a chat page for foreign buyers (5 languages) that recommends approved Tier 1 projects from the Google Sheet,
 answers typed questions with Claude, and saves consented leads to the sheet's **Leads** tab.
 
 ```
-Buyer's browser ──► public/index.html (chat)
+Buyer's browser ──► public/index.html (website) ──panel──► public/chat.html?embed=1 (chat)
                       │ /api/data  → approved projects from the sheet (refreshed every 10 min; built-in snapshot if the sheet can't be read)
                       │ /api/chat  → Claude API (key stays on the server)
                       └ /api/lead  → new row in "Leads" (only after KVKK consent)
@@ -26,7 +31,7 @@ Buyer's browser ──► public/index.html (chat)
 4. **Vercel** — Add New → Project → import the repository → Framework preset "Other" → before deploying, add the
    environment variables from `.env.example` (paste the whole JSON file as `GOOGLE_SERVICE_ACCOUNT`) → Deploy.
 5. Fill in the [brackets] in `public/privacy.html` and have a lawyer check it.
-6. Optional: Vercel → Domains → add your domain (e.g. chat.yourdomain.com), then set `ALLOWED_ORIGINS`.
+6. Domain: Vercel → Project → Settings → Domains → add `istanbulhomeadvisor.com` and `www.istanbulhomeadvisor.com`, then copy the DNS records Vercel shows into your domain registrar. Set `ALLOWED_ORIGINS` to `https://istanbulhomeadvisor.com,https://www.istanbulhomeadvisor.com`.
 
 ## No-AI mode (current, costs nothing)
 Without `ANTHROPIC_API_KEY` the bot uses only your data: all button flows and recommendations work as normal; typed messages

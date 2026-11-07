@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Istanbul Home Advisor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one conversation column, like a messaging app; answers are tapped as reply chips, projects appear inside the chat only when the advisor has enough to recommend. */
+:root{
+  --bg:#EEF3F4; --surface:#FFFFFF; --sunk:#E3EBEE; --ink:#13212B; --muted:#5A6B76; --line:#D3DDE1;
+  --accent:#1D4E9E; --accent-ink:#FFFFFF; --tile:#0F7F80; --warn:#9A5400; --warn-bg:#FBEFD9; --risk:#A1302B; --risk-bg:#F8E1DF; --ok:#1E6B3C; --ok-bg:#DDF1E3;
+  --f-display:"Young Serif",Georgia,"Times New Roman",serif; --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E171D; --surface:#15212A; --sunk:#1C2B35; --ink:#E6EEF2; --muted:#93A6B2; --line:#2A3B46;
+  --accent:#7EA8F2; --accent-ink:#0B1726; --tile:#4FC0BE; --warn:#F0B661; --warn-bg:#3A2B12; --risk:#F2928B; --risk-bg:#3D1C1A; --ok:#7FD39D; --ok-bg:#163423; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E171D; --surface:#15212A; --sunk:#1C2B35; --ink:#E6EEF2; --muted:#93A6B2; --line:#2A3B46;
+  --accent:#7EA8F2; --accent-ink:#0B1726; --tile:#4FC0BE; --warn:#F0B661; --warn-bg:#3A2B12; --risk:#F2928B; --risk-bg:#3D1C1A; --ok:#7FD39D; --ok-bg:#163423; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+*{box-sizing:border-box}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{height:100%;display:grid;grid-template-rows:auto 1fr auto;max-width:820px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:14px 10px;border-bottom:1px solid var(--line)}
+.brand{min-width:0;display:grid}
+.brand h1{font-family:var(--f-display);font-weight:400;font-size:1.4rem;margin:0}
+.brand span{color:var(--muted);font-size:.82rem}
+.spacer{flex:1}
+.lang{display:flex;gap:4px;flex-wrap:wrap}
+.lang button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:.78rem;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.log{overflow-y:auto;padding-block:18px;display:flex;flex-direction:column;gap:12px;min-height:0}
+.msg{max-width:86%;padding:10px 14px;border-radius:16px;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.bot{background:var(--surface);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+[dir="rtl"] .msg.bot{border-bottom-left-radius:16px;border-bottom-right-radius:4px}
+[dir="rtl"] .msg.me{border-bottom-right-radius:16px;border-bottom-left-radius:4px}
+.msg.me{background:var(--accent);color:var(--accent-ink);align-self:flex-end;border-bottom-right-radius:4px}
+.msg.note{align-self:center;max-width:none;color:var(--muted);font-size:.82rem;padding:2px 8px}
+.msg .why{display:block;color:var(--muted);font-size:.84rem;margin-top:4px}
+.progress{align-self:center;font-family:var(--f-mono);font-size:.72rem;color:var(--muted);letter-spacing:.04em}
+.recs{align-self:stretch;display:grid;gap:10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:7px}
+.card h3{margin:0;font-size:1.02rem;text-wrap:balance}
+.where{color:var(--muted);font-size:.85rem}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px 14px;font-size:.86rem}
+.facts div span{display:block;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.price{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:500}
+.fit{font-size:.86rem;background:var(--sunk);border-radius:10px;padding:6px 10px}
+.src{font-size:.74rem;color:var(--muted)}
+.badges{display:flex;gap:6px;flex-wrap:wrap}
+.badge{font-size:.72rem;padding:2px 8px;border-radius:999px;background:var(--sunk)}
+.badge.ok{background:var(--ok-bg);color:var(--ok)} .badge.warn{background:var(--warn-bg);color:var(--warn)} .badge.risk{background:var(--risk-bg);color:var(--risk)}
+.cardacts{display:flex;gap:8px;flex-wrap:wrap}
+.replies{display:flex;gap:8px;flex-wrap:wrap;padding-block:10px 4px}
+.reply{border:1px solid var(--tile);color:var(--tile);background:var(--surface);border-radius:999px;padding:7px 14px;cursor:pointer;font-weight:600;font-size:.88rem}
+.reply.alt{border-color:var(--line);color:var(--muted);font-weight:500}
+.reply[aria-pressed="true"]{background:var(--tile);color:#fff}
+.dock{border-top:1px solid var(--line);padding-block:6px 12px;background:var(--bg)}
+.composer{display:flex;gap:8px}
+.composer textarea,.composer input{flex:1;resize:none;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:10px 12px;min-height:44px;max-height:120px;min-width:0}
+.btn{border:0;border-radius:12px;padding:10px 16px;font-weight:600;cursor:pointer;background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.small{padding:6px 12px;font-size:.82rem;border-radius:10px}
+.btn:disabled{opacity:.5;cursor:default}
+.foot{font-size:.72rem;color:var(--muted);padding-top:6px}
+.consent{display:flex;gap:8px;align-items:flex-start;font-size:.84rem;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+@media (max-width:560px){.msg{max-width:94%}.brand span{display:none}}
+/* Embedded in the website's chat panel: the panel shows the brand, so the header keeps only languages and Start over. */
+html.embed header .brand{display:none}html.embed header{padding-block:10px 8px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}html.embed header::-webkit-scrollbar{display:none}html.embed .lang{flex-wrap:nowrap}html.embed .lang button,html.embed #restart{white-space:nowrap;flex:none}html.embed .app{max-width:none}
+.foot a.privacy{color:var(--muted);white-space:nowrap}
+</style>
+
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand"><h1 id="brandName">Istanbul Home Advisor</h1><span id="tagline">New-build homes for international buyers</span></div>
+    <div class="spacer"></div>
+    <div class="lang" id="lang" aria-label="Language"></div>
+    <button class="btn small ghost" id="restart" type="button">Start over</button>
+  </header>
+  <div class="log" id="log" aria-live="polite"></div>
+  <div class="dock">
+    <div class="replies" id="replies"></div>
+    <form class="composer" id="composer">
+      <textarea id="input" rows="1" placeholder="Type an answer or ask anything…" aria-label="Your message"></textarea>
+      <button class="btn" id="send" type="submit">Send</button>
+      <button class="btn ghost" id="stop" type="button" hidden>Stop</button>
+    </form>
+    <input id="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px">
+    <p class="foot"><span id="foot">Prices are asking prices from listed sources and dates; an agent confirms everything before you reserve. General information only, not legal or financial advice.</span> <a href="privacy.html" target="_blank" rel="noopener" class="privacy">Privacy / KVKK</a></p>
+  </div>
+</div>
+
+<script>
+/* ===== Configuration: edit these ===== */
+const CONFIG = { brand:"Istanbul Home Advisor", whatsapp:"", dataCheckedOn:"November 2026" };
+
+/* ===== Legal & buying knowledge base (owner-approved text; dated) ===== */
+const KB_CHECKED = "1 November 2026";
+const KB = `
+CITIZENSHIP BY REAL ESTATE (checked ${KB_CHECKED})
+- Minimum investment: USD 400,000 in real estate (one property or several combined). Each property must be valued by a licensed appraiser (valuation report); the appraised value, not the asking price, counts.
+- The buyer must not sell the property for 3 years; this is written on the title deed.
+- Payment must be made in foreign currency and converted through a Turkish bank (foreign currency purchase document, "DAB"). The money used for the threshold cannot be a mortgage from a Turkish bank.
+- The seller must be a Turkish citizen or a Turkish company.
+- Spouse and children under 18 can be included.
+- Since August 2026 authorities have revoked thousands of citizenships obtained with inflated valuations, and several developers and appraisers are under investigation. Buyers should rely only on independent valuations and documented payments.
+- Turkey's "secure payment system" for property sales (payment held until the deed transfer) had its mandatory start postponed to 1 October 2026; confirm the current status with your agent or lawyer.
+
+RESIDENCE PERMIT
+- Buying property can support a short-term residence permit. The property value rules and the list of neighbourhoods closed to new foreign residents change; an agent checks the specific address before you buy.
+
+TITLE DEEDS (TAPU)
+- "Kat mülkiyeti" = full condominium title (building completed and registered). "Kat irtifakı" = construction-servitude title used for off-plan or not-yet-registered buildings; it is converted after completion.
+- Title deed transfer fee is usually 4% of the declared value, by law split between buyer and seller, though developers often ask the buyer to pay it or advertise it as included or exempt — confirm in the contract.
+- Under-declaring the price on the deed is illegal and makes citizenship applications fail. Never agree to "pay the rest in cash".
+
+TAXES AND COSTS ON NEW HOMES
+- VAT on new residential units depends on size, location and buyer status (rates from 1% to 20% apply). Some foreign buyers can get a VAT exemption when paying in foreign currency. Confirm the rate for the exact unit.
+- Typical extra costs: valuation report, notary and translation, utility subscriptions, annual property tax, building maintenance fee (aidat).
+
+BUYING STEPS (typical)
+1) Choose a unit and get the price list and payment plan in writing. 2) Reservation or deposit. 3) Sales contract (notarised for off-plan). 4) Valuation report. 5) Payment through a Turkish bank. 6) Title deed transfer at the land registry. 7) For citizenship: application through the land registry certificate and the immigration office.
+`;
+
+
+
+/* ===== Interface text (English is the source; other languages load from i18n.json) ===== */
+const EN = {
+  tagline:"New-build homes for international buyers", restart:"Start over", send:"Send", stop:"Stop",
+  placeholder:"Type an answer or ask anything…", placeholderAnswer:"Type your answer…",
+  foot:"Prices are asking prices from listed sources and dates; an agent confirms everything before you reserve. General information only, not legal or financial advice.",
+  langSwitched:"Switched to English — starting the conversation again.",
+  start:"Hello and welcome! I'm your Istanbul property advisor. I'll ask you a few short questions, one at a time, so I can suggest homes that really fit you. You can type a question at any point.\n\nFirst, what brings you to Istanbul property?",
+  o_citizenship:"Turkish citizenship", o_rental:"Rental income", o_living:"A home to live in", o_holiday:"A holiday home", o_investment:"Investment / resale profit", o_project:"I have a project in mind", o_legal:"Legal & buying questions", o_explore:"Just exploring",
+  cit_know:"Great choice — many of our clients buy for citizenship. Do you already know the main rules?", o_know_yes:"Yes, I know them", o_know_no:"Please explain briefly",
+  cit_explain:"In short:\n• You need real estate worth at least USD 400,000, confirmed by a licensed valuation report (one home or several combined).\n• You keep it for at least 3 years.\n• You pay in foreign currency through a Turkish bank, without a Turkish mortgage for that amount.\n• Your spouse and children under 18 can be included.\n\n(General information checked {date}, not legal advice.)\n\nWho would apply with you?",
+  cit_family:"Who would be included in the application?", o_fam_single:"Just me", o_fam_couple:"Me and my spouse", o_fam_family:"Spouse and children under 18", o_unsure:"Not sure yet",
+  cit_combine:"Would you prefer one property of $400k+, or are you open to combining two or three smaller units (often better for renting out)?", o_one:"One property", o_combine:"Open to combining", o_either_agent:"Whatever an agent recommends",
+  cit_timeline:"How soon do you want to start the citizenship application?", o_asap:"As soon as possible", o_6m:"Within 6 months", o_12m:"Within a year", o_later:"No rush",
+  rent_kind:"What kind of renting do you have in mind?", o_short:"Short-term / Airbnb", o_long:"Long-term tenants", o_advise:"Not sure — advise me",
+  rent_manage:"Would you like us to manage the tenants and the property for you after the purchase?", o_managed:"Yes, fully managed", o_self:"I'll manage it myself", o_maybe_later:"Maybe later",
+  rent_tenant:"Who would your ideal tenants be? Pick any, then tap Done.", o_business:"Business professionals", o_students:"Students", o_families:"Families", o_tourists:"Tourists",
+  live_who:"Lovely. Who will be living in the home?", o_single:"Just me", o_couple:"A couple", o_family:"Family with children", o_retire:"Retiring here",
+  live_school:"Do you need good international or private schools nearby?", o_school_yes:"Yes, very important", o_nice:"Nice to have", o_no:"No",
+  live_work:"Where will you (or your partner) work or spend most days? This helps me keep commutes short.", o_levent:"Levent / Maslak business area", o_atasehir:"Ataşehir / Asian side centre", o_remote:"Remote / from home", o_notdecided:"Not decided",
+  live_ready:"Do you need to move in soon?", o_ready_only:"Yes, ready homes only", o_can_wait:"I can wait 1–2 years",
+  hol_use:"Nice! How much of the year would you spend in Istanbul?", o_weeks:"A few weeks", o_months:"1–3 months", o_half:"Half the year",
+  hol_rent:"Would you like to rent it out while you're away?", o_yes:"Yes", o_maybe:"Maybe",
+  inv_horizon:"How long do you plan to hold the investment before selling?", o_h_short:"1–3 years", o_h_mid:"3–5 years", o_h_long:"5+ years",
+  inv_risk:"Which suits you better?", o_offplan:"Early off-plan (lower price, more waiting)", o_near:"Near completion (balanced)", o_ready_deed:"Ready with title deed (lowest risk)",
+  exp_intro:"No problem — Istanbul has two sides. The European side has the main business districts (Levent, Maslak, Şişli) and the historic centre; the Asian side is often calmer and greener, with Ataşehir's finance district and a long Marmara sea coast (Kadıköy, Maltepe, Kartal).\n\nWhat matters most to you in a home? Pick any, then tap Done.",
+  o_value:"Good value for money", o_view:"Sea or Bosphorus view", o_metro:"Close to metro / city life", o_green:"Quiet, green, family-friendly",
+  nationality:"Which country are you from? (It helps me with the buying process and any special rules.)", ph_country:"e.g. Iran, Saudi Arabia, Germany…",
+  budget:"What total budget are you considering, in US dollars?", budget_cit:"What total budget are you considering? For citizenship it needs to be at least $400,000 in total.",
+  b_u250:"Under $250,000", "b_250-400":"$250,000 – $400,000", "b_400-600":"$400,000 – $600,000", "b_600-1m":"$600,000 – $1M", "b_1-2m":"$1M – $2M", "b_2m+":"Over $2M", o_type:"I'd rather type it",
+  budget_type:"Please type your budget (for example: 350k or 1.2 million).", ph_budget:"e.g. 500k",
+  payment:"How would you like to pay?", o_cash:"Cash (often 10–20% discount)", o_plan:"Instalments with the developer",
+  side:"Which side of the city do you prefer?", o_european:"European side", o_asian:"Asian side", o_any:"No preference", o_area:"A specific area",
+  area:"Which area or district? (e.g. Şişli, Beşiktaş, Kadıköy, Başakşehir)", ph_area:"District or neighbourhood",
+  rooms:"What size of home are you looking for?", o_r1:"Studio / 1+1", o_r2:"2+1", o_r3:"3+1", o_r4:"4+1 or larger", o_villa:"Villa", o_flex:"Flexible",
+  timing:"When would you like the home to be ready?", o_now:"Ready now", o_year:"Within a year", o_offok:"Off-plan is fine",
+  priorities:"Last one: what matters most? Pick any, then tap Done.", o_p_view:"Sea / Bosphorus view", o_p_metro:"Near metro", o_p_green:"Green & quiet", o_p_fac:"Social facilities (pool, gym)", o_p_airport:"Near the airport", o_p_value:"Best price",
+  done:"Done", skip:"Skip", nopref:"No preference", progress:"Question {n} of 7 · about your purchase",
+  proj_name:"Which project are you thinking of? Type its name.", ph_project:"Project name",
+  legal_topic:"Of course. Which topic?", o_l_cit:"Citizenship rules", o_l_deed:"Title deeds (tapu)", o_l_tax:"Taxes & fees", o_l_res:"Residence permit", o_l_steps:"Buying step by step", o_l_pay:"Safe payment",
+  l_cit:"Citizenship by property: at least USD 400,000 of real estate (one or several properties), confirmed by a licensed valuation report; kept for 3 years; paid in foreign currency through a Turkish bank; bought from a Turkish citizen or company. Spouse and children under 18 can be included. Since August 2026 the authorities have revoked many citizenships obtained with inflated valuations, so independent valuations and clean payment records matter.",
+  l_deed:"Title deeds: \"kat mülkiyeti\" is full ownership of a finished, registered flat. \"Kat irtifakı\" is the title used before a building is completed and registered; it is converted later. The deed transfer fee is usually 4% of the declared value — by law split between buyer and seller, though developers often set their own rule. Never agree to declare a lower price on the deed.",
+  l_tax:"Taxes and fees: VAT on new homes ranges from 1% to 20% depending on size, location and buyer status (some foreign buyers paying in foreign currency can be exempt). Add the deed fee (usually 4%, split), valuation report, notary and translation, utility connections, yearly property tax and the building maintenance fee.",
+  l_res:"Residence permit: owning property can support a short-term residence permit. Minimum values and the neighbourhoods closed to new foreign residents change, so an agent checks the exact address before you buy.",
+  l_steps:"Buying step by step: 1) choose a unit and get the price list and payment plan in writing; 2) reservation deposit; 3) sales contract (notarised for off-plan); 4) valuation report; 5) payment through a Turkish bank; 6) title deed transfer at the land registry; 7) for citizenship, the application follows the deed.",
+  l_pay:"Safe payment: pay only to the developer's or seller's bank account, keep every receipt, and get a foreign-currency purchase document from the bank. Turkey's secure payment system for property sales (money held until the deed transfers) had its mandatory start set for 1 October 2026 — your agent confirms how it applies to your purchase.",
+  l_disclaimer:"(General information checked {date}. Rules change — for your own case, our agent or a licensed lawyer will confirm.)",
+  a_another_legal:"Another legal topic", a_find_homes:"Find homes for me", a_agent:"Talk to an agent",
+  summary:"Thanks! So you're looking for {goal}, {budget}, {side}{ready}.", summary_ready:", ready to move in",
+  g_citizenship:"citizenship", g_rental:"rental income", g_living:"a home to live in", g_holiday:"a holiday home", g_investment:"investment", g_explore:"a home", g_default:"a home",
+  open_budget:"open budget", s_european:"European side", s_asian:"Asian side", s_any:"either side",
+  top:"Here are the {n} projects that fit you best:", none:"I couldn't find a project that matches everything you asked for. Small changes often help — for example a wider budget, the other side of the city, or allowing off-plan homes.",
+  a_widen:"Widen my budget", a_anyside:"Either side is fine", a_offplan:"Off-plan is fine", a_more:"Show 3 more", a_compare:"Compare these", a_change:"Change my answers", a_prices:"Send me price lists",
+  more_head:"Here are 3 more:", no_more:"That's all the close matches. An agent can look for more, including resale homes.",
+  compare_q:"Which one would you like to know more about?", price_req:"price on request",
+  change_msg:"Sure — let's adjust. I'll keep your purpose and ask the other questions again.",
+  card_from:"From", card_homes:"Homes", card_delivery:"Delivery", card_why:"Why it fits: {x}", card_src:"Price source: {x}", card_more:"Tell me more", card_prices:"Send me the price list", card_ask_agent:"Ask an agent", side_word:"side",
+  badge_ready:"Ready", badge_cit:"Citizenship-level price", badge_combine:"Combine units for citizenship", badge_resale:"Resale only", badge_review:"Developer being re-verified", badge_confirm:"Details to confirm",
+  why_in:"in {x}", why_ready:"ready to move in", why_starts:"starts at {x}", why_cit:"price meets the $400k citizenship level", why_combine:"units can be combined for citizenship",
+  why_good_rental:"good for rental income", why_good_family:"good for family living", why_good_luxury:"lifestyle", why_good_investment:"good for investment", why_good_citizenship:"good for citizenship",
+  why_has1:"has 1+1 units", why_has2:"has 2+1 units", why_has3:"has 3+1 units", why_has4:"has large units", why_hasvilla:"has villas",
+  why_view:"water views", why_metro:"near public transport", why_green:"green setting", why_fac:"pool & gym", why_school:"schools nearby", why_levent:"short commute to Levent/Maslak", why_atasehir:"short commute to Ataşehir", why_short:"suited to short-term rental",
+  proj_notfound:"I couldn't find \"{q}\" in our list. It may be spelled differently — an agent can check it for you. Meanwhile, shall I suggest similar projects?",
+  proj_yes:"Yes — {name} is one of the projects we offer.", proj_pending:"{name} is on our list, and an agent is confirming its latest details. Would you like them to send you the information?",
+  proj_t2:"{name} isn't one of the projects we're currently offering. I can suggest similar homes that we can help you buy — would you like that?", proj_t3:"We don't currently work on {name}, but I can suggest current alternatives. Shall we?",
+  a_flow_q:"Yes, ask me a few questions", a_askproj:"Ask a question about it", a_similar:"Find similar projects", a_alts:"Yes, suggest alternatives",
+  lead_offer:"Would you like one of our agents to send you the latest price lists and floor plans on WhatsApp, and arrange viewings?", a_yes_please:"Yes please", a_not_yet:"Not yet",
+  not_yet_msg:"No problem. Feel free to ask me anything about these homes, the areas or the buying process.", a_legal:"Legal questions", a_new_search:"Start a new search", a_ask_another:"Ask another question", a_keep:"Keep exploring",
+  lead_name:"Great. What's your name?", ph_name:"Your name", lead_phone:"What's your WhatsApp number, with country code?", ph_phone:"+90 …",
+  lead_view:"Would you like to see the homes in person or start with a video tour?", o_v_visit:"In person — I'll visit", o_v_video:"Video tour first", o_v_here:"I'm already in Istanbul",
+  lead_when:"When is a good time to contact you?", o_morning:"Morning", o_afternoon:"Afternoon", o_evening:"Evening", o_anytime:"Any time",
+  consent:"Last thing: may we store these details to contact you about property? We follow Turkey's data protection law (KVKK), use them only for this, and delete them on request.", o_agree:"Yes, I agree", o_decline:"No, don't store them",
+  declined_wa:"No problem — nothing has been saved. You can message us directly on WhatsApp: {wa}", declined:"No problem — nothing has been saved. You can contact the agency directly whenever you're ready.",
+  thanks:"Thank you, {name}! An agent will message you on WhatsApp with price lists for your shortlist.", save_fail_wa:"I couldn't save your details on this page. Please message us on WhatsApp at {wa} and mention this chat.", save_fail:"I couldn't save your details on this page. Please contact the agency directly and mention this chat.",
+  me_more:"Tell me more about {name}", me_prices:"Send me the price list for {name}", ask_project:"Ask about this project…",
+  typing:"Typing…", ai_off:"I can't answer typed questions on this page right now, but the buttons will guide you, and an agent can answer anything else.",
+  e_not_granted:"The assistant needs your permission to answer typed questions. The buttons still work.", e_disabled:"Typed questions aren't available for your account. The buttons still work.", e_rate:"Too many questions at once — please wait a minute.", e_session:"Please sign in again to keep chatting.", e_other:"Something went wrong. Please try again.",
+  load_fail:"The project list couldn't load. Reload the page to try again."
+};
+const LANGS = [["en","English","English"],["tr","Türkçe","Turkish"],["ar","العربية","Arabic"],["fa","فارسی","Persian"],["ru","Русский","Russian"]];
+let I18N = {};
+let L = "en";
+function t(k, vars){ let s = (I18N[L] && I18N[L][k]) || EN[k] || k; if (vars) for (const [a,b] of Object.entries(vars)) s = s.split("{"+a+"}").join(b); return s; }
+const langName = () => LANGS.find(x=>x[0]===L)[2];
+
+/* ===== Data and state ===== */
+let P = [], NAMES = {tier1x:[], tier2:[], tier3:[]};
+let ctl = null;
+const A = {}; const turns = []; let step = null;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money = n => n ? "$" + Math.round(n).toLocaleString("en-US") : "";
+
+/* ===== Conversation script (options: [textKey, value]) ===== */
+const BUDGETS = {"u250":[0,250000],"250-400":[250000,400000],"400-600":[400000,600000],"600-1m":[600000,1000000],"1-2m":[1000000,2000000],"2m+":[2000000,1e12]};
+const FAM = [["o_fam_single","single"],["o_fam_couple","couple"],["o_fam_family","family"],["o_unsure","unsure"]];
+const S = {
+  start:{say:"start", options:[["o_citizenship","citizenship"],["o_rental","rental"],["o_living","living"],["o_holiday","holiday"],["o_investment","investment"],["o_project","project"],["o_legal","legal"],["o_explore","explore"]],
+    next:v=>({citizenship:"cit_know",rental:"rent_kind",living:"live_who",holiday:"hol_use",investment:"inv_horizon",project:"proj_name",legal:"legal_topic",explore:"exp_intro"}[v])},
+  cit_know:{say:"cit_know", options:[["o_know_yes","yes"],["o_know_no","no"]], next:v=> v==="no" ? "cit_explain" : "cit_family"},
+  cit_explain:{say:"cit_explain", options:FAM, key:"family", next:"cit_combine"},
+  cit_family:{say:"cit_family", options:FAM, key:"family", next:"cit_combine"},
+  cit_combine:{say:"cit_combine", options:[["o_one","one"],["o_combine","combine"],["o_either_agent","either"]], key:"combine", next:"cit_timeline"},
+  cit_timeline:{say:"cit_timeline", options:[["o_asap","asap"],["o_6m","6m"],["o_12m","12m"],["o_later","later"]], key:"citTime", next:v=>{ if (v==="asap"||v==="6m") A.timing="ready"; return "nationality"; }},
+  rent_kind:{say:"rent_kind", options:[["o_short","short"],["o_long","long"],["o_advise","unsure"]], key:"rentKind", next:"rent_manage"},
+  rent_manage:{say:"rent_manage", options:[["o_managed","yes"],["o_self","no"],["o_maybe_later","maybe"]], key:"manage", next:"rent_tenant"},
+  rent_tenant:{say:"rent_tenant", options:[["o_business","business"],["o_students","students"],["o_families","families"],["o_tourists","tourists"]], multi:true, key:"tenants", next:"nationality"},
+  live_who:{say:"live_who", options:[["o_single","single"],["o_couple","couple"],["o_family","family"],["o_retire","retire"]], key:"household", next:v=> v==="family" ? "live_school" : "live_work"},
+  live_school:{say:"live_school", options:[["o_school_yes","yes"],["o_nice","nice"],["o_no","no"]], key:"schools", next:"live_work"},
+  live_work:{say:"live_work", options:[["o_levent","levent"],["o_atasehir","atasehir"],["o_remote","remote"],["o_notdecided","unsure"]], key:"work", next:"live_ready"},
+  live_ready:{say:"live_ready", options:[["o_ready_only","ready"],["o_can_wait","any"]], key:"timing", next:"nationality"},
+  hol_use:{say:"hol_use", options:[["o_weeks","weeks"],["o_months","months"],["o_half","half"]], key:"stay", next:"hol_rent"},
+  hol_rent:{say:"hol_rent", options:[["o_yes","yes"],["o_no","no"],["o_maybe","maybe"]], key:"rentAway", next:"nationality"},
+  inv_horizon:{say:"inv_horizon", options:[["o_h_short","short"],["o_h_mid","mid"],["o_h_long","long"]], key:"horizon", next:"inv_risk"},
+  inv_risk:{say:"inv_risk", options:[["o_offplan","offplan"],["o_near","near"],["o_ready_deed","ready"]], key:"risk", next:v=>{ if (v==="ready") A.timing="ready"; return "nationality"; }},
+  exp_intro:{say:"exp_intro", options:[["o_value","value"],["o_view","view"],["o_metro","metro"],["o_green","green"]], multi:true, key:"priorities", next:"nationality"},
+  nationality:{say:"nationality", input:true, key:"country", ph:"ph_country", next:"budget"},
+  budget:{say:()=> A.goal==="citizenship" ? "budget_cit" : "budget",
+    options:()=>Object.keys(BUDGETS).filter(k=> A.goal!=="citizenship" || !["u250","250-400"].includes(k) || A.combine==="combine").map(k=>["b_"+k,k]).concat([["o_type","type"]]), key:"budget",
+    next:v=> v==="type" ? "budget_type" : "payment"},
+  budget_type:{say:"budget_type", input:true, key:"budgetText", ph:"ph_budget", next:"payment"},
+  payment:{say:"payment", options:[["o_cash","cash"],["o_plan","plan"],["o_unsure","unsure"]], key:"payment", next:"side"},
+  side:{say:"side", options:[["o_european","european"],["o_asian","asian"],["o_any","any"],["o_area","area"]], key:"side", next:v=> v==="area" ? "area" : "rooms"},
+  area:{say:"area", input:true, key:"area", ph:"ph_area", next:"rooms"},
+  rooms:{say:"rooms", options:[["o_r1","1"],["o_r2","2"],["o_r3","3"],["o_r4","4"],["o_villa","villa"],["o_flex","any"]], key:"rooms", next:"timing", skip:()=> A.goal==="citizenship" && A.combine==="combine"},
+  timing:{say:"timing", options:[["o_now","ready"],["o_year","year"],["o_offok","any"]], key:"timing", next:"priorities", skip:()=> !!A.timing},
+  priorities:{say:"priorities", options:[["o_p_view","view"],["o_p_metro","metro"],["o_p_green","green"],["o_p_fac","facilities"],["o_p_airport","airport"],["o_p_value","value"]], multi:true, key:"priorities", next:"recommend", skip:()=> !!A.priorities},
+  proj_name:{say:"proj_name", input:true, key:"projectQuery", ph:"ph_project", next:"proj_answer"},
+  legal_topic:{say:"legal_topic", options:[["o_l_cit","cit"],["o_l_deed","deed"],["o_l_tax","tax"],["o_l_res","res"],["o_l_steps","steps"],["o_l_pay","pay"]], key:"legal", next:"legal_answer"},
+};
+const PROGRESS = ["nationality","budget","payment","side","rooms","timing","priorities"];
+
+/* ===== Recommendation engine ===== */
+function budgetRange(){
+  if (A.budget && BUDGETS[A.budget]) return BUDGETS[A.budget];
+  const s = String(A.budgetText||"").toLowerCase().replace(/[,\s]/g,"").replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g,d=>"۰۱۲۳۴۵۶۷۸۹".indexOf(d));
+  const m = s.match(/([\d.]+)(k|m|million|milyon|млн|тыс|thousand|bin|هزار|میلیون|مليون|ألف|الف)?/); if (!m) return null;
+  let n = parseFloat(m[1]); const u = m[2]||"";
+  if (/^(m|million|milyon|млн|میلیون|مليون)/.test(u)) n*=1e6; else if (u) n*=1e3; else if (n < 10000) n*=1000;
+  return [n*0.6, n*1.1];
+}
+const hasRooms = (p,r) => { const s = (p.unitTypes+" "+p.type).toLowerCase(); if (r==="villa") return /villa/.test(s); if (r==="4") return /[4-9]\+\d/.test(s); if (r==="1") return /1\+1|studio|1\+0/.test(s); return s.includes(r+"+1"); };
+function rank(){
+  const br = budgetRange(); const pri = A.priorities||[]; const out = [];
+  for (const p of P){
+    let s = {high:4, medium:2, low:-1}[p.conf] ?? -2; const why = [];
+    const txt = (p.desc+" "+p.views+" "+p.fac+" "+p.transport+" "+p.district+" "+p.hood).toLowerCase();
+    if (A.side && A.side!=="any" && A.side!=="area" && !String(p.side).toLowerCase().includes(A.side)) continue;
+    if (A.area){ const a = A.area.toLowerCase(); if ((p.district+" "+p.hood).toLowerCase().includes(a)) { s+=5; why.push(t("why_in",{x:p.district})); } else s-=3; }
+    if (A.timing==="ready"){ if (!/ready|delivered|completed/i.test(p.status+" "+p.delivery)) continue; why.push(t("why_ready")); }
+    if (br){ if (!p.fromUSD) s-=2; else if (p.fromUSD < br[0]*0.7 || p.fromUSD > br[1]) continue; else { s+=3; why.push(t("why_starts",{x:money(p.fromUSD)})); } }
+    if (A.goal==="citizenship"){ if (/^no\b/i.test(p.cit)) continue; if (/^yes/i.test(p.cit)) { s+=3; why.push(t("why_cit")); } else if (/bundle/i.test(p.cit) && A.combine!=="one") { s+=1; why.push(t("why_combine")); } else if (A.combine==="one") s-=3; }
+    const bf = (p.bestFor||[]).join(" ").toLowerCase();
+    const tag = {citizenship:"citizenship", rental:"rental", living:"family", holiday:"luxury", investment:"investment"}[A.goal];
+    if (tag && bf.includes(tag)) { s+=2; why.push(t("why_good_"+tag)); }
+    if (A.rooms && A.rooms!=="any"){ if (hasRooms(p,A.rooms)) { s+=2; why.push(t("why_has"+A.rooms)); } else s-=2; }
+    if (pri.includes("view") && /sea|bosphorus|deniz|boğaz|lake/.test(txt)) { s+=2; why.push(t("why_view")); }
+    if (pri.includes("metro") && /metro|marmaray|metrobus|tram/.test(txt)) { s+=2; why.push(t("why_metro")); }
+    if (pri.includes("green") && /green|forest|park|garden|quiet/.test(txt)) { s+=1; why.push(t("why_green")); }
+    if (pri.includes("facilities") && /pool|gym|spa|fitness/.test(txt)) { s+=1; why.push(t("why_fac")); }
+    if (pri.includes("airport") && /airport/.test(txt)) s+=1;
+    if (A.schools==="yes" && /school|college|kolej|university/.test(txt)) { s+=2; why.push(t("why_school")); }
+    if (A.work==="levent" && /levent|maslak|şişli|sisli|beşiktaş|besiktas|kağıthane|kagithane|sarıyer|sariyer/.test(txt)) { s+=2; why.push(t("why_levent")); }
+    if (A.work==="atasehir" && /ataşehir|atasehir|kadıköy|kadikoy|ümraniye|umraniye|üsküdar|uskudar/.test(txt)) { s+=2; why.push(t("why_atasehir")); }
+    if (A.rentKind==="short" && /airbnb|tourist|taksim|beyoğlu|beyoglu|sultanahmet/.test(txt)) { s+=2; why.push(t("why_short")); }
+    if (A.risk==="offplan" && /off-plan|under construction/i.test(p.status)) s+=2;
+    if (p.risk.includes("developer-investigation")) s-=6;
+    if (p.risk.includes("no-developer-stock")) s-=3;
+    out.push({p, s, why:[...new Set(why)].slice(0,3)});
+  }
+  return out.sort((a,b)=>b.s-a.s);
+}
+
+/* ===== UI ===== */
+function scrollDown(){ const l = $("#log"); requestAnimationFrame(()=> l.scrollTop = l.scrollHeight); }
+function addMsg(kind, text){ const d = document.createElement("div"); d.className = "msg "+kind; d.dir = "auto"; d.textContent = text; $("#log").append(d); scrollDown(); return d; }
+function card(r){
+  const p = r.p, b = [];
+  if (/ready|delivered|completed/i.test(p.status)) b.push(`<span class="badge ok">${t("badge_ready")}</span>`); else if (p.status) b.push(`<span class="badge">${esc(p.status)}</span>`);
+  if (/^yes/i.test(p.cit)) b.push(`<span class="badge ok">${t("badge_cit")}</span>`); else if (/bundle/i.test(p.cit)) b.push(`<span class="badge warn">${t("badge_combine")}</span>`);
+  if (p.risk.includes("no-developer-stock")) b.push(`<span class="badge warn">${t("badge_resale")}</span>`);
+  if (p.risk.includes("developer-investigation")) b.push(`<span class="badge risk">${t("badge_review")}</span>`);
+  if (p.conf==="low") b.push(`<span class="badge warn">${t("badge_confirm")}</span>`);
+  return `<article class="card" data-id="${esc(p.id)}" dir="auto">
+    <h3 dir="ltr">${esc(p.name)}</h3>
+    <div class="where" dir="ltr">${esc([p.district,p.hood].filter(Boolean).join(" · "))}${p.dev? " · "+esc(p.dev):""}</div>
+    <div class="badges">${b.join("")}</div>
+    <div class="facts"><div><span>${t("card_from")}</span><b class="price">${esc(money(p.fromUSD) || t("price_req"))}</b></div><div><span>${t("card_homes")}</span><bdi>${esc(p.unitTypes||"—")}</bdi></div><div><span>${t("card_delivery")}</span><bdi>${esc(p.delivery||p.status||"—")}</bdi></div></div>
+    ${r.why.length? `<div class="fit">${esc(t("card_why",{x:r.why.join(L==="ar"||L==="fa"?"، ":", ")}))}</div>`:""}
+    ${p.priceSrc? `<div class="src">${esc(t("card_src",{x:p.priceSrc}))}</div>`:""}
+    <div class="cardacts"><button class="btn small ghost more" type="button">${t("card_more")}</button><button class="btn small ghost agent" type="button">${t("card_prices")}</button></div>
+  </article>`;
+}
+function showCards(list){ const d = document.createElement("div"); d.className = "recs"; d.innerHTML = list.map(card).join(""); $("#log").append(d); scrollDown(); }
+function setReplies(opts, multi){
+  const r = $("#replies"); r.innerHTML = "";
+  (opts||[]).forEach(([key, value, cls]) => { const b = document.createElement("button"); b.type="button"; b.className="reply"+(cls?" "+cls:""); b.textContent=t(key); b.dataset.v=value; if (multi) b.setAttribute("aria-pressed","false"); r.append(b); });
+  if (multi){ const d = document.createElement("button"); d.type="button"; d.className="reply"; d.textContent=t("done"); d.dataset.done="1"; r.append(d); }
+}
+const val = x => typeof x === "function" ? x() : x;
+function setPh(k){ $("#input").placeholder = t(k || "placeholder"); }
+
+/* ===== Flow engine ===== */
+function go(id){
+  step = id; const st = S[id]; if (!st) return;
+  if (st.skip && st.skip()) return go(typeof st.next==="function" ? st.next(A[st.key]) : st.next);
+  addMsg("bot", t(val(st.say), {date:KB_CHECKED}));
+  const n = PROGRESS.indexOf(id); if (n >= 0){ const p = document.createElement("div"); p.className="progress"; p.textContent = t("progress",{n:n+1}); $("#log").append(p); }
+  if (st.input){ setReplies([["skip","__skip","alt"]]); setPh(st.ph || "placeholderAnswer"); $("#input").focus(); }
+  else setReplies(val(st.options), st.multi);
+}
+function answer(value, label){
+  const st = S[step]; if (!st) return;
+  addMsg("me", label);
+  if (st.key) A[st.key] = value;
+  if (step==="start") A.goal = value;
+  setPh();
+  const nxt = typeof st.next==="function" ? st.next(value) : st.next;
+  if (nxt==="recommend") return recommend();
+  if (nxt==="proj_answer") return projectAnswer(value);
+  if (nxt==="legal_answer") return legalAnswer(value);
+  setTimeout(()=>go(nxt), 250);
+}
+function recommend(){
+  step = "results"; const r = rank(); const top = r.slice(0,3);
+  if (!top.length){ addMsg("bot", t("none")); setReplies([["a_widen","widen"],["a_anyside","anyside"],["a_offplan","offplan"],["a_agent","lead"]]); return; }
+  addMsg("bot", summaryLine() + "\n\n" + t("top",{n:top.length}));
+  showCards(top); window._ranked = r; window._shown = 3;
+  setReplies([["a_more","more"],["a_compare","compare"],["a_change","change"],["a_prices","lead"]]);
+}
+function summaryLine(){
+  const goal = t("g_"+(A.goal||"default"));
+  const bud = A.budget && BUDGETS[A.budget] ? t("b_"+A.budget) : (A.budgetText || t("open_budget"));
+  const side = A.area ? A.area : t("s_"+({european:"european",asian:"asian"}[A.side]||"any"));
+  return t("summary",{goal, budget:bud, side, ready: A.timing==="ready" ? t("summary_ready") : ""});
+}
+function projectAnswer(q){
+  step = "after"; const hits = lookupName(q);
+  if (!hits.length){ addMsg("bot", t("proj_notfound",{q})); setReplies([["a_flow_q","flow"],["a_agent","lead"]]); return; }
+  const h = hits[0];
+  if (h.tier===1){ const p = P.find(x=>x.id===h.id);
+    if (p){ addMsg("bot", t("proj_yes",{name:p.name}) + (L==="en" && p.desc ? "\n\n"+p.desc : "")); showCards([{p, s:0, why:[]}]); setReplies([["a_askproj","askproj"],["a_similar","flow"],["card_prices","lead"]]); return; }
+    addMsg("bot", t("proj_pending",{name:h.name})); }
+  else addMsg("bot", t(h.tier===2 ? "proj_t2" : "proj_t3", {name:h.name}));
+  setReplies([["a_alts","flow"],["a_agent","lead"]]);
+}
+function legalAnswer(topic){
+  step = "after";
+  addMsg("bot", t("l_"+topic) + "\n\n" + t("l_disclaimer",{date:KB_CHECKED}));
+  setReplies([["a_another_legal","legal"],["a_find_homes","flow"],["a_agent","lead"]]);
+}
+
+/* ===== Lead capture, one question at a time ===== */
+const LEAD = [{k:"name", q:"lead_name", ph:"ph_name"},{k:"phone", q:"lead_phone", ph:"ph_phone"},
+  {k:"viewing", q:"lead_view", opts:[["o_v_visit","visit"],["o_v_video","video"],["o_v_here","here"]]},
+  {k:"when", q:"lead_when", opts:[["o_morning","morning"],["o_afternoon","afternoon"],["o_evening","evening"],["o_anytime","any"]]}];
+let leadI = -1; let lead = {};
+function startLead(){ leadI = 0; step = "lead"; askLead(); }
+function askLead(){ const Q = LEAD[leadI]; if (!Q) return askConsent(); addMsg("bot", t(Q.q)); if (Q.opts) setReplies(Q.opts); else { setReplies([]); setPh(Q.ph); $("#input").focus(); } }
+function leadAnswer(v, label){ addMsg("me", label); lead[LEAD[leadI].k] = v; leadI++; setTimeout(askLead, 200); }
+function askConsent(){ step = "consent"; setPh(); addMsg("bot", t("consent")); setReplies([["o_agree","agree"],["o_decline","decline"]]); }
+async function finishLead(agree){
+  step = "after"; setPh();
+  if (!agree){ addMsg("bot", CONFIG.whatsapp ? t("declined_wa",{wa:CONFIG.whatsapp}) : t("declined")); setReplies([["a_keep","flow"]]); return; }
+  const rec = {...lead, language:langName(), answers:{...A}, shortlist:(window._ranked||[]).slice(0, window._shown||3).map(r=>r.p.id+" "+r.p.name), consent:"KVKK contact consent v1 ("+L+")", at:new Date().toISOString(),
+    questions: turns.filter(x=>x.role==="user").slice(-3).map(x=>x.content.slice(0,300))};
+  try{
+    const r = await fetch("/api/lead", {method:"POST", headers:{"content-type":"application/json"},
+      body:JSON.stringify({...rec, consentGiven:true, consentText:rec.consent, website:($("#hp")||{}).value||""})});
+    if (!r.ok) throw 0;
+    addMsg("bot", t("thanks",{name:lead.name||""}));
+  }catch{ addMsg("bot", CONFIG.whatsapp ? t("save_fail_wa",{wa:CONFIG.whatsapp}) : t("save_fail")); }
+  setReplies([["a_ask_another","ask"],["a_new_search","restart"]]);
+}
+
+/* ===== Name lookup ===== */
+const norm = s => String(s||"").toLocaleLowerCase("tr").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/ı/g,"i").replace(/[^a-z0-9]+/g," ").trim();
+function lookupName(q){
+  const n = norm(q); if (n.length < 3) return [];
+  const hit = name => { const m = norm(name); return m && (m.includes(n) || (m.length > 4 && n.includes(m))); };
+  const out = [];
+  P.forEach(p => { if (hit(p.name)||hit(p.listName)) out.push({tier:1,id:p.id,name:p.name}); });
+  NAMES.tier1x.forEach(([id,name]) => { if (hit(name)) out.push({tier:1,id,name}); });
+  NAMES.tier2.forEach(([id,name]) => { if (hit(name)) out.push({tier:2,id,name}); });
+  NAMES.tier3.forEach(([id,name]) => { if (hit(name)) out.push({tier:3,id,name}); });
+  return out.slice(0,8);
+}
+
+/* ===== Typed questions go to Claude (via our server; the API key never reaches the browser) ===== */
+async function askClaude(text){
+  if (CONFIG.ai !== true){ const m = text.match(/\((IST-[AEX]-\d+)\)\.$/); const p = m && P.find(x=>x.id===m[1]); return p ? moreLocal(p) : localAnswer(text); }
+  turns.push({role:"user", content:text});
+  const out = addMsg("bot", t("typing"));
+  $("#send").disabled = true; $("#stop").hidden = false; ctl = new AbortController();
+  try{
+    const cur = step && S[step] ? EN[val(S[step].say)] : "";
+    const shown = (window._ranked||[]).slice(0, window._shown||0).map(r=>r.p.id+" "+r.p.name);
+    const r = await fetch("/api/chat", {method:"POST", headers:{"content-type":"application/json"}, signal:ctl.signal,
+      body:JSON.stringify({lang:langName(), messages:turns.slice(-10), answers:A, shown, current:cur||""})});
+    const j = await r.json().catch(()=>({}));
+    if (!r.ok || !j.text) throw {code: r.status===429 ? "rate_limited" : "other"};
+    out.textContent = j.text; turns.push({role:"assistant", content:j.text}); scrollDown();
+  }catch(e){
+    out.remove(); turns.pop();
+    const code = e && e.name==="AbortError" ? "cancelled" : e && e.code;
+    const m = {rate_limited:"e_rate", cancelled:""}[code] ?? "e_other"; if (m) addMsg("note", t(m));
+  }finally{ $("#send").disabled = false; $("#stop").hidden = true; }
+}
+
+/* ===== Input handling ===== */
+function onReply(btn){
+  const v = btn.dataset.v, label = btn.textContent;
+  if (step==="lead") return leadAnswer(v, label);
+  if (step==="consent"){ addMsg("me", label); return finishLead(v==="agree"); }
+  if (step==="results"||step==="after"){ addMsg("me", label); return afterAction(v); }
+  const st = S[step]; if (!st) return;
+  if (st.multi){
+    if (btn.dataset.done){ const sel = [...$("#replies").querySelectorAll('[aria-pressed="true"]')]; return answer(sel.map(b=>b.dataset.v), sel.length ? sel.map(b=>b.textContent).join(L==="ar"||L==="fa"?"، ":", ") : t("nopref")); }
+    btn.setAttribute("aria-pressed", btn.getAttribute("aria-pressed")!=="true"); return;
+  }
+  if (v==="__skip") return answer(null, t("skip"));
+  answer(v, label);
+}
+function afterAction(v){
+  const r = window._ranked||[];
+  if (v==="more"){ const next = r.slice(window._shown, window._shown+3); if (!next.length){ addMsg("bot",t("no_more")); setReplies([["a_agent","lead"],["a_change","change"]]); return; } addMsg("bot",t("more_head")); showCards(next); window._shown += next.length; setReplies([["a_more","more"],["a_compare","compare"],["a_prices","lead"]]); return; }
+  if (v==="compare"){ const list = r.slice(0, window._shown).map(x=>x.p);
+    addMsg("bot", list.map(p=>`• ${p.name}: ${t("card_from")} ${money(p.fromUSD)||t("price_req")} · ${p.district} · ${p.status||""}${p.delivery?" ("+p.delivery+")":""} · ${p.unitTypes||""}`).join("\n") + "\n\n" + t("compare_q"));
+    const r2 = $("#replies"); r2.innerHTML = "";
+    list.slice(0,4).forEach(p=>{ const b = document.createElement("button"); b.type="button"; b.className="reply"; b.textContent=p.name.slice(0,28); b.dataset.v="p:"+p.id; r2.append(b); });
+    const b = document.createElement("button"); b.type="button"; b.className="reply"; b.textContent=t("a_prices"); b.dataset.v="lead"; r2.append(b); return; }
+  if (v.startsWith("p:")){ const p = P.find(x=>x.id===v.slice(2)); if (p) return askClaude(`Tell me more about ${p.name} (${p.id}).`); }
+  if (v==="change"){ for (const k of Object.keys(A)) if (k!=="goal") delete A[k]; addMsg("bot",t("change_msg")); return go("budget"); }
+  if (v==="widen"){ delete A.budget; delete A.budgetText; return recommend(); }
+  if (v==="anyside"){ A.side="any"; delete A.area; return recommend(); }
+  if (v==="offplan"){ A.timing="any"; return recommend(); }
+  if (v==="lead") return startLead();
+  if (v==="notyet"){ addMsg("bot",t("not_yet_msg")); setReplies([["a_more","more"],["a_legal","legal"],["a_new_search","restart"]]); return; }
+  if (v==="legal") return go("legal_topic");
+  if (v==="flow"){ A.goal = A.goal && A.goal!=="project" && A.goal!=="legal" ? A.goal : "explore"; return go(A.goal==="explore" ? "exp_intro" : "nationality"); }
+  if (v==="askproj"){ setReplies([]); setPh("ask_project"); $("#input").focus(); return; }
+  if (v==="ask"){ setReplies([]); $("#input").focus(); return; }
+  if (v==="restart") return restart();
+}
+function onText(text){
+  text = text.trim(); if (!text) return;
+  if (step==="lead"){ if (LEAD[leadI] && !LEAD[leadI].opts) return leadAnswer(text, text); }
+  const st = S[step];
+  if (st && st.input) return answer(text, text);
+  if (step==="budget" && /[\d٠-٩۰-۹]/.test(text)){ A.budget = null; A.budgetText = text; addMsg("me", text); return go("payment"); }
+  addMsg("me", text); askClaude(text);
+}
+
+/* ===== No-AI mode: answer typed messages from our own data only ===== */
+const TOPICS = [
+  ["cit", /citizen|passport|vatanda|pasaport|جنسي|جواز|شهروند|تابعیت|پاسپورت|граждан|паспорт/i],
+  ["res", /residen|ikamet|إقامة|اقامة|اقامت|вид на жительство|внж|резиден/i],
+  ["deed", /deed|tapu|title|طابو|سند|право собствен/i],
+  ["tax", /tax|vat\b|kdv|vergi|harç|ضريب|مالیات|налог|ндс|пошлин/i],
+  ["pay", /payment|pay\b|transfer|ödeme|havale|دفع|تحويل|پرداخت|оплат|перевод/i],
+  ["steps", /step|process|how (do|to|can) (i )?buy|adım|süreç|nasıl|خطوات|مراحل|چطور|چگونه|шаг|процесс|как купить/i],
+];
+const GENERIC = new Set("istanbul residence residences residential park city tower towers evleri evler konutlari konaklari villa villas villalari project projects apartment apartments home homes house houses sea view new with near what price prices about tell more the and for".split(" "));
+function findProject(text){
+  const words = norm(text).split(" ").filter(Boolean);
+  for (let n = Math.min(4, words.length); n >= 1; n--)
+    for (let i = 0; i + n <= words.length; i++){
+      const ws = words.slice(i, i+n), q = ws.join(" ");
+      if (q.length < 4 || ws.every(w => GENERIC.has(w) || w.length < 3)) continue;
+      if (n === 1 && q.length < 5) continue;
+      if (lookupName(q).length) return q;
+    }
+  return null;
+}
+function localAnswer(text){
+  const q = findProject(text);
+  if (q) return projectAnswer(q);
+  const topic = TOPICS.find(([, re]) => re.test(text));
+  if (topic) return legalAnswer(topic[0]);
+  addMsg("bot", t("ai_off"));
+  if (!S[step] || !(S[step].options || S[step].input)) setReplies([["a_find_homes","flow"],["a_legal","legal"],["a_agent","lead"]]);
+}
+function moreLocal(p){
+  const parts = [p.desc, (p.ksp||[]).filter(Boolean).join(" · "), p.pay && ("Payment: " + p.pay), p.delivery && ("Delivery: " + p.delivery), p.priceSrc && ("Price source: " + p.priceSrc)].filter(Boolean);
+  addMsg("bot", parts.join("\n\n") || t("proj_pending",{name:p.name}));
+}
+function restart(){
+  for (const k of Object.keys(A)) delete A[k]; turns.length = 0; window._ranked = null; window._shown = 0; leadI = -1; lead = {};
+  $("#log").innerHTML = ""; setPh(); go("start");
+}
+function applyLang(code, announce){
+  L = code; const rtl = L==="ar" || L==="fa";
+  document.documentElement.lang = L; document.documentElement.dir = rtl ? "rtl" : "ltr";
+  [...$("#lang").children].forEach(x=>x.setAttribute("aria-pressed", x.dataset.l===L));
+  $("#tagline").textContent = t("tagline"); $("#restart").textContent = t("restart"); $("#send").textContent = t("send"); $("#stop").textContent = t("stop"); $("#foot").textContent = t("foot");
+  try{ localStorage.setItem("iha_lang", L); }catch{}
+  restart();
+  if (announce) { const n = document.createElement("div"); n.className = "msg note"; n.textContent = t("langSwitched"); $("#log").prepend(n); }
+}
+
+/* ===== Boot ===== */
+function init(){
+  document.title = CONFIG.brand; $("#brandName").textContent = CONFIG.brand;
+  $("#lang").innerHTML = LANGS.map(([c,label])=>`<button type="button" data-l="${c}" lang="${c}" aria-pressed="false">${label}</button>`).join("");
+  $("#lang").onclick = e => { const b = e.target.closest("button"); if (b && b.dataset.l !== L) applyLang(b.dataset.l, true); };
+  $("#replies").onclick = e => { const b = e.target.closest(".reply"); if (b) onReply(b); };
+  $("#log").onclick = e => { const c = e.target.closest(".card"); if (!c) return; const p = P.find(x=>x.id===c.dataset.id); if (!p) return;
+    if (e.target.closest(".more")){ addMsg("me", t("me_more",{name:p.name})); askClaude(`Tell me more about ${p.name} (${p.id}).`); }
+    if (e.target.closest(".agent")){ addMsg("me", t("me_prices",{name:p.name})); lead.interest = p.id+" "+p.name; startLead(); } };
+  $("#composer").onsubmit = e => { e.preventDefault(); const v = $("#input").value; $("#input").value = ""; onText(v); };
+  $("#input").onkeydown = e => { if (e.key==="Enter" && !e.shiftKey){ e.preventDefault(); $("#composer").requestSubmit(); } };
+  $("#stop").onclick = () => ctl?.abort();
+  $("#restart").onclick = restart;
+}
+async function load(){
+  let saved = null; try{ saved = localStorage.getItem("iha_lang"); }catch{}
+  const nav = (navigator.language||"en").slice(0,2);
+  const asked = new URLSearchParams(location.search).get("lang");
+  const want = (LANGS.some(x=>x[0]===asked) && asked) || saved || (LANGS.some(x=>x[0]===nav) ? nav : "en");
+  try{
+    const [d, c] = await Promise.all([
+      fetch("/api/data").then(r=>{ if (!r.ok) throw 0; return r.json(); })
+        .catch(()=>Promise.all([fetch("data.json").then(r=>r.json()), fetch("names.json").then(r=>r.json())]).then(([projects,names])=>({projects,names}))),
+      fetch("i18n.json").then(r=>r.json()).catch(()=>({}))]);
+    P = d.projects; if (d.names) NAMES = d.names; if (d.config) Object.assign(CONFIG, d.config); I18N = c || {};
+    document.title = CONFIG.brand; $("#brandName").textContent = CONFIG.brand;
+  }
+  catch{ addMsg("note", t("load_fail")); }
+  applyLang(want, false);
+}
+/* ===== Website embed: chat.html?embed=1&lang=xx inside the homepage panel ===== */
+const QS = new URLSearchParams(location.search);
+if (QS.get("embed")==="1") document.documentElement.classList.add("embed");
+let ready = false; const pending = [];
+function fromSite(m){
+  if (m.type==="iha-lang" && LANGS.some(x=>x[0]===m.lang) && m.lang!==L) applyLang(m.lang, false);
+  if (m.type==="iha-project"){ const p = P.find(x=>x.id===m.id); if (!p) return;
+    addMsg("me", t("me_more",{name:p.name})); askClaude(`Tell me more about ${p.name} (${p.id}).`); }
+}
+addEventListener("message", e => { if (e.origin!==location.origin || !e.data || typeof e.data!=="object") return;
+  if (ready) fromSite(e.data); else pending.push(e.data); });
+init(); load().then(()=>{ ready = true; pending.splice(0).forEach(fromSite); });
+
+</script>
+
+</body>
+</html>
