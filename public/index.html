@@ -14,6 +14,7 @@
 <meta name="theme-color" content="#1D4E9E">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231D4E9E'/%3E%3Cpath d='M14 46V30l18-13 18 13v16H38V35H26v11z' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
 <style>
 /* Same palette and type as the chat (chat.html), so the panel feels part of the site. */
@@ -193,13 +194,23 @@ body.immersive .top .langsel::after{border-color:rgba(255,255,255,.85)}
 .top{transition:background .3s,color .3s}
 .journey{position:relative;height:600vh;margin-top:-64px;background:#0B1A26}
 .stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;color:#fff;contain:paint;background:#0B1A26}
-.stage{background:#0B1A26 url("video/journey-d.webp") center/cover no-repeat}
-@media (max-aspect-ratio:1/1){.stage{background-image:url("video/journey-m.webp")}}
-.film{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s}
-.film.ready{opacity:1}
+.tour-map{position:absolute;inset:0}
+.tour-map .maplibregl-ctrl-attrib{font:11px var(--f-body);background:rgba(0,0,0,.35)!important;color:rgba(255,255,255,.8)}
+.tour-map .maplibregl-ctrl-attrib a{color:inherit}
+.tour-map .maplibregl-ctrl-bottom-left{bottom:max(4px,env(safe-area-inset-bottom,0px));left:max(4px,env(safe-area-inset-left,0px))}
+.intro{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;will-change:opacity,transform;transform-origin:50% 50%}
+.geo{position:absolute;top:44%;font:400 clamp(1.4rem,4.2vw,3.2rem)/1 var(--f-display);letter-spacing:.32em;color:#fff;text-shadow:0 2px 18px rgba(0,0,0,.65);pointer-events:none;will-change:opacity,transform}
+:lang(ar) .geo,:lang(fa) .geo{letter-spacing:0;font-family:var(--f-body);font-weight:700}
+.geo.eu{left:12%}.geo.as{right:12%}
+@media (max-aspect-ratio:1/1){.geo{top:30%;font-size:1.3rem;letter-spacing:.24em}.geo.eu{left:8%}.geo.as{right:8%}}
+.pin-place{display:grid;justify-items:center;gap:6px;pointer-events:none;opacity:0;transition:opacity .3s}
+.pin-place i{width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 0 5px rgba(255,255,255,.3),0 0 24px rgba(0,0,0,.5)}
+.pin-place.on{opacity:1}
+.cap.stop{top:auto;bottom:max(96px,calc(env(safe-area-inset-bottom,0px) + 96px));transform:translate(-50%,0)}
 .scrim{position:absolute;inset:0;pointer-events:none;background:
   linear-gradient(to bottom,rgba(6,14,22,.55),rgba(6,14,22,0) 22%),
   radial-gradient(ellipse 70% 55% at 50% 50%,rgba(6,14,22,.62),rgba(6,14,22,.18) 75%);opacity:var(--o,.9)}
+.scrim.low{background:linear-gradient(to bottom,rgba(6,14,22,.55),rgba(6,14,22,0) 22%),linear-gradient(to top,rgba(6,14,22,.75),rgba(6,14,22,0) 45%)}
 .cap{position:absolute;left:50%;top:50%;width:min(760px,calc(100% - 32px));transform:translate(-50%,-50%);text-align:center;opacity:0;pointer-events:none;text-shadow:0 2px 28px rgba(0,0,0,.55);will-change:opacity,transform}
 .cap.on{pointer-events:auto}
 .cap h1{font-size:clamp(2rem,5.6vw,4rem)}
@@ -246,7 +257,7 @@ body.immersive .top .langsel::after{border-color:rgba(255,255,255,.85)}
 /* Reduced motion: no scroll-scrubbing; the photos appear as a calm stack with their captions */
 @media (prefers-reduced-motion:reduce){
   .journey{height:auto;margin-top:0}.stage{position:relative;height:auto;display:grid;gap:0}
-  .stage::before{content:"";display:block;height:62vh;background:inherit;background-color:#0B1A26}.film{display:none}
+  .tour-map,.geo{display:none}.intro{position:relative;height:56vh;opacity:1!important;transform:none!important}
   .scrim,.hint,.progress{display:none}
   .cap{position:relative;left:auto;top:auto;transform:none!important;opacity:1!important;margin:32px auto;pointer-events:auto;color:var(--ink);text-shadow:none}
   .cap p{color:var(--muted)}.cap .kicker{color:var(--tile)}.btn.ghost.light{color:var(--ink);border-color:var(--line);background:transparent}
@@ -283,16 +294,20 @@ body.immersive .top .langsel::after{border-color:rgba(255,255,255,.85)}
 <main>
 <section class="journey" id="journey" aria-label="Istanbul">
   <div class="stage">
-    <!-- Drone journey: one 4K-sourced video (day over the Bosphorus Bridge, dissolving into night) scrubbed by the scroll.
-         Desktop: 2560x1440; phones: a 1080x1920 crop that keeps the bridge in frame. -->
-    <video class="film" id="film" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true" tabindex="-1"></video>
+    <!-- Satellite tour: opens on the overview image, then a live satellite map flies a camera path driven by the scroll:
+         overview → Bebek → pull back → Üsküdar (Asian side) → pull back → Levent & Maslak → back to the whole city. -->
+    <div class="tour-map" id="tourMap" aria-hidden="true"></div>
+    <img class="intro" id="intro" src="img/istanbul-satellite.webp" alt="" width="1672" height="941" fetchpriority="high" aria-hidden="true">
+    <div class="geo eu" id="geoEu" data-t="m_eu" aria-hidden="true">EUROPE</div>
+    <div class="geo as" id="geoAs" data-t="m_as" aria-hidden="true">ASIA</div>
     <div class="scrim" id="scrim"></div>
 
     <div class="cap c1"><span class="kicker" data-t="kicker">New-build homes for international buyers</span><h1 data-t="h1">Find the right home in Istanbul, with honest advice in your language.</h1><p data-t="sub"></p><div class="ctas"><button class="btn" type="button" data-chat data-t="cta_main">Start with the advisor</button></div></div>
-    <div class="cap c2"><h2 data-t="j1_t">Two continents. One city.</h2><p data-t="j1_p"></p></div>
-    <div class="cap c3"><h2 data-t="j2_t">Life along the Bosphorus</h2><p data-t="j2_p"></p></div>
-    <div class="cap c4"><h2 data-t="j3_t">As the city lights up</h2><p data-t="j3_p"></p></div>
-    <div class="cap c5"><h2 data-t="j4_t">This could be your view.</h2><p data-t="j4_p"></p><div class="ctas"><button class="btn" type="button" data-chat data-t="j4_cta">Find my view</button><a class="btn ghost light" href="#districts" data-t="j4_map">Explore the map</a></div></div>
+    <div class="cap stop c2"><h2 data-t="j1_t">Two continents. One city.</h2><p data-t="j1_p"></p></div>
+    <div class="cap stop c3"><span class="kicker" data-t="side_eu">European side</span><h2 data-t="tb_t">Bebek</h2><p data-t="tb_p"></p></div>
+    <div class="cap stop c4"><span class="kicker" data-t="side_as">Asian side</span><h2 data-t="tu_t">Üsküdar</h2><p data-t="tu_p"></p></div>
+    <div class="cap stop c5"><span class="kicker" data-t="side_eu">European side</span><h2 data-t="tl_t">Levent &amp; Maslak</h2><p data-t="tl_p"></p></div>
+    <div class="cap c6"><h2 data-t="te_t">Where will you call home?</h2><p data-t="te_p"></p><div class="ctas"><button class="btn" type="button" data-chat data-t="te_cta">Find my home</button><a class="btn ghost light" href="#districts" data-t="j4_map">Explore the map</a></div></div>
     <div class="hint" id="hint"><span data-t="j_hint">Scroll to explore</span><i></i></div>
     <div class="progress" aria-hidden="true"><b id="prog"></b></div>
   </div>
@@ -415,6 +430,7 @@ body.immersive .top .langsel::after{border-color:rgba(255,255,255,.85)}
   </div>
 </div>
 
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js" defer></script>
 <script>
 /* Site text in 5 languages (same set as the chat). Arabic, Persian and Russian need a native-speaker check. */
 const T = {
@@ -653,35 +669,35 @@ addEventListener("scroll", () => $("#top").classList.toggle("scrolled", scrollY 
 
 /* ===== Extra text for the immersive journey and the district map ===== */
 const T2 = {
-en:{j_hint:"Scroll to explore",j1_t:"Two continents. One city.",j1_p:"Istanbul stretches across Europe and Asia, joined by the Bosphorus.",
+en:{tb_t:"Bebek",tb_p:"A bay of waterside mansions, cafés and morning walks along the European shore.",tu_t:"Üsküdar",tu_p:"The Asian shore, with Maiden's Tower and views back across the water to the old city.",tl_t:"Levent & Maslak",tl_p:"Istanbul's business district, where many of the newest residential towers rise.",te_t:"Where will you call home?",te_p:"Tell the advisor what matters to you, and it finds approved homes in the right neighbourhood.",te_cta:"Find my home",j_hint:"Scroll to explore",j1_t:"Two continents. One city.",j1_p:"Istanbul stretches across Europe and Asia, joined by the Bosphorus.",
  j2_t:"Life along the Bosphorus",j2_p:"Bridges, waterside palaces and ferries crossing between continents, all day long.",
  j3_t:"As the city lights up",j3_p:"Some of Istanbul's most sought-after homes look out over this water.",
  j4_t:"This could be your view.",j4_p:"Tell the advisor what you are dreaming of, and it finds approved homes that match.",j4_cta:"Find my view",j4_map:"Explore the map",
  m_eu:"EUROPE",m_as:"ASIA",m_bs:"Black Sea",m_mar:"Sea of Marmara",m_bos:"Bosphorus",m_gh:"Golden Horn",
  d_h:"Explore by district",d_p:"Tap a district to see the approved projects there. Orange is the European side, teal the Asian side.",d_pick:"Pick a district on the map to see its projects.",
  d_count:"{n} approved projects",d_short:"Get a shortlist for this area",nav_map:"Map"},
-tr:{j_hint:"Keşfetmek için kaydırın",j1_t:"İki kıta. Tek şehir.",j1_p:"İstanbul, Boğaz'la birleşen Avrupa ve Asya'ya yayılır.",
+tr:{tb_t:"Bebek",tb_p:"Avrupa Yakası'nda yalılar, kafeler ve sabah yürüyüşleriyle bir koy.",tu_t:"Üsküdar",tu_p:"Kız Kulesi ve suyun karşısındaki tarihi yarımada manzarasıyla Anadolu Yakası.",tl_t:"Levent ve Maslak",tl_p:"En yeni konut kulelerinin yükseldiği İstanbul'un iş merkezi.",te_t:"Eviniz nerede olacak?",te_p:"Danışmana sizin için neyin önemli olduğunu anlatın; doğru semtte onaylı evleri bulsun.",te_cta:"Evimi bul",j_hint:"Keşfetmek için kaydırın",j1_t:"İki kıta. Tek şehir.",j1_p:"İstanbul, Boğaz'la birleşen Avrupa ve Asya'ya yayılır.",
  j2_t:"Boğaz boyunca yaşam",j2_p:"Köprüler, yalılar ve kıtalar arasında gidip gelen vapurlar.",
  j3_t:"Şehrin ışıkları yanarken",j3_p:"İstanbul'un en çok aranan evlerinden bazıları bu manzaraya bakıyor.",
  j4_t:"Bu sizin manzaranız olabilir.",j4_p:"Danışmana hayalinizdeki evi anlatın; size uyan onaylı evleri bulsun.",j4_cta:"Manzaramı bul",j4_map:"Haritayı keşfet",
  m_eu:"AVRUPA",m_as:"ASYA",m_bs:"Karadeniz",m_mar:"Marmara Denizi",m_bos:"İstanbul Boğazı",m_gh:"Haliç",
  d_h:"İlçelere göre keşfedin",d_p:"Onaylı projeleri görmek için bir ilçeye dokunun. Turuncu Avrupa Yakası, turkuaz Anadolu Yakası.",d_pick:"Projelerini görmek için haritadan bir ilçe seçin.",
  d_count:"{n} onaylı proje",d_short:"Bu bölge için liste alın",nav_map:"Harita"},
-ar:{j_hint:"مرّر للاستكشاف",j1_t:"قارتان. مدينة واحدة.",j1_p:"تمتد إسطنبول بين أوروبا وآسيا، ويصل بينهما البوسفور.",
+ar:{tb_t:"بيبك",tb_p:"خليج من القصور المطلة على الماء والمقاهي ونزهات الصباح على الضفة الأوروبية.",tu_t:"أسكودار",tu_p:"الضفة الآسيوية، مع برج الفتاة وإطلالة عبر الماء على المدينة القديمة.",tl_t:"ليفنت ومسلك",tl_p:"حي الأعمال في إسطنبول، حيث ترتفع كثير من أحدث الأبراج السكنية.",te_t:"أين سيكون منزلك؟",te_p:"أخبر المستشار بما يهمك، وسيجد منازل معتمدة في الحي المناسب.",te_cta:"اعثر على منزلي",j_hint:"مرّر للاستكشاف",j1_t:"قارتان. مدينة واحدة.",j1_p:"تمتد إسطنبول بين أوروبا وآسيا، ويصل بينهما البوسفور.",
  j2_t:"الحياة على امتداد البوسفور",j2_p:"جسور وقصور على الماء وعبّارات تعبر بين القارتين طوال اليوم.",
  j3_t:"حين تضيء المدينة",j3_p:"بعض أكثر المنازل طلبًا في إسطنبول تطل على هذا الماء.",
  j4_t:"قد تكون هذه إطلالتك.",j4_p:"أخبر المستشار بما تحلم به، وسيجد منازل معتمدة تناسبك.",j4_cta:"اعثر على إطلالتي",j4_map:"استكشف الخريطة",
  m_eu:"أوروبا",m_as:"آسيا",m_bs:"البحر الأسود",m_mar:"بحر مرمرة",m_bos:"البوسفور",m_gh:"القرن الذهبي",
  d_h:"استكشف حسب المنطقة",d_p:"اضغط على منطقة لرؤية المشاريع المعتمدة فيها. البرتقالي للجانب الأوروبي، والفيروزي للجانب الآسيوي.",d_pick:"اختر منطقة على الخريطة لرؤية مشاريعها.",
  d_count:"{n} مشروعًا معتمدًا",d_short:"احصل على قائمة لهذه المنطقة",nav_map:"الخريطة"},
-fa:{j_hint:"برای کاوش اسکرول کنید",j1_t:"دو قاره. یک شهر.",j1_p:"استانبول میان اروپا و آسیا گسترده است و بسفر آن‌ها را به هم می‌پیوندد.",
+fa:{tb_t:"ببک",tb_p:"خلیجی با عمارت‌های کنار آب، کافه‌ها و پیاده‌روی‌های صبحگاهی در ساحل اروپایی.",tu_t:"اسکودار",tu_p:"ساحل آسیایی، با برج دختر و منظرهٔ شهر قدیم آن سوی آب.",tl_t:"لونت و مسلک",tl_p:"منطقهٔ تجاری استانبول، جایی که بسیاری از جدیدترین برج‌های مسکونی ساخته می‌شوند.",te_t:"خانهٔ شما کجا خواهد بود؟",te_p:"به مشاور بگویید چه چیزی برایتان مهم است؛ خانه‌های تأییدشده را در محلهٔ مناسب پیدا می‌کند.",te_cta:"خانه‌ام را پیدا کن",j_hint:"برای کاوش اسکرول کنید",j1_t:"دو قاره. یک شهر.",j1_p:"استانبول میان اروپا و آسیا گسترده است و بسفر آن‌ها را به هم می‌پیوندد.",
  j2_t:"زندگی در امتداد بسفر",j2_p:"پل‌ها، کاخ‌های کنار آب و کشتی‌هایی که تمام روز میان دو قاره رفت‌وآمد می‌کنند.",
  j3_t:"وقتی شهر روشن می‌شود",j3_p:"برخی از پرطرفدارترین خانه‌های استانبول رو به همین آب هستند.",
  j4_t:"این می‌تواند منظرهٔ شما باشد.",j4_p:"به مشاور بگویید رؤیایتان چیست؛ خانه‌های تأییدشدهٔ مناسب را پیدا می‌کند.",j4_cta:"منظره‌ام را پیدا کن",j4_map:"کاوش در نقشه",
  m_eu:"اروپا",m_as:"آسیا",m_bs:"دریای سیاه",m_mar:"دریای مرمره",m_bos:"بسفر",m_gh:"شاخ طلایی",
  d_h:"کاوش بر اساس منطقه",d_p:"روی یک منطقه بزنید تا پروژه‌های تأییدشدهٔ آن را ببینید. نارنجی بخش اروپایی و فیروزه‌ای بخش آسیایی است.",d_pick:"برای دیدن پروژه‌ها، یک منطقه را روی نقشه انتخاب کنید.",
  d_count:"{n} پروژهٔ تأییدشده",d_short:"برای این منطقه فهرست بگیرید",nav_map:"نقشه"},
-ru:{j_hint:"Прокрутите, чтобы исследовать",j1_t:"Два континента. Один город.",j1_p:"Стамбул раскинулся в Европе и Азии, которые соединяет Босфор.",
+ru:{tb_t:"Бебек",tb_p:"Бухта с особняками у воды, кафе и утренними прогулками на европейском берегу.",tu_t:"Ускюдар",tu_p:"Азиатский берег с Девичьей башней и видом через воду на старый город.",tl_t:"Левент и Маслак",tl_p:"Деловой район Стамбула, где строятся многие новейшие жилые башни.",te_t:"Где будет ваш дом?",te_p:"Расскажите консультанту, что для вас важно, и он найдёт одобренные дома в подходящем районе.",te_cta:"Найти мой дом",j_hint:"Прокрутите, чтобы исследовать",j1_t:"Два континента. Один город.",j1_p:"Стамбул раскинулся в Европе и Азии, которые соединяет Босфор.",
  j2_t:"Жизнь вдоль Босфора",j2_p:"Мосты, дворцы у воды и паромы, весь день курсирующие между континентами.",
  j3_t:"Когда город зажигает огни",j3_p:"Из окон самых востребованных домов Стамбула видна именно эта вода.",
  j4_t:"Это может быть ваш вид.",j4_p:"Расскажите консультанту, о чём мечтаете, и он подберёт подходящие одобренные дома.",j4_cta:"Найти мой вид",j4_map:"Открыть карту",
@@ -731,39 +747,69 @@ function buildMap(svg, withLabels){
   }
 }
 
-/* ===== Scroll engine: drone video scrubbed by scroll ===== */
+/* ===== Scroll engine: satellite tour ===== */
 const clamp = (x, a=0, b=1) => Math.min(b, Math.max(a, x));
-const win01 = (p, a, b, f=.035) => clamp(Math.min((p - a) / f, (b - p) / f)); // fade in after a, out before b
-const J = {journey:$("#journey"), stage:$(".stage"), film:$("#film"), scrim:$("#scrim"), caps:[...document.querySelectorAll(".journey .cap")], hint:$("#hint"), body:document.body};
+const smooth = x => x * x * (3 - 2 * x);
+const win01 = (p, a, b, f=.03) => clamp(Math.min((p - a) / f, (b - p) / f)); // fade in after a, out before b
+// Satellite imagery: Esri World Imagery. Before launch, use a keyed plan (ArcGIS Location Platform free tier) or swap the URL for another provider.
+const TOUR_TILES = {url:"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", attribution:"Imagery © Esri, Maxar, Earthstar Geographics"};
+const OVERVIEW = {lon:29.06, lat:41.1, lonSpan:.62}; // roughly what the opening image shows
+// Camera keyframes along the scroll (p = 0…1). "zoom" -1 means: the overview zoom for this screen.
+const KEYS = [
+  {p:0,   lon:29.06,  lat:41.10,  zoom:-1,   pitch:0,  bearing:0},
+  {p:.10, lon:29.06,  lat:41.10,  zoom:-1,   pitch:0,  bearing:0},
+  {p:.24, lon:29.0435,lat:41.0768,zoom:15.4, pitch:58, bearing:-28},  // Bebek bay
+  {p:.33, lon:29.0430,lat:41.0775,zoom:15.6, pitch:60, bearing:-8},
+  {p:.42, lon:29.03,  lat:41.055, zoom:12.2, pitch:20, bearing:0},    // pull back
+  {p:.52, lon:29.0125,lat:41.0235,zoom:15.3, pitch:58, bearing:-115}, // Üsküdar, looking west to the old city
+  {p:.61, lon:29.0118,lat:41.0228,zoom:15.5, pitch:60, bearing:-95},
+  {p:.70, lon:29.02,  lat:41.06,  zoom:12.3, pitch:20, bearing:0},    // pull back
+  {p:.80, lon:29.012, lat:41.083, zoom:15.0, pitch:62, bearing:12},   // Levent & Maslak
+  {p:.87, lon:29.013, lat:41.088, zoom:15.1, pitch:62, bearing:30},
+  {p:.98, lon:29.06,  lat:41.10,  zoom:-1,   pitch:0,  bearing:0},
+];
+const PLACES = [{lon:29.0435,lat:41.0768,k:"tb_t",a:.23,b:.35},{lon:29.0125,lat:41.0235,k:"tu_t",a:.51,b:.63},{lon:29.012,lat:41.083,k:"tl_t",a:.79,b:.89}];
+const J = {journey:$("#journey"), stage:$(".stage"), mapEl:$("#tourMap"), intro:$("#intro"), eu:$("#geoEu"), as:$("#geoAs"), scrim:$("#scrim"),
+  caps:[...document.querySelectorAll(".journey .cap")], hint:$("#hint"), body:document.body, map:null, pins:[]};
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-const portrait = matchMedia("(max-aspect-ratio: 1/1)");
-const saveData = !!(navigator.connection && navigator.connection.saveData);
-let lastP = -1, ticking = false, target = 0, shown = 0, filmSet = "";
-// Load the right cut for the screen shape (and none when the viewer asked to save data or reduce motion: the poster stays).
-function pickFilm(){
-  if (reduced.matches || saveData) return;
-  const set = portrait.matches ? "m" : "d"; if (set === filmSet) return; filmSet = set;
-  const v = J.film; v.classList.remove("ready"); v.poster = `video/journey-${set}.webp`; v.src = `video/journey-${set}.mp4`; v.load();
-  v.addEventListener("loadeddata", () => { v.classList.add("ready"); seekLoop(); }, {once:true});
+let lastP = -1, ticking = false;
+function overviewZoom(){
+  const W = J.stage.clientWidth, H = J.stage.clientHeight, imgAspect = 1672 / 941;
+  const lonVisible = OVERVIEW.lonSpan * Math.min(1, (W / H) / imgAspect); // object-fit: cover crops the sides on tall screens
+  return Math.log2(360 * W / (512 * lonVisible));
 }
-// iOS only renders seeks once the video has been "played" after a touch.
-addEventListener("touchstart", () => { const v = J.film; if (v.src && v.paused) v.play().then(() => v.pause()).catch(() => {}); }, {once:true, passive:true});
-// Ease the video time toward the scroll position, and never queue a seek while one is still in progress.
-let looping = false;
-function seekLoop(){
-  if (looping) return; looping = true;
-  const step = () => {
-    const v = J.film, d = v.duration;
-    if (!d || reduced.matches){ looping = false; return; }
-    shown += (target - shown) * .2;
-    if (Math.abs(target - shown) < .0004) shown = target;
-    const t = Math.min(d - .04, shown * d);
-    if (!v.seeking && Math.abs(v.currentTime - t) > .012) v.currentTime = t;
-    if (shown !== target || v.seeking) requestAnimationFrame(step); else looping = false;
+function camAt(p){
+  let i = 0; while (i < KEYS.length - 2 && p > KEYS[i + 1].p) i++;
+  const a = KEYS[i], b = KEYS[i + 1], k = smooth(clamp((p - a.p) / (b.p - a.p))), z0 = overviewZoom();
+  const za = a.zoom < 0 ? z0 : a.zoom, zb = b.zoom < 0 ? z0 : b.zoom;
+  // Move the centre in step with the zoom so the target stays steady while diving in or rising out.
+  // With u = map units per pixel (2^-zoom), m = (u(za) - u(z)) / (u(za) - u(zb)) moves the centre early when diving in and late when rising out.
+  const zoom = za + (zb - za) * k, u = z => Math.pow(2, -z);
+  const m = Math.abs(zb - za) < .01 ? k : (u(za) - u(zoom)) / (u(za) - u(zb));
+  let db = b.bearing - a.bearing; if (db > 180) db -= 360; if (db < -180) db += 360;
+  return {center:[a.lon + (b.lon - a.lon) * m, a.lat + (b.lat - a.lat) * m], zoom, pitch:a.pitch + (b.pitch - a.pitch) * k, bearing:a.bearing + db * k};
+}
+function initMap(){
+  if (J.map || reduced.matches || !window.maplibregl) return;
+  const z0 = overviewZoom();
+  J.map = new maplibregl.Map({container:J.mapEl, interactive:false, attributionControl:false, renderWorldCopies:false, maxPitch:70, fadeDuration:150,
+    pixelRatio:Math.min(devicePixelRatio || 1, 2), maxTileCacheSize:1500, center:[OVERVIEW.lon, OVERVIEW.lat], zoom:z0,
+    style:{version:8, sources:{sat:{type:"raster", tiles:[TOUR_TILES.url], tileSize:256, maxzoom:19, attribution:TOUR_TILES.attribution}},
+      layers:[{id:"bg", type:"background", paint:{"background-color":"#0B1A26"}}, {id:"sat", type:"raster", source:"sat", paint:{"raster-fade-duration":150}}]}});
+  J.map.addControl(new maplibregl.AttributionControl({compact:true}), "bottom-left");
+  J.pins = PLACES.map(pl => { const el = document.createElement("div"); el.className = "pin-place"; el.innerHTML = "<i></i>";
+    return {pl, el, m:new maplibregl.Marker({element:el, anchor:"center"}).setLngLat([pl.lon, pl.lat]).addTo(J.map)}; });
+  J.map.on("load", () => { lastP = -1; frame_(); prefetch(); });
+}
+// Warm the browser cache with the tiles each stop needs, so the dives stay sharp on a first visit.
+function prefetch(){
+  const seen = new Set(), go = (lon, lat, z) => {
+    const n = 2 ** z, x = Math.floor((lon + 180) / 360 * n), y = Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * n);
+    for (let dx = -2; dx <= 2; dx++) for (let dy = -3; dy <= 1; dy++){ const u = TOUR_TILES.url.replace("{z}", z).replace("{x}", x + dx).replace("{y}", y + dy); if (!seen.has(u)){ seen.add(u); new Image().src = u; } }
   };
-  requestAnimationFrame(step);
+  KEYS.filter(k => k.zoom > 13).forEach((k, i) => setTimeout(() => { go(k.lon, k.lat, Math.round(k.zoom) + 1); go(k.lon, k.lat, Math.round(k.zoom)); }, 400 * i));
 }
-function layout(){ pickFilm(); lastP = -1; frame_(); }
+function layout(){ initMap(); if (J.map) J.map.resize(); lastP = -1; frame_(); }
 function frame_(){
   ticking = false;
   const r = J.journey.getBoundingClientRect();
@@ -772,15 +818,25 @@ function frame_(){
   const p = clamp(-r.top / (r.height - innerHeight));
   if (Math.abs(p - lastP) < .0002) return; lastP = p;
   J.stage.style.setProperty("--p", p);
-  target = p; seekLoop();
-  // Video timeline: day bridge 0–49%, dissolve to night 49–57%, night 57–100%.
-  const vis = [win01(p, -1, .05, .03), win01(p, .1, .22), win01(p, .3, .44), win01(p, .62, .76), win01(p, .86, 2)];
-  J.caps.forEach((c, i) => { const o = vis[i]; c.style.opacity = o; c.style.transform = `translate(-50%, calc(-50% + ${((1 - o) * 24).toFixed(1)}px))`; c.classList.toggle("on", o > .5); });
-  J.scrim.style.setProperty("--o", (.3 + Math.max(...vis) * .7).toFixed(3));
+  if (J.map) J.map.jumpTo(camAt(p));
+  // Opening image: holds, then gently pushes in and dissolves into the live map as the first dive starts (and returns at the end).
+  const io = Math.max(1 - clamp((p - .1) / .05), clamp((p - .955) / .025));
+  J.intro.style.opacity = J.map ? io : 1;
+  J.intro.style.transform = `scale(${1 + clamp((p - .1) / .05) * .25})`;
+  const geo = Math.min(clamp((p - .03) / .025), 1 - clamp((p - .1) / .03)); // after the headline, while the image is still showing
+  J.eu.style.opacity = J.as.style.opacity = geo;
+  J.eu.style.transform = `translateX(${(-1 + geo) * 30}px)`; J.as.style.transform = `translateX(${(1 - geo) * 30}px)`;
+  const vis = [win01(p, -1, .045), win01(p, .05, .11), win01(p, .25, .36), win01(p, .53, .64), win01(p, .81, .9), win01(p, .965, 2)];
+  J.caps.forEach((c, i) => { const o = vis[i], stop = c.classList.contains("stop");
+    c.style.opacity = o; c.style.transform = stop ? `translate(-50%, ${((1 - o) * 24).toFixed(1)}px)` : `translate(-50%, calc(-50% + ${((1 - o) * 24).toFixed(1)}px))`; c.classList.toggle("on", o > .5); });
+  J.pins.forEach(({pl, el}) => el.classList.toggle("on", p > pl.a && p < pl.b));
+  const big = Math.max(vis[0], vis[5]), small = Math.max(vis[1], vis[2], vis[3], vis[4]);
+  J.scrim.style.setProperty("--o", (.25 + big * .75 + small * .25).toFixed(3));
+  J.scrim.classList.toggle("low", small > big);
   J.hint.style.opacity = 1 - clamp(p / .02);
 }
 function onScroll(){ if (!ticking){ ticking = true; requestAnimationFrame(frame_); } }
-portrait.addEventListener?.("change", layout);
+window.addEventListener("load", layout);
 
 /* ===== District map ===== */
 const DISTRICTS = [
