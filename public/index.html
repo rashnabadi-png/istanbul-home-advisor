@@ -191,11 +191,12 @@ body.immersive .top .langsel select{background:rgba(0,0,0,.18);border-color:rgba
 body.immersive .top .langsel select option{color:#13212B}
 body.immersive .top .langsel::after{border-color:rgba(255,255,255,.85)}
 .top{transition:background .3s,color .3s}
-.journey{position:relative;height:700vh;margin-top:-64px;background:#0B1A26}
+.journey{position:relative;height:600vh;margin-top:-64px;background:#0B1A26}
 .stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;color:#fff;contain:paint;background:#0B1A26}
-.shots{position:absolute;inset:0}
-.shot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;will-change:transform,opacity;backface-visibility:hidden;user-select:none;-webkit-user-drag:none}
-.shot:first-child{opacity:1}
+.stage{background:#0B1A26 url("video/journey-d.webp") center/cover no-repeat}
+@media (max-aspect-ratio:1/1){.stage{background-image:url("video/journey-m.webp")}}
+.film{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s}
+.film.ready{opacity:1}
 .scrim{position:absolute;inset:0;pointer-events:none;background:
   linear-gradient(to bottom,rgba(6,14,22,.55),rgba(6,14,22,0) 22%),
   radial-gradient(ellipse 70% 55% at 50% 50%,rgba(6,14,22,.62),rgba(6,14,22,.18) 75%);opacity:var(--o,.9)}
@@ -245,7 +246,7 @@ body.immersive .top .langsel::after{border-color:rgba(255,255,255,.85)}
 /* Reduced motion: no scroll-scrubbing; the photos appear as a calm stack with their captions */
 @media (prefers-reduced-motion:reduce){
   .journey{height:auto;margin-top:0}.stage{position:relative;height:auto;display:grid;gap:0}
-  .shots{position:relative;display:grid}.shot{position:relative;height:56vh;opacity:1!important;transform:none!important}
+  .stage::before{content:"";display:block;height:62vh;background:inherit;background-color:#0B1A26}.film{display:none}
   .scrim,.hint,.progress{display:none}
   .cap{position:relative;left:auto;top:auto;transform:none!important;opacity:1!important;margin:32px auto;pointer-events:auto;color:var(--ink);text-shadow:none}
   .cap p{color:var(--muted)}.cap .kicker{color:var(--tile)}.btn.ghost.light{color:var(--ink);border-color:var(--line);background:transparent}
@@ -282,22 +283,15 @@ body.immersive .top .langsel::after{border-color:rgba(255,255,255,.85)}
 <main>
 <section class="journey" id="journey" aria-label="Istanbul">
   <div class="stage">
-    <!-- Photo journey: Istanbul from above → the shore → a Bosphorus villa → inside → up the stairs → the view from the bedroom.
-         Each shot zooms toward its focus point (data-f, as fractions of the image) between scales data-z, over scroll range data-r. -->
-    <div class="shots" aria-hidden="true">
-      <img class="shot" src="img/journey/1-istanbul.webp" alt="" width="1672" height="941" fetchpriority="high" decoding="async" data-f=".43 .69" data-z="1 3.6" data-r="0 .25">
-      <img class="shot" src="img/journey/2-villa.webp" alt="" width="1672" height="941" decoding="async" data-f=".5 .63" data-z="1 1.9" data-r=".19 .42">
-      <img class="shot" src="img/journey/3-terrace.webp" alt="" width="1672" height="941" decoding="async" data-f=".5 .47" data-z="1 1.8" data-r=".36 .57">
-      <img class="shot" src="img/journey/4-living.webp" alt="" width="1672" height="941" decoding="async" data-f=".84 .44" data-z="1.04 1.75" data-r=".51 .73">
-      <img class="shot" src="img/journey/5-stairs.webp" alt="" width="1672" height="941" decoding="async" data-f=".5 .3" data-z="1 2.3" data-r=".67 .87">
-      <img class="shot" src="img/journey/6-view.webp" alt="" width="1672" height="941" decoding="async" data-f=".6 .38" data-z="1 1.4" data-r=".81 .97">
-    </div>
+    <!-- Drone journey: one 4K-sourced video (day over the Bosphorus Bridge, dissolving into night) scrubbed by the scroll.
+         Desktop: 2560x1440; phones: a 1080x1920 crop that keeps the bridge in frame. -->
+    <video class="film" id="film" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true" tabindex="-1"></video>
     <div class="scrim" id="scrim"></div>
 
     <div class="cap c1"><span class="kicker" data-t="kicker">New-build homes for international buyers</span><h1 data-t="h1">Find the right home in Istanbul, with honest advice in your language.</h1><p data-t="sub"></p><div class="ctas"><button class="btn" type="button" data-chat data-t="cta_main">Start with the advisor</button></div></div>
     <div class="cap c2"><h2 data-t="j1_t">Two continents. One city.</h2><p data-t="j1_p"></p></div>
-    <div class="cap c3"><h2 data-t="j2_t">Life on the Bosphorus shore</h2><p data-t="j2_p"></p></div>
-    <div class="cap c4"><h2 data-t="j3_t">Step inside</h2><p data-t="j3_p"></p></div>
+    <div class="cap c3"><h2 data-t="j2_t">Life along the Bosphorus</h2><p data-t="j2_p"></p></div>
+    <div class="cap c4"><h2 data-t="j3_t">As the city lights up</h2><p data-t="j3_p"></p></div>
     <div class="cap c5"><h2 data-t="j4_t">This could be your view.</h2><p data-t="j4_p"></p><div class="ctas"><button class="btn" type="button" data-chat data-t="j4_cta">Find my view</button><a class="btn ghost light" href="#districts" data-t="j4_map">Explore the map</a></div></div>
     <div class="hint" id="hint"><span data-t="j_hint">Scroll to explore</span><i></i></div>
     <div class="progress" aria-hidden="true"><b id="prog"></b></div>
@@ -660,36 +654,36 @@ addEventListener("scroll", () => $("#top").classList.toggle("scrolled", scrollY 
 /* ===== Extra text for the immersive journey and the district map ===== */
 const T2 = {
 en:{j_hint:"Scroll to explore",j1_t:"Two continents. One city.",j1_p:"Istanbul stretches across Europe and Asia, joined by the Bosphorus.",
- j2_t:"Life on the Bosphorus shore",j2_p:"Waterside homes beside Ortaköy, with the bridge and the ferries in front of you.",
- j3_t:"Step inside",j3_p:"Light, space and calm, a few steps from the water.",
+ j2_t:"Life along the Bosphorus",j2_p:"Bridges, waterside palaces and ferries crossing between continents, all day long.",
+ j3_t:"As the city lights up",j3_p:"Some of Istanbul's most sought-after homes look out over this water.",
  j4_t:"This could be your view.",j4_p:"Tell the advisor what you are dreaming of, and it finds approved homes that match.",j4_cta:"Find my view",j4_map:"Explore the map",
  m_eu:"EUROPE",m_as:"ASIA",m_bs:"Black Sea",m_mar:"Sea of Marmara",m_bos:"Bosphorus",m_gh:"Golden Horn",
  d_h:"Explore by district",d_p:"Tap a district to see the approved projects there. Orange is the European side, teal the Asian side.",d_pick:"Pick a district on the map to see its projects.",
  d_count:"{n} approved projects",d_short:"Get a shortlist for this area",nav_map:"Map"},
 tr:{j_hint:"Keşfetmek için kaydırın",j1_t:"İki kıta. Tek şehir.",j1_p:"İstanbul, Boğaz'la birleşen Avrupa ve Asya'ya yayılır.",
- j2_t:"Boğaz kıyısında yaşam",j2_p:"Ortaköy yakınında, önünüzde köprü ve vapurlarla su kenarında evler.",
- j3_t:"İçeri buyurun",j3_p:"Suya birkaç adım mesafede ışık, ferahlık ve huzur.",
+ j2_t:"Boğaz boyunca yaşam",j2_p:"Köprüler, yalılar ve kıtalar arasında gidip gelen vapurlar.",
+ j3_t:"Şehrin ışıkları yanarken",j3_p:"İstanbul'un en çok aranan evlerinden bazıları bu manzaraya bakıyor.",
  j4_t:"Bu sizin manzaranız olabilir.",j4_p:"Danışmana hayalinizdeki evi anlatın; size uyan onaylı evleri bulsun.",j4_cta:"Manzaramı bul",j4_map:"Haritayı keşfet",
  m_eu:"AVRUPA",m_as:"ASYA",m_bs:"Karadeniz",m_mar:"Marmara Denizi",m_bos:"İstanbul Boğazı",m_gh:"Haliç",
  d_h:"İlçelere göre keşfedin",d_p:"Onaylı projeleri görmek için bir ilçeye dokunun. Turuncu Avrupa Yakası, turkuaz Anadolu Yakası.",d_pick:"Projelerini görmek için haritadan bir ilçe seçin.",
  d_count:"{n} onaylı proje",d_short:"Bu bölge için liste alın",nav_map:"Harita"},
 ar:{j_hint:"مرّر للاستكشاف",j1_t:"قارتان. مدينة واحدة.",j1_p:"تمتد إسطنبول بين أوروبا وآسيا، ويصل بينهما البوسفور.",
- j2_t:"الحياة على ضفاف البوسفور",j2_p:"منازل على الماء قرب أورتاكوي، والجسر والعبّارات أمامك.",
- j3_t:"تفضّل بالدخول",j3_p:"ضوء ومساحة وهدوء، على بُعد خطوات من الماء.",
+ j2_t:"الحياة على امتداد البوسفور",j2_p:"جسور وقصور على الماء وعبّارات تعبر بين القارتين طوال اليوم.",
+ j3_t:"حين تضيء المدينة",j3_p:"بعض أكثر المنازل طلبًا في إسطنبول تطل على هذا الماء.",
  j4_t:"قد تكون هذه إطلالتك.",j4_p:"أخبر المستشار بما تحلم به، وسيجد منازل معتمدة تناسبك.",j4_cta:"اعثر على إطلالتي",j4_map:"استكشف الخريطة",
  m_eu:"أوروبا",m_as:"آسيا",m_bs:"البحر الأسود",m_mar:"بحر مرمرة",m_bos:"البوسفور",m_gh:"القرن الذهبي",
  d_h:"استكشف حسب المنطقة",d_p:"اضغط على منطقة لرؤية المشاريع المعتمدة فيها. البرتقالي للجانب الأوروبي، والفيروزي للجانب الآسيوي.",d_pick:"اختر منطقة على الخريطة لرؤية مشاريعها.",
  d_count:"{n} مشروعًا معتمدًا",d_short:"احصل على قائمة لهذه المنطقة",nav_map:"الخريطة"},
 fa:{j_hint:"برای کاوش اسکرول کنید",j1_t:"دو قاره. یک شهر.",j1_p:"استانبول میان اروپا و آسیا گسترده است و بسفر آن‌ها را به هم می‌پیوندد.",
- j2_t:"زندگی در ساحل بسفر",j2_p:"خانه‌هایی کنار آب نزدیک اورتاکوی، با پل و کشتی‌ها روبه‌رویتان.",
- j3_t:"بفرمایید داخل",j3_p:"نور، فضا و آرامش، چند قدم دورتر از آب.",
+ j2_t:"زندگی در امتداد بسفر",j2_p:"پل‌ها، کاخ‌های کنار آب و کشتی‌هایی که تمام روز میان دو قاره رفت‌وآمد می‌کنند.",
+ j3_t:"وقتی شهر روشن می‌شود",j3_p:"برخی از پرطرفدارترین خانه‌های استانبول رو به همین آب هستند.",
  j4_t:"این می‌تواند منظرهٔ شما باشد.",j4_p:"به مشاور بگویید رؤیایتان چیست؛ خانه‌های تأییدشدهٔ مناسب را پیدا می‌کند.",j4_cta:"منظره‌ام را پیدا کن",j4_map:"کاوش در نقشه",
  m_eu:"اروپا",m_as:"آسیا",m_bs:"دریای سیاه",m_mar:"دریای مرمره",m_bos:"بسفر",m_gh:"شاخ طلایی",
  d_h:"کاوش بر اساس منطقه",d_p:"روی یک منطقه بزنید تا پروژه‌های تأییدشدهٔ آن را ببینید. نارنجی بخش اروپایی و فیروزه‌ای بخش آسیایی است.",d_pick:"برای دیدن پروژه‌ها، یک منطقه را روی نقشه انتخاب کنید.",
  d_count:"{n} پروژهٔ تأییدشده",d_short:"برای این منطقه فهرست بگیرید",nav_map:"نقشه"},
 ru:{j_hint:"Прокрутите, чтобы исследовать",j1_t:"Два континента. Один город.",j1_p:"Стамбул раскинулся в Европе и Азии, которые соединяет Босфор.",
- j2_t:"Жизнь на берегу Босфора",j2_p:"Дома у воды рядом с Ортакёем — мост и паромы прямо перед вами.",
- j3_t:"Заходите",j3_p:"Свет, простор и тишина в нескольких шагах от воды.",
+ j2_t:"Жизнь вдоль Босфора",j2_p:"Мосты, дворцы у воды и паромы, весь день курсирующие между континентами.",
+ j3_t:"Когда город зажигает огни",j3_p:"Из окон самых востребованных домов Стамбула видна именно эта вода.",
  j4_t:"Это может быть ваш вид.",j4_p:"Расскажите консультанту, о чём мечтаете, и он подберёт подходящие одобренные дома.",j4_cta:"Найти мой вид",j4_map:"Открыть карту",
  m_eu:"ЕВРОПА",m_as:"АЗИЯ",m_bs:"Чёрное море",m_mar:"Мраморное море",m_bos:"Босфор",m_gh:"Золотой Рог",
  d_h:"Районы на карте",d_p:"Нажмите на район, чтобы увидеть одобренные проекты. Оранжевый — европейская сторона, бирюзовый — азиатская.",d_pick:"Выберите район на карте, чтобы увидеть его проекты.",
@@ -737,43 +731,56 @@ function buildMap(svg, withLabels){
   }
 }
 
-/* ===== Scroll engine: photo journey ===== */
+/* ===== Scroll engine: drone video scrubbed by scroll ===== */
 const clamp = (x, a=0, b=1) => Math.min(b, Math.max(a, x));
-const ease = x => x < .5 ? 2*x*x : 1 - Math.pow(-2*x + 2, 2) / 2;
 const win01 = (p, a, b, f=.035) => clamp(Math.min((p - a) / f, (b - p) / f)); // fade in after a, out before b
-const FADE = .06; // each new shot crossfades in over this much scroll
-const J = {journey:$("#journey"), stage:$(".stage"), scrim:$("#scrim"), caps:[...document.querySelectorAll(".journey .cap")], hint:$("#hint"), body:document.body,
-  shots:[...document.querySelectorAll(".journey .shot")].map(el => ({el, f:el.dataset.f.split(" ").map(Number), z:el.dataset.z.split(" ").map(Number), r:el.dataset.r.split(" ").map(Number)}))};
+const J = {journey:$("#journey"), stage:$(".stage"), film:$("#film"), scrim:$("#scrim"), caps:[...document.querySelectorAll(".journey .cap")], hint:$("#hint"), body:document.body};
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-let lastP = -1, ticking = false;
-// With object-fit:cover, setting object-position and transform-origin to the same percentages keeps the focus point fixed on screen
-// at every screen shape, so each zoom heads straight for it (and phones crop toward it).
-function layout(){
-  J.shots.forEach(s => { const pos = `${s.f[0]*100}% ${s.f[1]*100}%`; s.el.style.objectPosition = pos; s.el.style.transformOrigin = pos; });
-  lastP = -1; frame_();
+const portrait = matchMedia("(max-aspect-ratio: 1/1)");
+const saveData = !!(navigator.connection && navigator.connection.saveData);
+let lastP = -1, ticking = false, target = 0, shown = 0, filmSet = "";
+// Load the right cut for the screen shape (and none when the viewer asked to save data or reduce motion: the poster stays).
+function pickFilm(){
+  if (reduced.matches || saveData) return;
+  const set = portrait.matches ? "m" : "d"; if (set === filmSet) return; filmSet = set;
+  const v = J.film; v.classList.remove("ready"); v.poster = `video/journey-${set}.webp`; v.src = `video/journey-${set}.mp4`; v.load();
+  v.addEventListener("loadeddata", () => { v.classList.add("ready"); seekLoop(); }, {once:true});
 }
+// iOS only renders seeks once the video has been "played" after a touch.
+addEventListener("touchstart", () => { const v = J.film; if (v.src && v.paused) v.play().then(() => v.pause()).catch(() => {}); }, {once:true, passive:true});
+// Ease the video time toward the scroll position, and never queue a seek while one is still in progress.
+let looping = false;
+function seekLoop(){
+  if (looping) return; looping = true;
+  const step = () => {
+    const v = J.film, d = v.duration;
+    if (!d || reduced.matches){ looping = false; return; }
+    shown += (target - shown) * .2;
+    if (Math.abs(target - shown) < .0004) shown = target;
+    const t = Math.min(d - .04, shown * d);
+    if (!v.seeking && Math.abs(v.currentTime - t) > .012) v.currentTime = t;
+    if (shown !== target || v.seeking) requestAnimationFrame(step); else looping = false;
+  };
+  requestAnimationFrame(step);
+}
+function layout(){ pickFilm(); lastP = -1; frame_(); }
 function frame_(){
   ticking = false;
   const r = J.journey.getBoundingClientRect();
   J.body.classList.toggle("immersive", !reduced.matches && r.bottom > 64);
   if (reduced.matches) return;
   const p = clamp(-r.top / (r.height - innerHeight));
-  if (Math.abs(p - lastP) < .0003) return; lastP = p;
+  if (Math.abs(p - lastP) < .0002) return; lastP = p;
   J.stage.style.setProperty("--p", p);
-  J.shots.forEach((s, i) => {
-    const [a, b] = s.r, k = ease(clamp((p - a) / (b - a)));
-    const o = i === 0 ? 1 : clamp((p - a) / FADE);
-    const next = J.shots[i + 1], covered = next && p >= next.r[0] + FADE;
-    s.el.style.opacity = o;
-    s.el.style.visibility = (o <= 0 || covered) ? "hidden" : "visible";
-    if (o > 0 && !covered) s.el.style.transform = `scale(${(s.z[0] + (s.z[1] - s.z[0]) * k).toFixed(4)})`;
-  });
-  const vis = [win01(p, -1, .055, .03), win01(p, .08, .18), win01(p, .26, .36), win01(p, .52, .65), win01(p, .88, 2)];
+  target = p; seekLoop();
+  // Video timeline: day bridge 0–49%, dissolve to night 49–57%, night 57–100%.
+  const vis = [win01(p, -1, .05, .03), win01(p, .1, .22), win01(p, .3, .44), win01(p, .62, .76), win01(p, .86, 2)];
   J.caps.forEach((c, i) => { const o = vis[i]; c.style.opacity = o; c.style.transform = `translate(-50%, calc(-50% + ${((1 - o) * 24).toFixed(1)}px))`; c.classList.toggle("on", o > .5); });
-  J.scrim.style.setProperty("--o", (.35 + Math.max(...vis) * .65).toFixed(3));
+  J.scrim.style.setProperty("--o", (.3 + Math.max(...vis) * .7).toFixed(3));
   J.hint.style.opacity = 1 - clamp(p / .02);
 }
 function onScroll(){ if (!ticking){ ticking = true; requestAnimationFrame(frame_); } }
+portrait.addEventListener?.("change", layout);
 
 /* ===== District map ===== */
 const DISTRICTS = [
