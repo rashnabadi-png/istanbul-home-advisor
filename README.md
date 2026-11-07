@@ -1,6 +1,6 @@
 # Istanbul Home Advisor — website + chat bot
 
-**Website** (`public/index.html`, the homepage at istanbulhomeadvisor.com): hero, services, featured projects (pulled live from the
+**Website** (`public/index.html`, the homepage at istanbulhomeadvisor.com): an immersive scroll journey (dive from a map of Istanbul onto the Bosphorus, golden hour turning to night, then pull back through a living-room window: "this could be your view"), an interactive district map with approved-project counts per district, services, featured projects (pulled live from the
 same approved data as the bot), how it works, FAQ, contact, all in the same 5 languages. Every "Ask the advisor" button, and
 "Ask about this project" on each card, opens the bot in a chat panel (full screen on phones). The site's language choice is passed to
 the bot. WhatsApp button appears once `WHATSAPP_NUMBER` is set in Vercel.
