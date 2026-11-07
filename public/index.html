@@ -203,9 +203,9 @@ body.immersive .top .langsel::after{border-color:rgba(255,255,255,.85)}
 :lang(ar) .geo,:lang(fa) .geo{letter-spacing:0;font-family:var(--f-body);font-weight:700}
 .geo.eu{left:12%}.geo.as{right:12%}
 @media (max-aspect-ratio:1/1){.geo{top:30%;font-size:1.3rem;letter-spacing:.24em}.geo.eu{left:8%}.geo.as{right:8%}}
-.pin-place{display:grid;justify-items:center;gap:6px;pointer-events:none;opacity:0;transition:opacity .3s}
-.pin-place i{width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 0 5px rgba(255,255,255,.3),0 0 24px rgba(0,0,0,.5)}
-.pin-place.on{opacity:1}
+.pin-place{display:grid;justify-items:center;gap:6px;pointer-events:none}
+.pin-place i{opacity:0;transition:opacity .3s;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 0 5px rgba(255,255,255,.3),0 0 24px rgba(0,0,0,.5)}
+.pin-place.on i{opacity:1}
 .cap.stop{top:auto;bottom:max(96px,calc(env(safe-area-inset-bottom,0px) + 96px));transform:translate(-50%,0)}
 .scrim{position:absolute;inset:0;pointer-events:none;background:
   linear-gradient(to bottom,rgba(6,14,22,.55),rgba(6,14,22,0) 22%),
@@ -758,17 +758,17 @@ const OVERVIEW = {lon:29.06, lat:41.1, lonSpan:.62}; // roughly what the opening
 const KEYS = [
   {p:0,   lon:29.06,  lat:41.10,  zoom:-1,   pitch:0,  bearing:0},
   {p:.10, lon:29.06,  lat:41.10,  zoom:-1,   pitch:0,  bearing:0},
-  {p:.24, lon:29.0435,lat:41.0768,zoom:15.4, pitch:58, bearing:-28},  // Bebek bay
-  {p:.33, lon:29.0430,lat:41.0775,zoom:15.6, pitch:60, bearing:-8},
+  {p:.24, lon:29.0462,lat:41.0772,zoom:15.4, pitch:58, bearing:-28},  // Bebek bay
+  {p:.33, lon:29.0466,lat:41.0778,zoom:15.6, pitch:60, bearing:-8},
   {p:.42, lon:29.03,  lat:41.055, zoom:12.2, pitch:20, bearing:0},    // pull back
-  {p:.52, lon:29.0125,lat:41.0235,zoom:15.3, pitch:58, bearing:-115}, // Üsküdar, looking west to the old city
-  {p:.61, lon:29.0118,lat:41.0228,zoom:15.5, pitch:60, bearing:-95},
+  {p:.52, lon:29.0080,lat:41.0218,zoom:15.2, pitch:58, bearing:-115}, // Üsküdar shore and Maiden's Tower, looking west to the old city
+  {p:.61, lon:29.0072,lat:41.0214,zoom:15.4, pitch:60, bearing:-95},
   {p:.70, lon:29.02,  lat:41.06,  zoom:12.3, pitch:20, bearing:0},    // pull back
-  {p:.80, lon:29.012, lat:41.083, zoom:15.0, pitch:62, bearing:12},   // Levent & Maslak
-  {p:.87, lon:29.013, lat:41.088, zoom:15.1, pitch:62, bearing:30},
+  {p:.80, lon:29.011, lat:41.0785,zoom:15.0, pitch:62, bearing:12},   // Levent & Maslak
+  {p:.87, lon:29.012, lat:41.0815,zoom:15.1, pitch:62, bearing:30},
   {p:.98, lon:29.06,  lat:41.10,  zoom:-1,   pitch:0,  bearing:0},
 ];
-const PLACES = [{lon:29.0435,lat:41.0768,k:"tb_t",a:.23,b:.35},{lon:29.0125,lat:41.0235,k:"tu_t",a:.51,b:.63},{lon:29.012,lat:41.083,k:"tl_t",a:.79,b:.89}];
+const PLACES = [{lon:29.0435,lat:41.0768,k:"tb_t",a:.23,b:.35},{lon:29.0041,lat:41.0211,k:"tu_t",a:.51,b:.63},{lon:29.011,lat:41.0795,k:"tl_t",a:.79,b:.89}];
 const J = {journey:$("#journey"), stage:$(".stage"), mapEl:$("#tourMap"), intro:$("#intro"), eu:$("#geoEu"), as:$("#geoAs"), scrim:$("#scrim"),
   caps:[...document.querySelectorAll(".journey .cap")], hint:$("#hint"), body:document.body, map:null, pins:[]};
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
