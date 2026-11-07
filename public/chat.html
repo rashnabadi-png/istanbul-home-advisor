@@ -616,6 +616,8 @@ if (QS.get("embed")==="1") document.documentElement.classList.add("embed");
 let ready = false; const pending = [];
 function fromSite(m){
   if (m.type==="iha-focus"){ $("#input").focus({preventScroll:true}); return; }
+  // From the neighbourhood explorer: recommend approved projects in that district straight away.
+  if (m.type==="iha-area" && m.district){ A.area = m.district; if (m.side) A.side = m.side; addMsg("me", m.hood ? `${m.hood}, ${m.district}` : m.district); recommend(); return; }
   if (m.type==="iha-lang" && LANGS.some(x=>x[0]===m.lang) && m.lang!==L) applyLang(m.lang, false);
   if (m.type==="iha-project"){ const p = P.find(x=>x.id===m.id); if (!p) return;
     addMsg("me", t("me_more",{name:p.name})); askClaude(`Tell me more about ${p.name} (${p.id}).`); }

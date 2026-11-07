@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Istanbul Neighbourhood Explorer</title>
+<meta name="description" content="Explore all 39 districts and 968 neighbourhoods (mahalle) of Istanbul on a satellite map: size, neighbours, distance to Taksim, district guides and approved new-build projects.">
+<link rel="canonical" href="https://istanbulhomeadvisor.com/explore.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Istanbul Home Advisor">
+<meta property="og:title" content="Istanbul Neighbourhood Explorer">
+<meta property="og:description" content="All 39 districts and 968 neighbourhoods of Istanbul on one interactive map.">
+<meta name="theme-color" content="#1D4E9E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231D4E9E'/%3E%3Cpath d='M14 46V30l18-13 18 13v16H38V35H26v11z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: satellite map on the left, a guide panel on the right (stacked on phones). Same palette and type as the home page. */
+:root{
+  --bg:#EEF3F4; --surface:#FFFFFF; --sunk:#E3EBEE; --ink:#13212B; --muted:#5A6B76; --line:#D3DDE1;
+  --accent:#1D4E9E; --accent-ink:#FFFFFF; --tile:#0F7F80; --tile-bg:#DCEFEF; --eu:#E8793D; --as:#1FA8A3; --gold:#F2B76B;
+  --f-display:"Young Serif",Georgia,"Times New Roman",serif; --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif; --r:16px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E171D; --surface:#15212A; --sunk:#1C2B35; --ink:#E6EEF2; --muted:#93A6B2; --line:#2A3B46; --accent:#7EA8F2; --accent-ink:#0B1726; --tile:#4FC0BE; --tile-bg:#163234; color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E171D; --surface:#15212A; --sunk:#1C2B35; --ink:#E6EEF2; --muted:#93A6B2; --line:#2A3B46; --accent:#7EA8F2; --accent-ink:#0B1726; --tile:#4FC0BE; --tile-bg:#163234; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+button,input{font:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;line-height:1.15;margin:0;text-wrap:balance}
+:lang(ar) h1,:lang(ar) h2,:lang(ar) h3,:lang(fa) h1,:lang(fa) h2,:lang(fa) h3,:lang(ru) h1,:lang(ru) h2,:lang(ru) h3{font-family:var(--f-body);font-weight:700}
+p{margin:0}
+.top{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.top .in{display:flex;align-items:center;gap:14px;height:60px;padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;min-width:0}
+.logo svg{width:30px;height:30px;flex:none}
+.logo b{font-family:var(--f-display);font-weight:400;font-size:1.08rem;white-space:nowrap}
+.top nav{display:flex;gap:18px;margin-inline-start:auto}
+.top nav a{text-decoration:none;color:var(--muted);font-weight:500;font-size:.92rem}
+.top nav a[aria-current]{color:var(--ink)}
+.langsel select{appearance:none;-webkit-appearance:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font-size:.85rem;cursor:pointer}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:10px 18px;font-weight:600;text-decoration:none;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.small{padding:7px 13px;font-size:.86rem}
+@media (max-width:760px){.top nav{display:none}.langsel{margin-inline-start:auto}.logo b{font-size:.98rem}}
+@media (max-width:420px){.logo b{display:none}}
+
+.ex{display:grid;grid-template-columns:1fr 420px;height:calc(100dvh - 61px)}
+.mapwrap{position:relative;min-width:0}
+#map{position:absolute;inset:0;background:#0B1A26}
+.side{overflow-y:auto;border-inline-start:1px solid var(--line);background:var(--bg);padding:20px max(18px,env(safe-area-inset-right,0px)) 120px 20px;display:grid;gap:18px;align-content:start}
+@media (max-width:900px){
+  .ex{display:block;height:auto}
+  .mapwrap{height:58vh;height:58svh}
+  .side{border:0;padding:18px max(16px,env(safe-area-inset-right,0px)) 120px max(16px,env(safe-area-inset-left,0px))}
+}
+.kicker{font-size:.76rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--tile)}
+:lang(ar) .kicker,:lang(fa) .kicker{letter-spacing:0}
+.lead h1{font-size:1.9rem;margin-top:4px}
+.lead p{color:var(--muted);margin-top:8px}
+.search{position:relative}
+.search input{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:11px 16px 11px 42px;font-size:.95rem}
+[dir="rtl"] .search input{padding:11px 42px 11px 16px}
+.search svg{position:absolute;inset-inline-start:15px;top:50%;width:18px;height:18px;margin-top:-9px;color:var(--muted);pointer-events:none}
+.results{position:absolute;z-index:5;left:0;right:0;top:calc(100% + 6px);background:var(--surface);border:1px solid var(--line);border-radius:14px;margin:0;padding:6px;list-style:none;box-shadow:0 18px 40px -20px rgba(15,35,64,.5);max-height:320px;overflow:auto}
+.results[hidden]{display:none}
+.results li button{width:100%;display:flex;justify-content:space-between;gap:10px;text-align:start;border:0;background:transparent;border-radius:10px;padding:8px 10px;cursor:pointer}
+.results li button:hover,.results li button.on{background:var(--sunk)}
+.results small{color:var(--muted);white-space:nowrap}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.filters button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 13px;font-size:.86rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
+.dot.eu{background:var(--eu)}.dot.as{background:var(--as)}.dot.pr{background:var(--gold)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px}
+.stat b{display:block;font:400 1.5rem/1.1 var(--f-display);font-variant-numeric:tabular-nums}
+.stat span{color:var(--muted);font-size:.8rem}
+.dlist{display:grid;gap:14px}
+.dlist h3{font-family:var(--f-body);font-weight:600;font-size:.95rem;display:flex;align-items:center;gap:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 11px;font-size:.86rem;cursor:pointer;display:inline-flex;gap:6px;align-items:baseline}
+.chips button:hover{border-color:var(--accent)}
+.chips small{color:var(--muted);font-variant-numeric:tabular-nums}
+.detail{display:grid;gap:16px}
+.crumb{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.86rem;color:var(--muted)}
+.crumb button{border:0;background:none;padding:0;color:var(--accent);cursor:pointer;font-weight:600}
+.detail h2{font-size:2.1rem}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 11px;font-size:.82rem;font-weight:600;background:var(--sunk)}
+.about{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:6px}
+.about h3{font-family:var(--f-body);font-weight:600;font-size:.95rem}
+.about p{color:var(--muted)}
+.about .note{font-size:.76rem}
+.plist{display:grid;gap:10px}
+.plist h3{font-family:var(--f-body);font-weight:600;font-size:.95rem}
+.pc{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;gap:4px}
+.pc b{font-weight:600}
+.pc .row{display:flex;justify-content:space-between;gap:10px;align-items:center;color:var(--muted);font-size:.86rem}
+.pc .row strong{color:var(--ink);font-variant-numeric:tabular-nums}
+.pc button{justify-self:start;border:0;background:none;padding:0;color:var(--accent);font-weight:600;cursor:pointer;font-size:.88rem;margin-top:2px}
+.empty{color:var(--muted);font-size:.92rem}
+.credits{font-size:.74rem;color:var(--muted)}
+.hovertip{position:absolute;z-index:4;pointer-events:none;background:rgba(19,33,43,.92);color:#fff;border-radius:10px;padding:6px 10px;font-size:.85rem;transform:translate(12px,12px);white-space:nowrap}
+.hovertip small{opacity:.75}
+.hovertip[hidden]{display:none}
+.dlabel{font:600 12px var(--f-body);color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.9),0 0 10px rgba(0,0,0,.6);letter-spacing:.04em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:opacity .2s}
+.hide-dlabels .dlabel,.only-major .dlabel:not(.major){opacity:0;pointer-events:none}
+.legend{position:absolute;top:12px;inset-inline-start:12px;display:flex;gap:10px;background:rgba(19,33,43,.78);color:#fff;border-radius:999px;padding:6px 12px;font-size:.8rem}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.maplibregl-ctrl-attrib{font:11px var(--f-body)}
+
+/* The advisor */
+.fab{position:fixed;z-index:40;inset-inline:max(12px,env(safe-area-inset-left,0px)) max(12px,env(safe-area-inset-right,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));margin-inline:auto;max-width:520px;display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:999px;padding:8px 10px 8px 8px;background:var(--surface);color:var(--ink);box-shadow:0 14px 34px -14px rgba(15,35,64,.55);cursor:pointer}
+.fab .ava{width:38px;height:38px;flex:none}
+.fab .t{flex:1;text-align:start;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fab .go{width:38px;height:38px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;flex:none}
+@media (min-width:901px){.fab{inset-inline:auto max(18px,env(safe-area-inset-right,0px));width:388px}}
+.fab.hide{opacity:0;pointer-events:none}
+.panel{position:fixed;z-index:50;inset-inline-end:16px;bottom:16px;width:min(420px,calc(100vw - 32px));height:min(700px,calc(100dvh - 32px));background:var(--bg);border:1px solid var(--line);border-radius:22px;box-shadow:0 30px 80px -24px rgba(15,35,64,.6);display:grid;grid-template-rows:auto 1fr;overflow:hidden;visibility:hidden;opacity:0;transform:translateY(16px);transition:opacity .2s,transform .2s}
+.panel.open{visibility:visible;opacity:1;transform:none}
+.panel .bar{display:flex;align-items:center;gap:10px;padding:12px 12px 12px 14px;background:var(--accent);color:#fff}
+.panel .bar div{display:grid;line-height:1.25}
+.panel .bar span{font-size:.78rem;opacity:.9}
+.panel .bar button{margin-inline-start:auto;border:0;background:rgba(255,255,255,.16);color:inherit;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;cursor:pointer}
+.panel iframe{border:0;width:100%;height:100%}
+@media (max-width:560px){.panel{inset:0;width:100%;height:100dvh;border-radius:0;border:0}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <a class="logo" href="./" aria-label="Istanbul Home Advisor"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="var(--accent)"/><path d="M14 46V30l18-13 18 13v16H38V35H26v11z" fill="var(--accent-ink)"/></svg><b>Istanbul Home Advisor</b></a>
+    <nav aria-label="Main"><a href="./" data-t="nav_home">Home</a><a href="explore.html" aria-current="page" data-t="nav_explore">Neighbourhoods</a></nav>
+    <label class="langsel"><select id="lang" aria-label="Language"><option value="en">English</option><option value="tr">Türkçe</option><option value="ar">العربية</option><option value="fa">فارسی</option><option value="ru">Русский</option></select></label>
+  </div>
+</header>
+
+<main class="ex">
+  <div class="mapwrap">
+    <div id="map" role="application" aria-label="Map of Istanbul neighbourhoods"></div>
+    <div class="legend" aria-hidden="true"><span><i class="dot eu"></i><span data-t="side_eu">European side</span></span><span><i class="dot as"></i><span data-t="side_as">Asian side</span></span></div>
+    <div class="hovertip" id="hoverTip" hidden></div>
+  </div>
+  <aside class="side" id="side">
+    <div class="lead"><span class="kicker" data-t="ex_kicker">Explore</span><h1 data-t="ex_title">Istanbul neighbourhoods</h1><p data-t="ex_lead">All 39 districts and 968 neighbourhoods (mahalle) of Istanbul. Tap the map or search to explore.</p></div>
+    <div class="search" role="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="q" type="search" autocomplete="off" aria-label="Search" aria-controls="results">
+      <ul class="results" id="results" role="listbox" hidden></ul>
+    </div>
+    <div class="filters" id="filters" role="group" aria-label="Filter"></div>
+    <div id="detail" class="detail" aria-live="polite"></div>
+    <p class="credits" data-t="credits">Boundaries © OpenStreetMap contributors (ODbL). Imagery © Esri, Maxar, Earthstar Geographics. Distances are straight-line estimates.</p>
+  </aside>
+</main>
+
+<button class="fab" id="fab" type="button" aria-label="Open chat">
+  <svg class="ava" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="avg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2A64C4"/><stop offset="1" stop-color="#0F7F80"/></linearGradient></defs><circle cx="32" cy="32" r="32" fill="url(#avg)"/><path d="M17 44V30l15-11 15 11v14H37v-8H27v8z" fill="#fff"/><circle cx="46" cy="18" r="6" fill="#F2B76B" stroke="#fff" stroke-width="2.5"/></svg>
+  <span class="t" data-t="fab_bar">Ask me anything about buying in Istanbul…</span>
+  <span class="go" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+</button>
+<div class="panel" id="panel" role="dialog" aria-labelledby="panelTitle">
+  <div class="bar">
+    <div><b id="panelTitle">Istanbul Home Advisor</b><span data-t="online">Online now</span></div>
+    <button id="close" type="button" aria-label="Close chat"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js" defer></script>
+<script>
+const T = {
+en:{nav_home:"Home",nav_explore:"Neighbourhoods",ex_kicker:"Explore",ex_title:"Istanbul neighbourhoods",ex_lead:"All 39 districts and 968 neighbourhoods (mahalle) of Istanbul. Tap the map or search to explore.",search_ph:"Search a neighbourhood or district…",
+ f_all:"All",f_eu:"European side",f_as:"Asian side",f_proj:"With approved projects",side_eu:"European side",side_as:"Asian side",st_districts:"districts",st_hoods:"neighbourhoods",st_projects:"approved projects",
+ district:"District",hood:"Neighbourhood",area:"Area",km2:"{n} km²",pitches:"about {n} football pitches",taksim:"To Taksim",taksim_v:"{n} km",straight:"straight line",nbs:"Neighbours",n_hoods:"neighbourhoods",
+ about:"About {x}",proj_here:"Approved projects in {x}",proj_district:"Approved projects in {x} district",proj_none:"No approved projects here yet. The advisor can suggest the closest ones.",
+ ask_area:"Find homes in {x}",ask_proj:"Ask about this project",hoods_in:"Neighbourhoods in {x}",all_districts:"All districts",from:"From",price_req:"Price on request",
+ note_en:"",fab_bar:"Ask me anything about buying in Istanbul…",online:"Online now",no_results:"No matches",
+ credits:"Boundaries © OpenStreetMap contributors (ODbL). Imagery © Esri, Maxar, Earthstar Geographics. Distances are straight-line estimates."},
+tr:{nav_home:"Ana sayfa",nav_explore:"Semtler",ex_kicker:"Keşfet",ex_title:"İstanbul'un mahalleleri",ex_lead:"İstanbul'un 39 ilçesi ve 968 mahallesi. Keşfetmek için haritaya dokunun ya da arayın.",search_ph:"Mahalle veya ilçe arayın…",
+ f_all:"Tümü",f_eu:"Avrupa Yakası",f_as:"Anadolu Yakası",f_proj:"Onaylı projesi olan",side_eu:"Avrupa Yakası",side_as:"Anadolu Yakası",st_districts:"ilçe",st_hoods:"mahalle",st_projects:"onaylı proje",
+ district:"İlçe",hood:"Mahalle",area:"Yüzölçümü",km2:"{n} km²",pitches:"yaklaşık {n} futbol sahası",taksim:"Taksim'e",taksim_v:"{n} km",straight:"kuş uçuşu",nbs:"Komşu mahalleler",n_hoods:"mahalle",
+ about:"{x} hakkında",proj_here:"{x} içindeki onaylı projeler",proj_district:"{x} ilçesindeki onaylı projeler",proj_none:"Burada henüz onaylı proje yok. Danışman en yakın seçenekleri önerebilir.",
+ ask_area:"{x} bölgesinde ev bul",ask_proj:"Bu projeyi sorun",hoods_in:"{x} mahalleleri",all_districts:"Tüm ilçeler",from:"Başlangıç",price_req:"Fiyat sorunuz",
+ note_en:"İlçe notları şimdilik İngilizce.",fab_bar:"İstanbul'da ev almakla ilgili her şeyi sorun…",online:"Şu an çevrimiçi",no_results:"Sonuç yok",
+ credits:"Sınırlar © OpenStreetMap katkıcıları (ODbL). Görüntüler © Esri, Maxar, Earthstar Geographics. Mesafeler kuş uçuşu tahminlerdir."},
+ar:{nav_home:"الرئيسية",nav_explore:"الأحياء",ex_kicker:"استكشف",ex_title:"أحياء إسطنبول",ex_lead:"كل مناطق إسطنبول الـ39 وأحيائها الـ968. اضغط على الخريطة أو ابحث للاستكشاف.",search_ph:"ابحث عن حي أو منطقة…",
+ f_all:"الكل",f_eu:"الجانب الأوروبي",f_as:"الجانب الآسيوي",f_proj:"فيها مشاريع معتمدة",side_eu:"الجانب الأوروبي",side_as:"الجانب الآسيوي",st_districts:"منطقة",st_hoods:"حيًا",st_projects:"مشروعًا معتمدًا",
+ district:"المنطقة",hood:"الحي",area:"المساحة",km2:"{n} كم²",pitches:"نحو {n} ملعب كرة قدم",taksim:"إلى تقسيم",taksim_v:"{n} كم",straight:"خط مستقيم",nbs:"الأحياء المجاورة",n_hoods:"حيًا",
+ about:"عن {x}",proj_here:"المشاريع المعتمدة في {x}",proj_district:"المشاريع المعتمدة في منطقة {x}",proj_none:"لا توجد مشاريع معتمدة هنا بعد. يمكن للمستشار اقتراح أقرب الخيارات.",
+ ask_area:"ابحث عن منازل في {x}",ask_proj:"اسأل عن هذا المشروع",hoods_in:"أحياء {x}",all_districts:"كل المناطق",from:"يبدأ من",price_req:"السعر عند الطلب",
+ note_en:"ملاحظات المناطق بالإنجليزية حاليًا.",fab_bar:"اسألني أي شيء عن الشراء في إسطنبول…",online:"متصل الآن",no_results:"لا نتائج",
+ credits:"الحدود © مساهمو OpenStreetMap ‏(ODbL). الصور © Esri وMaxar وEarthstar Geographics. المسافات تقديرية بخط مستقيم."},
+fa:{nav_home:"خانه",nav_explore:"محله‌ها",ex_kicker:"کاوش",ex_title:"محله‌های استانبول",ex_lead:"همهٔ ۳۹ منطقه و ۹۶۸ محلهٔ استانبول. برای کاوش روی نقشه بزنید یا جست‌وجو کنید.",search_ph:"جست‌وجوی محله یا منطقه…",
+ f_all:"همه",f_eu:"بخش اروپایی",f_as:"بخش آسیایی",f_proj:"دارای پروژهٔ تأییدشده",side_eu:"بخش اروپایی",side_as:"بخش آسیایی",st_districts:"منطقه",st_hoods:"محله",st_projects:"پروژهٔ تأییدشده",
+ district:"منطقه",hood:"محله",area:"مساحت",km2:"{n} کیلومتر مربع",pitches:"حدود {n} زمین فوتبال",taksim:"تا تکسیم",taksim_v:"{n} کیلومتر",straight:"خط مستقیم",nbs:"محله‌های همسایه",n_hoods:"محله",
+ about:"دربارهٔ {x}",proj_here:"پروژه‌های تأییدشده در {x}",proj_district:"پروژه‌های تأییدشده در منطقهٔ {x}",proj_none:"هنوز پروژهٔ تأییدشده‌ای اینجا نیست. مشاور می‌تواند نزدیک‌ترین گزینه‌ها را پیشنهاد دهد.",
+ ask_area:"خانه در {x} پیدا کن",ask_proj:"دربارهٔ این پروژه بپرسید",hoods_in:"محله‌های {x}",all_districts:"همهٔ مناطق",from:"از",price_req:"قیمت با استعلام",
+ note_en:"یادداشت‌های مناطق فعلاً به انگلیسی است.",fab_bar:"هر سؤالی دربارهٔ خرید در استانبول دارید بپرسید…",online:"اکنون آنلاین",no_results:"نتیجه‌ای نیست",
+ credits:"مرزها © مشارکت‌کنندگان OpenStreetMap ‏(ODbL). تصاویر © Esri، Maxar، Earthstar Geographics. فاصله‌ها تخمین خط مستقیم است."},
+ru:{nav_home:"Главная",nav_explore:"Районы",ex_kicker:"Исследуйте",ex_title:"Районы Стамбула",ex_lead:"Все 39 районов и 968 кварталов (махалле) Стамбула. Нажмите на карту или воспользуйтесь поиском.",search_ph:"Найти квартал или район…",
+ f_all:"Все",f_eu:"Европейская сторона",f_as:"Азиатская сторона",f_proj:"С одобренными проектами",side_eu:"Европейская сторона",side_as:"Азиатская сторона",st_districts:"районов",st_hoods:"кварталов",st_projects:"одобренных проектов",
+ district:"Район",hood:"Квартал",area:"Площадь",km2:"{n} км²",pitches:"около {n} футбольных полей",taksim:"До Таксима",taksim_v:"{n} км",straight:"по прямой",nbs:"Соседние кварталы",n_hoods:"кварталов",
+ about:"О районе {x}",proj_here:"Одобренные проекты: {x}",proj_district:"Одобренные проекты в районе {x}",proj_none:"Здесь пока нет одобренных проектов. Консультант предложит ближайшие варианты.",
+ ask_area:"Найти жильё: {x}",ask_proj:"Спросить об этом проекте",hoods_in:"Кварталы района {x}",all_districts:"Все районы",from:"От",price_req:"Цена по запросу",
+ note_en:"Описания районов пока на английском.",fab_bar:"Спросите всё о покупке жилья в Стамбуле…",online:"Сейчас онлайн",no_results:"Ничего не найдено",
+ credits:"Границы © участники OpenStreetMap (ODbL). Снимки © Esri, Maxar, Earthstar Geographics. Расстояния — оценка по прямой."}};
+const LANGS = ["en","tr","ar","fa","ru"];
+let L = "en";
+const $ = s => document.querySelector(s);
+const t = (k, v={}) => ((T[L] && T[L][k] != null ? T[L][k] : T.en[k]) ?? k).replace(/\{(\w+)\}/g, (_, x) => v[x] ?? "");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const norm = s => String(s||"").toLocaleLowerCase("tr").replace(/ı/g,"i").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g," ").trim();
+const slug = s => norm(s).replace(/ /g,"-");
+const nf = (n, d=0) => Number(n).toLocaleString(L === "en" ? "en-GB" : L, {maximumFractionDigits:d, minimumFractionDigits:d});
+const money = n => n ? "$" + Math.round(n).toLocaleString("en-US") : "";
+const clean = n => String(n||"").replace(/\s*\(.*?\)\s*/g," ").trim();
+
+/* ===== Data ===== */
+const S = {rows:[], bySlug:new Map(), districts:new Map(), profiles:{}, projects:[], geo:null, dgeo:null, map:null, filter:"all", sel:null, hover:null};
+function districtOf(p){ const d = norm(p.district); let best = null, at = 1e9;
+  for (const name of S.districts.keys()){ const i = d.indexOf(norm(name)); if (i >= 0 && i < at){ at = i; best = name; } } return best; }
+async function load(){
+  const j = u => fetch(u).then(r => { if (!r.ok) throw new Error(u); return r.json(); });
+  const [rows, geo, dgeo, prof, pdata] = await Promise.all([j("data/mahalleler.json"), j("data/mahalleler.geojson"), j("data/ilceler.geojson"), j("data/districts-en.json"),
+    fetch("/api/data").then(r => { if (!r.ok) throw 0; return r.json(); }).then(d => d.projects).catch(() => j("data.json"))]);
+  S.rows = rows; S.geo = geo; S.dgeo = dgeo; S.profiles = prof;
+  rows.forEach(r => { S.bySlug.set(r.slug, r); r.n = norm(r.name);
+    const d = S.districts.get(r.district) || {name:r.district, side:r.side, hoods:[], area:0, cx:0, cy:0}; d.hoods.push(r); d.area += r.area; d.cx += r.c[0] * r.area; d.cy += r.c[1] * r.area; S.districts.set(r.district, d); });
+  S.districts.forEach(d => { d.c = [d.cx / d.area, d.cy / d.area]; d.slug = slug(d.name); d.projects = []; d.hoods.sort((a,b) => a.name.localeCompare(b.name, "tr")); });
+  // Approved projects (the same data the advisor uses), linked to their district and, where listed, their neighbourhood.
+  S.projects = (pdata || []).filter(p => p && p.name);
+  S.projects.forEach(p => { const dn = districtOf(p); if (!dn) return; const d = S.districts.get(dn); d.projects.push(p); p._d = dn;
+    const h = norm(p.hood || ""); if (h) p._hoods = d.hoods.filter(r => r.n.length > 3 && (" " + h + " ").includes(" " + r.n + " ")).map(r => r.id); });
+  const rank = p => (p.sales === "Selling" ? 0 : 2) + (p.conf === "high" ? 0 : 1) + ((p.risk||[]).length ? 3 : 0) + (p.fromUSD ? 0 : 1);
+  S.districts.forEach(d => d.projects.sort((a,b) => rank(a) - rank(b) || (a.fromUSD||9e9) - (b.fromUSD||9e9)));
+  S.geo.features.forEach(f => { const r = S.rows[f.properties.id]; f.properties.proj = S.districts.get(r.district).projects.length ? 1 : 0; });
+}
+
+/* ===== Map ===== */
+const TILES = {url:"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", attribution:"Imagery © Esri, Maxar, Earthstar Geographics · Boundaries © OpenStreetMap contributors"};
+function initMap(){
+  const map = S.map = new maplibregl.Map({container:"map", attributionControl:false, maxPitch:0, dragRotate:false, pitchWithRotate:false, renderWorldCopies:false,
+    bounds:[[28.55,40.84],[29.45,41.26]], fitBoundsOptions:{padding:20}, maxBounds:[[27.6,40.6],[30.3,41.75]],
+    style:{version:8, sources:{sat:{type:"raster", tiles:[TILES.url], tileSize:256, maxzoom:19, attribution:TILES.attribution}},
+      layers:[{id:"bg", type:"background", paint:{"background-color":"#0B1A26"}},{id:"sat", type:"raster", source:"sat", paint:{"raster-brightness-max":.82,"raster-saturation":-.15}}]}});
+  map.touchZoomRotate.disableRotation();
+  map.addControl(new maplibregl.NavigationControl({showCompass:false}), "top-right");
+  map.addControl(new maplibregl.AttributionControl({compact:true}), "bottom-left");
+  map.on("load", () => {
+    map.addSource("m", {type:"geojson", data:S.geo, promoteId:"id"});
+    map.addSource("d", {type:"geojson", data:S.dgeo});
+    const sideColor = ["match", ["get","side"], "asian", "#1FA8A3", "#E8793D"];
+    map.addLayer({id:"m-fill", type:"fill", source:"m", paint:{"fill-color":sideColor,
+      "fill-opacity":["case", ["boolean",["feature-state","sel"],false], .55, ["boolean",["feature-state","hover"],false], .42, ["boolean",["feature-state","dim"],false], .03, ["boolean",["feature-state","indist"],false], .3, .16]}});
+    map.addLayer({id:"m-line", type:"line", source:"m", paint:{"line-color":"#ffffff", "line-opacity":["interpolate",["linear"],["zoom"], 9,.15, 12,.45, 14,.7], "line-width":["interpolate",["linear"],["zoom"], 9,.3, 13,1, 15,1.6]}});
+    map.addLayer({id:"d-line", type:"line", source:"d", paint:{"line-color":"#ffffff", "line-opacity":.85, "line-width":["interpolate",["linear"],["zoom"], 9,1, 13,2.2]}});
+    map.addLayer({id:"m-sel", type:"line", source:"m", filter:["==",["get","id"],-1], paint:{"line-color":"#F2B76B", "line-width":3}});
+    // District names as labels (no font server needed); hidden once you are zoomed into neighbourhoods
+    const MAJOR = new Set(["Sarıyer","Beykoz","Başakşehir","Beylikdüzü","Esenyurt","Kadıköy","Beşiktaş","Fatih","Ümraniye","Pendik","Arnavutköy","Eyüpsultan","Bakırköy","Maltepe","Tuzla","Çekmeköy","Şile","Çatalca","Silivri","Adalar"]);
+    S.districts.forEach(d => { const el = document.createElement("div"); el.className = "dlabel" + (MAJOR.has(d.name) ? " major" : ""); el.textContent = d.name; el.addEventListener("click", ev => { ev.stopPropagation(); go("#" + d.slug); });
+      new maplibregl.Marker({element:el}).setLngLat(d.c).addTo(map); });
+    const lbl = () => { const z = map.getZoom(); $("#map").classList.toggle("hide-dlabels", z > 12.3); $("#map").classList.toggle("only-major", z < 9.8); }; map.on("zoom", lbl); lbl();
+    document.querySelectorAll(".maplibregl-ctrl-attrib.maplibregl-compact-show").forEach(el => el.classList.remove("maplibregl-compact-show"));
+    map.on("mousemove", "m-fill", e => { const f = e.features[0]; if (!f) return; setHover(f.id); map.getCanvas().style.cursor = "pointer";
+      const r = S.rows[f.id], tip = $("#hoverTip"); tip.innerHTML = `${esc(r.name)} <small>· ${esc(r.district)}</small>`; tip.style.left = e.point.x + "px"; tip.style.top = e.point.y + "px"; tip.hidden = false; });
+    map.on("mouseleave", "m-fill", () => { setHover(null); map.getCanvas().style.cursor = ""; $("#hoverTip").hidden = true; });
+    map.on("click", "m-fill", e => { const f = e.features[0]; if (f) go("#" + S.rows[f.id].slug); });
+    applyFilter(); route(true);
+  });
+}
+function setHover(id){ const m = S.map; if (S.hover != null) m.setFeatureState({source:"m", id:S.hover}, {hover:false}); S.hover = id; if (id != null) m.setFeatureState({source:"m", id}, {hover:true}); }
+let lastSel = [], lastIn = [];
+function paintSelection(){
+  const m = S.map; if (!m || !m.getSource("m")) return;
+  lastSel.forEach(id => m.setFeatureState({source:"m", id}, {sel:false})); lastIn.forEach(id => m.setFeatureState({source:"m", id}, {indist:false}));
+  lastSel = []; lastIn = [];
+  if (S.sel && S.sel.type === "m"){ lastSel = [S.sel.r.id]; m.setFeatureState({source:"m", id:S.sel.r.id}, {sel:true}); m.setFilter("m-sel", ["==",["get","id"],S.sel.r.id]); }
+  else if (S.sel && S.sel.type === "d"){ lastIn = S.sel.d.hoods.map(r => r.id); lastIn.forEach(id => m.setFeatureState({source:"m", id}, {indist:true})); m.setFilter("m-sel", ["in",["get","id"],["literal",lastIn]]); }
+  else m.setFilter("m-sel", ["==",["get","id"],-1]);
+}
+function applyFilter(){
+  const m = S.map; if (!m || !m.getSource("m")) return;
+  S.rows.forEach(r => { const d = S.districts.get(r.district); const keep = S.filter === "all" || (S.filter === "proj" ? d.projects.length > 0 : r.side === S.filter);
+    m.setFeatureState({source:"m", id:r.id}, {dim:!keep}); });
+}
+function fitTo(rows){
+  const m = S.map; if (!m) return; let b = null;
+  rows.forEach(r => { const f = S.geo.features[r.id]; const rings = f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates;
+    rings.forEach(poly => poly[0].forEach(([x,y]) => { if (!b) b = [x,y,x,y]; b[0] = Math.min(b[0],x); b[1] = Math.min(b[1],y); b[2] = Math.max(b[2],x); b[3] = Math.max(b[3],y); })); });
+  if (!b) return;
+  const wide = matchMedia("(min-width:901px)").matches;
+  m.fitBounds([[b[0],b[1]],[b[2],b[3]]], {padding:wide ? 70 : 36, maxZoom:15.2, duration:reduced.matches ? 0 : 1100, essential:true});
+}
+const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+
+/* ===== Panel ===== */
+function stat(v, label){ return `<div class="stat"><b>${v}</b><span>${esc(label)}</span></div>`; }
+function projCards(list){
+  return list.slice(0, 5).map(p => `<div class="pc"><b dir="ltr">${esc(clean(p.name))}</b><div class="row"><span dir="ltr">${esc(clean(p.district))}</span><strong>${p.fromUSD ? esc(t("from")) + " " + esc(money(p.fromUSD)) : esc(t("price_req"))}</strong></div><button type="button" data-ask="${esc(p.id)}">${esc(t("ask_proj"))} →</button></div>`).join("");
+}
+function aboutBlock(d){
+  const txt = S.profiles[d.name]; if (!txt) return "";
+  return `<div class="about"><h3>${esc(t("about",{x:d.name}))}</h3><p dir="ltr" lang="en">${esc(txt)}</p>${L !== "en" && t("note_en") ? `<p class="note">${esc(t("note_en"))}</p>` : ""}</div>`;
+}
+function renderOverview(){
+  const groups = [["european", t("side_eu"), "eu"], ["asian", t("side_as"), "as"]];
+  const nP = [...S.districts.values()].reduce((a,d) => a + d.projects.length, 0);
+  $("#detail").innerHTML = `<div class="stats">${stat(nf(S.districts.size), t("st_districts"))}${stat(nf(S.rows.length), t("st_hoods"))}${stat(nf(nP), t("st_projects"))}</div>
+    <div class="dlist">${groups.map(([side, label, cls]) => `<div><h3><i class="dot ${cls}"></i>${esc(label)}</h3><div class="chips">${[...S.districts.values()].filter(d => d.side === side && (S.filter === "all" || S.filter === side || (S.filter === "proj" && d.projects.length))).sort((a,b) => a.name.localeCompare(b.name,"tr")).map(d => `<button type="button" data-go="#${d.slug}">${esc(d.name)} <small>${d.projects.length ? "● " : ""}${d.hoods.length}</small></button>`).join("")}</div></div>`).join("")}</div>`;
+  document.title = "Istanbul Neighbourhood Explorer";
+}
+function renderDistrict(d){
+  $("#detail").innerHTML = `<div class="crumb"><button type="button" data-go="#">${esc(t("all_districts"))}</button></div>
+    <div><span class="kicker">${esc(t("district"))}</span><h2>${esc(d.name)}</h2></div>
+    <div class="tags"><span class="tag"><i class="dot ${d.side === "asian" ? "as" : "eu"}"></i>${esc(t(d.side === "asian" ? "side_as" : "side_eu"))}</span></div>
+    <div class="stats">${stat(nf(d.hoods.length), t("n_hoods"))}${stat(nf(d.area, d.area < 10 ? 1 : 0) + " km²", t("area"))}${stat(nf(d.projects.length), t("st_projects"))}</div>
+    ${aboutBlock(d)}
+    <div class="plist"><h3>${esc(t("proj_district",{x:d.name}))}</h3>${d.projects.length ? projCards(d.projects) : `<p class="empty">${esc(t("proj_none"))}</p>`}</div>
+    <button class="btn" type="button" data-area="${esc(d.name)}">${esc(t("ask_area",{x:d.name}))}</button>
+    <div><h3 style="font:600 .95rem var(--f-body);margin-bottom:8px">${esc(t("hoods_in",{x:d.name}))}</h3><div class="chips">${d.hoods.map(r => `<button type="button" data-go="#${r.slug}">${esc(r.name)}</button>`).join("")}</div></div>`;
+  document.title = `${d.name} · Istanbul Neighbourhood Explorer`;
+}
+function renderHood(r){
+  const d = S.districts.get(r.district), here = d.projects.filter(p => (p._hoods||[]).includes(r.id));
+  $("#detail").innerHTML = `<div class="crumb"><button type="button" data-go="#">${esc(t("all_districts"))}</button><span>›</span><button type="button" data-go="#${d.slug}">${esc(d.name)}</button></div>
+    <div><span class="kicker">${esc(t("hood"))}</span><h2>${esc(r.name)}</h2></div>
+    <div class="tags"><span class="tag">${esc(d.name)}</span><span class="tag"><i class="dot ${r.side === "asian" ? "as" : "eu"}"></i>${esc(t(r.side === "asian" ? "side_as" : "side_eu"))}</span></div>
+    <div class="stats">${stat(nf(r.area, r.area < 10 ? 2 : 1) + " km²", t("area"))}${stat(nf(r.taksim, 1) + " km", t("taksim"))}${stat(nf(r.nb.length), t("nbs"))}</div>
+    <p class="empty">${esc(t("pitches",{n:nf(Math.round(r.area / .00714))}))} · ${esc(t("taksim"))}: ${esc(t("taksim_v",{n:nf(r.taksim,1)}))} (${esc(t("straight"))})</p>
+    ${r.nb.length ? `<div><h3 style="font:600 .95rem var(--f-body);margin-bottom:8px">${esc(t("nbs"))}</h3><div class="chips">${r.nb.map(i => S.rows[i]).map(n => `<button type="button" data-go="#${n.slug}">${esc(n.name)}${n.district !== r.district ? ` <small>${esc(n.district)}</small>` : ""}</button>`).join("")}</div></div>` : ""}
+    ${aboutBlock(d)}
+    <div class="plist"><h3>${esc(here.length ? t("proj_here",{x:r.name}) : t("proj_district",{x:d.name}))}</h3>${(here.length ? here : d.projects).length ? projCards(here.length ? here : d.projects) : `<p class="empty">${esc(t("proj_none"))}</p>`}</div>
+    <button class="btn" type="button" data-area="${esc(d.name)}" data-hood="${esc(r.name)}">${esc(t("ask_area",{x:r.name}))}</button>`;
+  document.title = `${r.name}, ${d.name} · Istanbul Neighbourhood Explorer`;
+}
+
+/* ===== Routing: #district or #district/neighbourhood, so every place has a link to share ===== */
+function go(hash){ if (location.hash === hash || (hash === "#" && !location.hash)) route(); else location.hash = hash === "#" ? "" : hash; }
+function route(first){
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (h && S.bySlug.has(h)){ const r = S.bySlug.get(h); S.sel = {type:"m", r}; renderHood(r); fitTo([r]); }
+  else if (h && [...S.districts.values()].some(d => d.slug === h)){ const d = [...S.districts.values()].find(d => d.slug === h); S.sel = {type:"d", d}; renderDistrict(d); fitTo(d.hoods); }
+  else { S.sel = null; renderOverview(); if (!first && S.map) S.map.fitBounds([[28.55,40.84],[29.45,41.26]], {padding:20, duration:reduced.matches ? 0 : 900}); }
+  paintSelection();
+  if (!first && !matchMedia("(min-width:901px)").matches && S.sel) $("#detail").scrollIntoView({behavior:reduced.matches ? "auto" : "smooth", block:"start"});
+}
+addEventListener("hashchange", () => route());
+
+/* ===== Search ===== */
+const ALIASES = [["Moda","kadikoy/caferaga"],["Nişantaşı","sisli/tesvikiye"],["Karaköy","beyoglu/kemankes-karamustafa-pasa"],["Bağdat Caddesi","kadikoy/caddebostan"]];
+let hits = [], hi = 0;
+function search(q){
+  const n = norm(q), box = $("#results"); if (!n){ box.hidden = true; return; }
+  const ds = [...S.districts.values()].filter(d => norm(d.name).startsWith(n) || norm(d.name).includes(" " + n)).map(d => ({label:d.name, sub:t("district"), hash:"#" + d.slug, s:0}));
+  const ms = S.rows.filter(r => r.n.includes(n)).map(r => ({label:r.name, sub:r.district, hash:"#" + r.slug, s:r.n.startsWith(n) ? 1 : 2}));
+  // Well-known area names that are not official mahalle names
+  ALIASES.forEach(([alias, s]) => { const r = S.bySlug.get(s); if (r && norm(alias).startsWith(n)) ms.push({label:alias, sub:`${r.name}, ${r.district}`, hash:"#" + s, s:1}); });
+  hits = [...ds, ...ms].sort((a,b) => a.s - b.s || a.label.localeCompare(b.label,"tr")).slice(0, 9); hi = 0;
+  box.innerHTML = hits.length ? hits.map((h, i) => `<li><button type="button" role="option" data-i="${i}" class="${i === 0 ? "on" : ""}">${esc(h.label)}<small>${esc(h.sub)}</small></button></li>`).join("") : `<li class="empty" style="padding:8px 10px">${esc(t("no_results"))}</li>`;
+  box.hidden = false;
+}
+function pick(i){ const h = hits[i]; if (!h) return; $("#results").hidden = true; $("#q").value = h.label; go(h.hash); }
+$("#q").addEventListener("input", e => search(e.target.value));
+$("#q").addEventListener("keydown", e => { const btns = [...document.querySelectorAll("#results button")]; if (!btns.length) return;
+  if (e.key === "ArrowDown" || e.key === "ArrowUp"){ e.preventDefault(); hi = (hi + (e.key === "ArrowDown" ? 1 : -1) + btns.length) % btns.length; btns.forEach((b, i) => b.classList.toggle("on", i === hi)); }
+  if (e.key === "Enter"){ e.preventDefault(); pick(hi); } if (e.key === "Escape") $("#results").hidden = true; });
+$("#results").addEventListener("click", e => { const b = e.target.closest("[data-i]"); if (b) pick(+b.dataset.i); });
+document.addEventListener("click", e => { if (!e.target.closest(".search")) $("#results").hidden = true; });
+
+/* ===== Filters ===== */
+function renderFilters(){
+  const F = [["all","f_all",""],["european","f_eu","eu"],["asian","f_as","as"],["proj","f_proj","pr"]];
+  $("#filters").innerHTML = F.map(([v,k,d]) => `<button type="button" data-f="${v}" aria-pressed="${S.filter === v}">${d ? `<i class="dot ${d}"></i>` : ""}${esc(t(k))}</button>`).join("");
+}
+$("#filters").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (!b) return; S.filter = b.dataset.f; renderFilters(); applyFilter(); if (!S.sel) renderOverview(); });
+
+/* ===== The advisor ===== */
+let frame = null;
+function openChat(msg){
+  if (!frame){ frame = document.createElement("iframe"); frame.title = "Istanbul Home Advisor chat"; frame.src = "chat.html?embed=1&lang=" + L; frame.addEventListener("load", () => frame.dataset.loaded = "1", {once:true}); $("#panel").appendChild(frame); }
+  if (msg){ const send = () => frame.contentWindow.postMessage(msg, location.origin); if (frame.dataset.loaded) send(); else frame.addEventListener("load", send, {once:true}); }
+  $("#panel").classList.add("open"); $("#fab").classList.add("hide");
+  if (matchMedia("(max-width:560px)").matches) document.body.style.overflow = "hidden";
+}
+function closeChat(){ $("#panel").classList.remove("open"); $("#fab").classList.remove("hide"); document.body.style.overflow = ""; }
+$("#fab").onclick = () => openChat({type:"iha-focus"}); $("#close").onclick = closeChat;
+addEventListener("keydown", e => { if (e.key === "Escape" && $("#panel").classList.contains("open")) closeChat(); });
+$("#side").addEventListener("click", e => {
+  const g = e.target.closest("[data-go]"); if (g) return go(g.dataset.go);
+  const a = e.target.closest("[data-ask]"); if (a) return openChat({type:"iha-project", id:a.dataset.ask});
+  const ar = e.target.closest("[data-area]"); if (ar){ const d = S.districts.get(ar.dataset.area); openChat({type:"iha-area", district:ar.dataset.area, hood:ar.dataset.hood || "", side:d ? d.side : ""}); }
+});
+
+/* ===== Language ===== */
+function applyLang(code){
+  L = LANGS.includes(code) ? code : "en";
+  document.documentElement.lang = L; document.documentElement.dir = (L === "ar" || L === "fa") ? "rtl" : "ltr";
+  document.querySelectorAll("[data-t]").forEach(el => el.textContent = t(el.dataset.t));
+  $("#q").placeholder = t("search_ph"); $("#lang").value = L;
+  try{ localStorage.setItem("iha_lang", L); }catch{}
+  renderFilters(); if (S.rows.length) route(true);
+  if (frame) frame.contentWindow?.postMessage({type:"iha-lang", lang:L}, location.origin);
+}
+$("#lang").onchange = e => applyLang(e.target.value);
+
+(async () => {
+  let saved = null; try{ saved = localStorage.getItem("iha_lang"); }catch{}
+  const nav = (navigator.language || "en").slice(0,2);
+  applyLang(saved || (LANGS.includes(nav) ? nav : "en"));
+  await load();
+  route(true);
+  const start = () => window.maplibregl ? initMap() : setTimeout(start, 50); start();
+})();
+</script>
+</body>
+</html>
