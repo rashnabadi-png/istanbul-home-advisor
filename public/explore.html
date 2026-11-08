@@ -281,6 +281,7 @@ async function load(){
     const d = S.districts.get(r.district) || {name:r.district, side:r.side, hoods:[], area:0, cx:0, cy:0}; d.hoods.push(r); d.area += r.area; d.cx += r.c[0] * r.area; d.cy += r.c[1] * r.area; S.districts.set(r.district, d); });
   S.districts.forEach(d => { d.c = [d.cx / d.area, d.cy / d.area]; d.slug = slug(d.name); d.projects = []; d.hoods.sort((a,b) => a.name.localeCompare(b.name, "tr")); });
   // Approved projects (the same data the advisor uses), linked to their district and, where listed, their neighbourhood.
+  S.esriKey = (pdata.config && pdata.config.esriKey) || "";
   S.projects = (pdata.projects || []).filter(p => p && p.name);
   S.others = (pdata.pins || []).map(([id, name, tier, lat, lng, acc]) => ({id, name, tier, lat, lng, acc}));
   placePins();
@@ -352,11 +353,12 @@ function setOthers(v){ showOthers = v; ["op-cluster","op-dot"].forEach(l => S.ma
 function highlightPins(ids){ S.pins.forEach(x => x.el && x.el.classList.toggle("hi", !!ids && ids.has(x.p.id))); }
 
 /* ===== Map ===== */
+// Without a key this uses Esri's public tile server (fine for testing). With ESRI_API_KEY set in Vercel it uses the key-based endpoint, as Esri requires for a public site.
 const TILES = {url:"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", attribution:"Imagery © Esri, Maxar, Earthstar Geographics · Boundaries © OpenStreetMap contributors"};
 function initMap(){
   const map = S.map = new maplibregl.Map({container:"map", attributionControl:false, maxPitch:0, dragRotate:false, pitchWithRotate:false, renderWorldCopies:false,
     bounds:[[28.55,40.84],[29.45,41.26]], fitBoundsOptions:{padding:20}, maxBounds:[[27.6,40.6],[30.3,41.75]],
-    style:{version:8, sources:{sat:{type:"raster", tiles:[TILES.url], tileSize:256, maxzoom:19, attribution:TILES.attribution}},
+    style:{version:8, sources:{sat:{type:"raster", tiles:[S.esriKey ? "https://ibasemaps-api.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}?token=" + encodeURIComponent(S.esriKey) : TILES.url], tileSize:256, maxzoom:19, attribution:TILES.attribution}},
       layers:[{id:"bg", type:"background", paint:{"background-color":"#0B1A26"}},{id:"sat", type:"raster", source:"sat", paint:{"raster-brightness-max":.82,"raster-saturation":-.15}}]}});
   map.touchZoomRotate.disableRotation();
   map.addControl(new maplibregl.NavigationControl({showCompass:false}), "top-right");

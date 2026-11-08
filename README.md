@@ -33,6 +33,13 @@ Buyer's browser ──► public/index.html (website) ──panel──► publi
 5. Fill in the [brackets] in `public/privacy.html` and have a lawyer check it.
 6. Domain: Vercel → Project → Settings → Domains → add `istanbulhomeadvisor.com` and `www.istanbulhomeadvisor.com`, then copy the DNS records Vercel shows into your domain registrar. Set `ALLOWED_ORIGINS` to `https://istanbulhomeadvisor.com,https://www.istanbulhomeadvisor.com`.
 
+## Satellite map key (Esri, free tier)
+1. Sign up free at https://location.arcgis.com (no card needed for the free tier: 2 million map tiles a month).
+2. Create an API key: Developer credentials → New item → API key. Under privileges tick **Basemaps** only.
+   Under allowed referrers add `https://istanbulhomeadvisor.com`, `https://www.istanbulhomeadvisor.com` and your `*.vercel.app` address.
+3. Vercel → Project → Settings → Environment Variables → add `ESRI_API_KEY` = the key → Redeploy.
+Without a payment method Esri never charges; if the free tiles ran out, the map imagery would pause until the next month.
+
 ## No-AI mode (current, costs nothing)
 Without `ANTHROPIC_API_KEY` the bot uses only your data: all button flows and recommendations work as normal; typed messages
 are matched to a project name (shows its card) or a legal topic (citizenship, residence, title deed, taxes, payments, buying steps,
