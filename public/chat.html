@@ -619,6 +619,8 @@ function fromSite(m){
   // From the neighbourhood explorer: recommend approved projects in that district straight away.
   if (m.type==="iha-area" && m.district){ A.area = m.district; if (m.side) A.side = m.side; addMsg("me", m.hood ? `${m.hood}, ${m.district}` : m.district); recommend(); return; }
   if (m.type==="iha-lang" && LANGS.some(x=>x[0]===m.lang) && m.lang!==L) applyLang(m.lang, false);
+  // A question typed or tapped on the website goes straight to the advisor
+  if (m.type==="iha-ask" && typeof m.text==="string" && m.text.trim()){ const q = m.text.trim().slice(0,400); addMsg("me", q); askClaude(q); return; }
   if (m.type==="iha-project"){ const p = P.find(x=>x.id===m.id); if (!p) return;
     addMsg("me", t("me_more",{name:p.name})); askClaude(`Tell me more about ${p.name} (${p.id}).`); }
 }

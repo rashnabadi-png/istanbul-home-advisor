@@ -208,8 +208,26 @@ footer a{color:var(--muted)}
 .xt-legend .dot{width:9px;height:9px;border-radius:50%;display:inline-block}.xt-legend .dot.eu{background:#E8793D}.xt-legend .dot.as{background:#1FA8A3;margin-inline-start:6px}
 @media (max-width:860px){.xt{grid-template-columns:1fr}.xt-map{order:-1}}
 
+
+/* Conversation starters on the story slides */
+.qbtn{display:inline-flex;align-items:center;gap:9px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.14);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#fff;border-radius:20px 20px 20px 6px;padding:11px 16px;font-weight:600;cursor:pointer;text-align:start;transition:background .15s,transform .15s}
+[dir=rtl] .qbtn{border-radius:20px 20px 6px 20px}
+.qbtn::before{content:"";width:18px;height:18px;flex:none;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 5h16v11H9l-5 4z' fill='none' stroke='black' stroke-width='2.2' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 5h16v11H9l-5 4z' fill='none' stroke='black' stroke-width='2.2' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
+.qbtn:hover{background:rgba(255,255,255,.24)}.qbtn:active{transform:scale(.98)}
+.langs{gap:8px}
+.lbtn{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:10px 18px;font-weight:600;font-size:1.02rem;cursor:pointer;transition:background .15s,transform .15s}
+.lbtn:hover{background:#fff;color:#0B1620}
+.sask{display:flex;align-items:center;gap:6px;background:#fff;border-radius:999px;padding:6px 6px 6px 20px;box-shadow:0 18px 50px -18px rgba(0,0,0,.6);margin-top:6px;max-width:560px}
+[dir=rtl] .sask{padding:6px 20px 6px 6px}
+.sask input{flex:1;min-width:0;border:0;outline:0;background:none;color:#13212B;font-size:1rem;padding:10px 0}
+.sask button{width:46px;height:46px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;cursor:pointer;flex:none}
+[dir=rtl] .sask button svg{transform:scaleX(-1)}
+.sask button svg{width:20px;height:20px}
+.sugg{display:flex;gap:8px;flex-wrap:wrap}.sugg .qbtn{font-size:.9rem;padding:8px 13px}
+@media (max-width:640px){.qbtn{font-size:.92rem;padding:9px 13px}.scap .ctas{gap:8px}.scap h2{font-size:1.75rem}.scap p{font-size:.95rem}}
+@media (prefers-reduced-motion:reduce){.qbtn,.lbtn{color:var(--ink);border-color:var(--line);background:transparent}}
 /* Business story: sticky stage, one scene per screen of scroll */
-.story{position:relative;height:800vh;background:#05080D}
+.story{position:relative;height:620vh;background:#05080D}
 .sstage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;color:#fff}
 .sshot{position:absolute;inset:0}
 .sshot img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;will-change:transform,opacity}
@@ -225,7 +243,7 @@ footer a{color:var(--muted)}
 .sdots{position:absolute;inset-inline-end:max(20px,3vw);top:50%;transform:translateY(-50%);display:grid;gap:10px}
 .sdots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.35);transition:transform .3s,background .3s}
 .sdots i.on{background:#fff;transform:scale(1.6)}
-@media (max-width:640px){.scap{bottom:max(96px,14vh)}.sdots{display:none}}
+@media (max-width:640px){.scap{bottom:calc(84px + env(safe-area-inset-bottom));gap:10px}.sdots{display:none}}
 @media (prefers-reduced-motion:reduce){
   .story{height:auto}.sstage{position:relative;height:auto;display:grid}
   .sshots{display:grid}.sshot{position:relative;height:60vh}.sshot img{opacity:1!important;transform:none!important}
@@ -444,20 +462,16 @@ body.immersive .top .langsel::after{border-color:rgba(255,255,255,.85)}
       <picture class="sshot"><source media="(max-aspect-ratio: 1/1)" srcset="img/story/1-galata-wide-m.webp"><img src="img/story/1-galata-wide.webp" alt="" width="3200" height="1800" loading="lazy" decoding="async" style="object-position:50% 50%"></picture>
       <picture class="sshot"><source media="(max-aspect-ratio: 1/1)" srcset="img/story/2-galata-close-m.webp"><img src="img/story/2-galata-close.webp" alt="" width="3200" height="1800" loading="lazy" decoding="async" style="object-position:50% 50%"></picture>
       <picture class="sshot"><source media="(max-aspect-ratio: 1/1)" srcset="img/story/3-taksim-m.webp"><img src="img/story/3-taksim.webp" alt="" width="3200" height="1800" loading="lazy" decoding="async" style="object-position:55% 50%"></picture>
-      <picture class="sshot"><source media="(max-aspect-ratio: 1/1)" srcset="img/story/4-camlica-m.webp"><img src="img/story/4-camlica.webp" alt="" width="3200" height="1800" loading="lazy" decoding="async" style="object-position:56% 50%"></picture>
       <picture class="sshot"><source media="(max-aspect-ratio: 1/1)" srcset="img/story/5-maidens-tower-m.webp"><img src="img/story/5-maidens-tower.webp" alt="" width="3200" height="1800" loading="lazy" decoding="async" style="object-position:51% 50%"></picture>
-      <picture class="sshot"><source media="(max-aspect-ratio: 1/1)" srcset="img/story/6-bridge-trails-m.webp"><img src="img/story/6-bridge-trails.webp" alt="" width="3200" height="1800" loading="lazy" decoding="async" style="object-position:49% 50%"></picture>
       <picture class="sshot"><source media="(max-aspect-ratio: 1/1)" srcset="img/story/7-bridge-wide-m.webp"><img src="img/story/7-bridge-wide.webp" alt="" width="3200" height="1800" loading="lazy" decoding="async" style="object-position:50% 50%"></picture>
     </div>
     <div class="sscrim"></div>
-      <div class="scap"><span class="kicker" data-t="s1_k"></span><h2 data-t="s1_t"></h2><p data-t="s1_p"></p></div>
-      <div class="scap"><span class="kicker" data-t="s2_k"></span><h2 data-t="s2_t"></h2><p data-t="s2_p"></p></div>
-      <div class="scap"><span class="kicker" data-t="s3_k"></span><h2 data-t="s3_t"></h2><p data-t="s3_p"></p></div>
-      <div class="scap"><span class="kicker" data-t="s4_k"></span><h2 data-t="s4_t"></h2><p data-t="s4_p"></p></div>
-      <div class="scap"><span class="kicker" data-t="s5_k"></span><h2 data-t="s5_t"></h2><p data-t="s5_p"></p></div>
-      <div class="scap"><span class="kicker" data-t="s6_k"></span><h2 data-t="s6_t"></h2><p data-t="s6_p"></p></div>
-      <div class="scap"><span class="kicker" data-t="s7_k"></span><h2 data-t="s7_t"></h2><p data-t="s7_p"></p><div class="ctas"><button class="btn" type="button" data-chat data-t="pt_cta">Ask the advisor</button><a class="btn ghost light" href="explore.html" data-t="xt_cta2">Explore neighbourhoods</a></div></div>
-    <div class="sdots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="scap"><span class="kicker" data-t="s1_k"></span><h2 data-t="s1_t"></h2><p data-t="s1_p"></p><div class="ctas"><button class="qbtn" type="button" data-ask-t="q_area"><span data-t="q_area"></span></button><a class="btn ghost light" href="explore.html" data-t="xt_cta2">Explore neighbourhoods</a></div></div>
+      <div class="scap"><span class="kicker" data-t="s2_k"></span><h2 data-t="s2_t"></h2><p data-t="s2_p"></p><div class="ctas"><button class="qbtn" type="button" data-ask-t="q_budget"><span data-t="q_budget"></span></button><a class="btn ghost light" href="explore.html" data-t="s2_map"></a></div></div>
+      <div class="scap"><span class="kicker" data-t="s3_k"></span><h2 data-t="s3_t"></h2><p data-t="s3_p"></p><div class="ctas langs"><button class="lbtn" type="button" data-say-lang="en" lang="en">Hello</button><button class="lbtn" type="button" data-say-lang="tr" lang="tr">Merhaba</button><button class="lbtn" type="button" data-say-lang="ar" lang="ar" dir="rtl">مرحبًا</button><button class="lbtn" type="button" data-say-lang="fa" lang="fa" dir="rtl">سلام</button><button class="lbtn" type="button" data-say-lang="ru" lang="ru">Привет</button></div></div>
+      <div class="scap"><span class="kicker" data-t="s4_k"></span><h2 data-t="s4_t"></h2><p data-t="s4_p"></p><div class="ctas"><button class="qbtn" type="button" data-ask-t="q_cit"><span data-t="q_cit"></span></button><button class="qbtn" type="button" data-ask-t="q_agent"><span data-t="q_agent"></span></button></div></div>
+      <div class="scap"><span class="kicker" data-t="s5_k"></span><h2 data-t="s5_t"></h2><p data-t="s5_p"></p><form class="sask" id="sask"><input id="saskIn" type="text" autocomplete="off" maxlength="400" data-tp="s5_ph" aria-label="Your question"><button type="submit" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></form><div class="sugg"><button class="qbtn" type="button" data-ask-t="q_s1"><span data-t="q_s1"></span></button><button class="qbtn" type="button" data-ask-t="q_s2"><span data-t="q_s2"></span></button></div></div>
+    <div class="sdots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
   </div>
 </section>
 
@@ -749,6 +763,7 @@ function applyLang(code){
   L = LANG_CODES.includes(code) ? code : "en";
   document.documentElement.lang = L; document.documentElement.dir = (L==="ar"||L==="fa") ? "rtl" : "ltr";
   document.querySelectorAll("[data-t]").forEach(el => el.textContent = t(el.dataset.t));
+  document.querySelectorAll("[data-tp]").forEach(el => el.placeholder = t(el.dataset.tp));
   $("#lang").value = L;
   $("#fab").setAttribute("aria-label", t("fab")); $("#close").setAttribute("aria-label", t("close")); $("#popout").setAttribute("aria-label", t("popout"));
   $("#popout").href = "chat.html?lang=" + L;
@@ -833,7 +848,13 @@ function applyDock(){
   requestAnimationFrame(() => { layout(); renderRoom(); renderDistricts(); });
 }
 wideQ.addEventListener?.("change", applyDock);
-document.addEventListener("click", e => { if (e.target.closest("[data-chat]")) openChat(); });
+document.addEventListener("click", e => {
+  if (e.target.closest("[data-chat]")) return openChat();
+  // Conversation starters: the question goes straight into the chat, in the visitor's language
+  const q = e.target.closest("[data-ask-t]"); if (q) return openChat({type:"iha-ask", text:t(q.dataset.askT)});
+  const lb = e.target.closest("[data-say-lang]"); if (lb){ if (lb.dataset.sayLang !== L){ applyLang(lb.dataset.sayLang); } openChat({type:"iha-ask", text:t("say_hi")}); }
+});
+$("#sask")?.addEventListener("submit", e => { e.preventDefault(); const v = $("#saskIn").value.trim(); if (!v) return $("#saskIn").focus(); $("#saskIn").value = ""; openChat({type:"iha-ask", text:v}); });
 $("#close").onclick = closeChat;
 addEventListener("keydown", e => { if (e.key==="Escape" && $("#panel").classList.contains("open") && !docked()) closeChat(); });
 addEventListener("scroll", () => $("#top").classList.toggle("scrolled", scrollY > 8), {passive:true});
@@ -878,6 +899,8 @@ ru:{h1:"Без продающих речей. Только факты.",sub:"С�
  d_count:"Одобренных проектов: {n}",d_short:"Получить подборку по району",nav_map:"Карта"}
 };
 Object.entries(T2).forEach(([l,o]) => Object.assign(T[l], o));
+const T4 = {"en": {"s1_k": "Start with the area", "s1_t": "Not sure which area suits you?", "s1_p": "Tell the advisor how you live: work, school, budget, sea view or quiet streets. Neighbourhoods first, homes second.", "q_area": "Which area of Istanbul suits me?", "s2_k": "Vetted projects", "s2_t": "Only projects we have checked.", "s2_p": "More than 170 new-build projects researched one by one. Sold-out or risky ones are flagged, never pushed.", "q_budget": "What can I buy with my budget?", "s2_map": "See them on the map", "s3_k": "Your language", "s3_t": "Say hello in your language.", "s3_p": "English, Türkçe, ⁨العربية⁩, ⁨فارسی⁩ or Русский. The advisor answers in your language, day or night. Pick one to start.", "s4_k": "Law and real people", "s4_t": "Citizenship, title deeds and a real agent.", "s4_p": "Rules for foreign buyers change. We flag what has changed, a licensed lawyer confirms your case, and a person you can meet arranges viewings.", "q_cit": "Can I get Turkish citizenship by buying a home?", "q_agent": "I'd like to talk to a real agent.", "s5_k": "Start today", "s5_t": "Your Istanbul home starts with one question.", "s5_p": "Ask anything. No sales talk, just the facts.", "s5_ph": "Type your question…", "q_s1": "Is it safe to buy off-plan?", "q_s2": "What extra costs should I expect?", "say_hi": "Hello! Where should I start?"}, "tr": {"s1_k": "Önce bölge", "s1_t": "Hangi bölge size uygun, emin değil misiniz?", "s1_p": "Danışmana nasıl yaşadığınızı anlatın: iş, okul, bütçe, deniz manzarası ya da sakin sokaklar. Önce mahalle, sonra ev.", "q_area": "İstanbul'un hangi bölgesi bana uygun?", "s2_k": "Kontrol edilmiş projeler", "s2_t": "Sadece kontrol ettiğimiz projeler.", "s2_p": "170'ten fazla yeni proje tek tek incelendi. Tükenmiş ya da riskli olanlar işaretlenir, asla dayatılmaz.", "q_budget": "Bütçemle ne alabilirim?", "s2_map": "Haritada görün", "s3_k": "Sizin dilinizde", "s3_t": "Kendi dilinizde merhaba deyin.", "s3_p": "English, Türkçe, ⁨العربية⁩, ⁨فارسی⁩ veya Русский. Danışman gece gündüz sizin dilinizde yanıt verir. Başlamak için birini seçin.", "s4_k": "Hukuk ve gerçek insanlar", "s4_t": "Vatandaşlık, tapu ve gerçek bir danışman.", "s4_p": "Yabancı alıcılar için kurallar değişir. Değişenleri belirtiriz, lisanslı bir avukat durumunuzu onaylar ve tanışabileceğiniz biri gezileri ayarlar.", "q_cit": "Ev alarak Türk vatandaşlığı alabilir miyim?", "q_agent": "Gerçek bir danışmanla konuşmak istiyorum.", "s5_k": "Bugün başlayın", "s5_t": "İstanbul'daki eviniz tek bir soruyla başlar.", "s5_p": "Her şeyi sorun. Satış konuşması yok, sadece gerçekler.", "s5_ph": "Sorunuzu yazın…", "q_s1": "Projeden almak güvenli mi?", "q_s2": "Hangi ek masraflar olur?", "say_hi": "Merhaba! Nereden başlamalıyım?"}, "ar": {"s1_k": "ابدأ بالمنطقة", "s1_t": "لست متأكدًا أي منطقة تناسبك؟", "s1_p": "أخبر المستشار عن أسلوب حياتك: العمل، المدرسة، الميزانية، إطلالة البحر أو الشوارع الهادئة. الأحياء أولًا، ثم المنازل.", "q_area": "أي منطقة في إسطنبول تناسبني؟", "s2_k": "مشاريع مدروسة", "s2_t": "فقط المشاريع التي تحققنا منها.", "s2_p": "أكثر من 170 مشروعًا جديدًا دُرس واحدًا تلو الآخر. المشاريع المباعة أو الخطرة يُشار إليها ولا تُفرض عليك.", "q_budget": "ماذا يمكنني أن أشتري بميزانيتي؟", "s2_map": "شاهدها على الخريطة", "s3_k": "بلغتك", "s3_t": "قل مرحبًا بلغتك.", "s3_p": "English أو Türkçe أو العربية أو فارسی أو Русский. يجيبك المستشار بلغتك ليلًا ونهارًا. اختر لغة للبدء.", "s4_k": "القانون وأشخاص حقيقيون", "s4_t": "الجنسية وسند الملكية ووكيل حقيقي.", "s4_p": "تتغير القوانين للمشترين الأجانب. ننبهك لما تغير، ويؤكد محامٍ مرخص وضعك، ويرتب شخص يمكنك مقابلته المعاينات.", "q_cit": "هل يمكنني الحصول على الجنسية التركية بشراء منزل؟", "q_agent": "أود التحدث مع وكيل حقيقي.", "s5_k": "ابدأ اليوم", "s5_t": "منزلك في إسطنبول يبدأ بسؤال واحد.", "s5_p": "اسأل أي شيء. لا كلام مبيعات، فقط الحقائق.", "s5_ph": "اكتب سؤالك…", "q_s1": "هل الشراء على المخطط آمن؟", "q_s2": "ما التكاليف الإضافية المتوقعة؟", "say_hi": "مرحبًا! من أين أبدأ؟"}, "fa": {"s1_k": "اول منطقه", "s1_t": "مطمئن نیستید کدام منطقه برایتان مناسب است؟", "s1_p": "به مشاور بگویید چطور زندگی می‌کنید: کار، مدرسه، بودجه، منظرهٔ دریا یا کوچه‌های آرام. اول محله، بعد خانه.", "q_area": "کدام منطقهٔ استانبول برای من مناسب است؟", "s2_k": "پروژه‌های بررسی‌شده", "s2_t": "فقط پروژه‌هایی که بررسی کرده‌ایم.", "s2_p": "بیش از ۱۷۰ پروژهٔ نوساز یکی‌یکی بررسی شده‌اند. پروژه‌های فروخته‌شده یا پرریسک علامت می‌خورند، هرگز تحمیل نمی‌شوند.", "q_budget": "با بودجهٔ من چه می‌توانم بخرم؟", "s2_map": "روی نقشه ببینید", "s3_k": "به زبان شما", "s3_t": "به زبان خودتان سلام کنید.", "s3_p": "English، Türkçe، العربية، فارسی یا Русский. مشاور شبانه‌روز به زبان شما پاسخ می‌دهد. برای شروع یکی را انتخاب کنید.", "s4_k": "قانون و آدم‌های واقعی", "s4_t": "شهروندی، سند و یک مشاور واقعی.", "s4_p": "قوانین برای خریداران خارجی تغییر می‌کند. تغییرات را اعلام می‌کنیم، یک وکیل دارای مجوز وضعیت شما را تأیید می‌کند و فردی که می‌توانید ببینید بازدیدها را هماهنگ می‌کند.", "q_cit": "آیا با خرید خانه می‌توانم شهروندی ترکیه بگیرم؟", "q_agent": "می‌خواهم با یک مشاور واقعی صحبت کنم.", "s5_k": "از امروز شروع کنید", "s5_t": "خانهٔ شما در استانبول با یک سؤال شروع می‌شود.", "s5_p": "هر چه می‌خواهید بپرسید. بدون حرف فروش، فقط واقعیت‌ها.", "s5_ph": "سؤالتان را بنویسید…", "q_s1": "خرید پیش‌فروش امن است؟", "q_s2": "چه هزینه‌های اضافی دارد؟", "say_hi": "سلام! از کجا شروع کنم؟"}, "ru": {"s1_k": "Сначала район", "s1_t": "Не знаете, какой район вам подходит?", "s1_p": "Расскажите консультанту, как вы живёте: работа, школа, бюджет, вид на море или тихие улицы. Сначала район, потом квартира.", "q_area": "Какой район Стамбула мне подходит?", "s2_k": "Проверенные проекты", "s2_t": "Только проекты, которые мы проверили.", "s2_p": "Более 170 новостроек изучены по одной. Распроданные и рискованные помечены и никогда не навязываются.", "q_budget": "Что можно купить на мой бюджет?", "s2_map": "Смотреть на карте", "s3_k": "На вашем языке", "s3_t": "Поздоровайтесь на своём языке.", "s3_p": "English, Türkçe, ⁨العربية⁩, ⁨فارسی⁩ или Русский. Консультант отвечает на вашем языке днём и ночью. Выберите, чтобы начать.", "s4_k": "Закон и живые люди", "s4_t": "Гражданство, тапу и настоящий агент.", "s4_p": "Правила для иностранцев меняются. Мы отмечаем изменения, лицензированный юрист подтверждает ваш случай, а человек, с которым можно встретиться, организует просмотры.", "q_cit": "Могу ли я получить гражданство Турции, купив жильё?", "q_agent": "Хочу поговорить с живым агентом.", "s5_k": "Начните сегодня", "s5_t": "Ваш дом в Стамбуле начинается с одного вопроса.", "s5_p": "Спрашивайте что угодно. Без продаж, только факты.", "s5_ph": "Введите вопрос…", "q_s1": "Безопасно ли покупать на этапе строительства?", "q_s2": "Какие будут дополнительные расходы?", "say_hi": "Здравствуйте! С чего начать?"}};
+Object.entries(T4).forEach(([l,o]) => Object.assign(T[l], o));
 const tf = (k, v) => t(k).replace(/\{(\w+)\}/g, (_, x) => v[x] ?? "");
 
 /* ===== Map of Istanbul, drawn from approximate coordinates (stylised, not to survey accuracy) ===== */
