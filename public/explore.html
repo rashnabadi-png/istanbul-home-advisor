@@ -114,6 +114,52 @@ p{margin:0}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .maplibregl-ctrl-attrib{font:11px var(--f-body)}
 
+/* Project pins */
+#map .gpin{background:none;border:0;box-shadow:none}
+.gpin{width:18px;height:18px;padding:0;border:0;background:none;-webkit-appearance:none;appearance:none;cursor:pointer;display:grid;place-items:center}
+.gpin span{visibility:hidden}.gpin:hover span,.gpin:focus-visible span,.gpin.hi span{visibility:visible}
+.gpin i{width:12px;height:12px;border-radius:50%;background:#22C55E;border:2px solid #fff;box-shadow:0 0 0 4px rgba(34,197,94,.28),0 2px 8px rgba(0,0,0,.45);transition:transform .15s}
+.gpin.approx i{box-shadow:0 0 0 4px rgba(34,197,94,.18),0 2px 8px rgba(0,0,0,.45)}
+.gpin.later i{background:#7FD9A0}
+.gpin span{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);white-space:nowrap;background:rgba(19,33,43,.92);color:#fff;font:600 12px var(--f-body);padding:3px 8px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .15s}
+.gpin:hover,.gpin:focus-visible,.gpin.hi{z-index:5}
+.gpin:hover i,.gpin:focus-visible i,.gpin.hi i{transform:scale(1.45)}
+.gpin:hover span,.gpin:focus-visible span,.gpin.hi span{opacity:1}
+.gpin.hi i{animation:gpulse 1.6s ease-out infinite}
+@keyframes gpulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.6),0 2px 8px rgba(0,0,0,.45)}100%{box-shadow:0 0 0 16px rgba(34,197,94,0),0 2px 8px rgba(0,0,0,.45)}}
+.pins-far .gpin{width:12px;height:12px}.pins-far .gpin i{width:8px;height:8px;border-width:1.5px;box-shadow:0 0 0 2px rgba(34,197,94,.3)}
+.pins-near .gpin i{width:15px;height:15px}
+.gdot,.odot{display:inline-block;width:10px;height:10px;border-radius:50%;flex:none;vertical-align:-1px}
+.gdot{background:#22C55E;box-shadow:0 0 0 3px rgba(34,197,94,.25)}
+.odot{background:#AEB9C3;border:1px solid #1B2630}
+.legend{gap:8px;padding:5px 6px 5px 12px;align-items:center;flex-wrap:wrap;max-width:calc(100% - 70px)}
+.legend .lg{display:inline-flex;align-items:center;gap:7px;color:#fff;font-size:.8rem}
+.legend .lg b{font-weight:700;font-variant-numeric:tabular-nums;opacity:.9}
+.legend .tog{border:1px solid rgba(255,255,255,.3);background:transparent;border-radius:999px;padding:3px 10px;cursor:pointer}
+.legend .tog[aria-pressed="false"]{opacity:.55;text-decoration:line-through}
+.hint{display:flex;gap:10px;align-items:center;background:var(--tile-bg);border-radius:12px;padding:10px 12px;font-size:.9rem}
+.stat .g{color:#16A34A;font-style:normal}
+.pc{display:flex;gap:10px;align-items:flex-start;text-align:start;width:100%;cursor:pointer;font:inherit;color:inherit}
+.pc:hover{border-color:#22C55E}
+.pc .gdot{margin-top:5px}
+.pcb{display:grid;gap:2px;flex:1;min-width:0}
+.pcb .row{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:.86rem}
+.pcb .row strong{color:var(--ink);white-space:nowrap}
+.pcard{display:grid;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 18px 40px -28px rgba(15,35,64,.6);border-top:4px solid #22C55E}
+.pcard .kicker{display:flex;align-items:center;gap:8px;color:#16A34A}
+.pcard h2{font-size:1.7rem}
+.pcard .stat{background:var(--bg)}
+.pcard .stat b{font-size:1.05rem;font-family:var(--f-body);font-weight:700;overflow-wrap:break-word}
+.pcard .stat:first-child b{white-space:nowrap}@media (max-width:420px){.pcard .stat b{font-size:.95rem}}
+.ksp{margin:0;padding-inline-start:18px;display:grid;gap:4px;color:var(--muted);font-size:.92rem}
+.approxnote{font-size:.8rem;color:var(--muted);background:var(--sunk);border-radius:10px;padding:8px 10px}
+.pacts{display:flex;gap:8px;flex-wrap:wrap}
+.tag.st_selling{background:#DCFCE7;color:#166534}.tag.st_sold{background:#FEE2E2;color:#991B1B}.tag.st_resale{background:#FEF3C7;color:#92400E}.tag.st_pre{background:#E0E7FF;color:#3730A3}
+.opop{display:grid;gap:6px;font:14px var(--f-body);color:#13212B}
+.opop span{color:#5A6B76;font-size:.85rem}
+.opop button{justify-self:start;border:0;background:none;padding:0;color:#1D4E9E;font-weight:600;cursor:pointer}
+.maplibregl-popup-content{border-radius:12px;padding:12px 30px 12px 14px}
+
 /* The advisor */
 .fab{position:fixed;z-index:40;inset-inline:max(12px,env(safe-area-inset-left,0px)) max(12px,env(safe-area-inset-right,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));margin-inline:auto;max-width:520px;display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:999px;padding:8px 10px 8px 8px;background:var(--surface);color:var(--ink);box-shadow:0 14px 34px -14px rgba(15,35,64,.55);cursor:pointer}
 .fab .ava{width:38px;height:38px;flex:none}
@@ -143,7 +189,7 @@ p{margin:0}
 <main class="ex">
   <div class="mapwrap">
     <div id="map" role="application" aria-label="Map of Istanbul neighbourhoods"></div>
-    <div class="legend" aria-hidden="true"><span><i class="dot eu"></i><span data-t="side_eu">European side</span></span><span><i class="dot as"></i><span data-t="side_as">Asian side</span></span></div>
+    <div class="legend" id="legend"></div>
     <div class="hovertip" id="hoverTip" hidden></div>
   </div>
   <aside class="side" id="side">
@@ -212,6 +258,8 @@ ru:{nav_home:"Главная",nav_explore:"Районы",ex_kicker:"Исслед
 const LANGS = ["en","tr","ar","fa","ru"];
 let L = "en";
 const $ = s => document.querySelector(s);
+const T3 = {"en": {"lg_avail": "Available through us", "lg_other": "Other projects", "grey_title": "Not offered through us right now.", "grey_ask": "Ask for similar options", "and_more": "+ {n} more. Ask the advisor for the full list.", "st_selling": "Selling now", "st_sold": "Sold out", "st_resale": "Resale only", "st_pre": "Pre-launch", "p_types": "Unit types", "p_delivery": "Delivery", "approx_hood": "The pin shows the neighbourhood, not the exact building.", "approx_district": "The pin shows the district, not the exact building.", "back_to": "Back to {x}", "avail_short": "Available", "avail_here": "Available here", "other_n": "{n} other projects we know of here (grey on the map).", "pins_hint": "Green pins are projects you can buy through us. Tap one to see it."}, "tr": {"lg_avail": "Bizim üzerimizden satışta", "lg_other": "Diğer projeler", "grey_title": "Şu an bizim üzerimizden sunulmuyor.", "grey_ask": "Benzer seçenekleri sor", "and_more": "+ {n} proje daha. Tam liste için danışmana sorun.", "st_selling": "Satışta", "st_sold": "Tükendi", "st_resale": "Sadece ikinci el", "st_pre": "Ön satış", "p_types": "Daire tipleri", "p_delivery": "Teslim", "approx_hood": "İşaret binayı değil, mahalleyi gösterir.", "approx_district": "İşaret binayı değil, ilçeyi gösterir.", "back_to": "{x} sayfasına dön", "avail_short": "Satışta", "avail_here": "Burada satışta", "other_n": "Burada bildiğimiz {n} başka proje var (haritada gri).", "pins_hint": "Yeşil işaretler bizim üzerimizden alabileceğiniz projelerdir. Görmek için dokunun."}, "ar": {"lg_avail": "متاح عن طريقنا", "lg_other": "مشاريع أخرى", "grey_title": "غير معروض عن طريقنا حاليًا.", "grey_ask": "اسأل عن خيارات مشابهة", "and_more": "+ {n} مشاريع أخرى. اطلب القائمة الكاملة من المستشار.", "st_selling": "متاح للبيع", "st_sold": "نفدت", "st_resale": "إعادة بيع فقط", "st_pre": "قبل الإطلاق", "p_types": "أنواع الوحدات", "p_delivery": "التسليم", "approx_hood": "الدبوس يشير إلى الحي، وليس المبنى بالضبط.", "approx_district": "الدبوس يشير إلى المنطقة، وليس المبنى بالضبط.", "back_to": "العودة إلى {x}", "avail_short": "متاح", "avail_here": "متاح هنا", "other_n": "{n} مشاريع أخرى نعرفها هنا (رمادية على الخريطة).", "pins_hint": "الدبابيس الخضراء مشاريع يمكنك شراؤها عن طريقنا. اضغط على أحدها لرؤيته."}, "fa": {"lg_avail": "قابل خرید از طریق ما", "lg_other": "پروژه‌های دیگر", "grey_title": "فعلاً از طریق ما عرضه نمی‌شود.", "grey_ask": "گزینه‌های مشابه را بپرسید", "and_more": "+ {n} پروژهٔ دیگر. فهرست کامل را از مشاور بپرسید.", "st_selling": "در حال فروش", "st_sold": "فروخته شد", "st_resale": "فقط دست دوم", "st_pre": "پیش‌فروش", "p_types": "نوع واحدها", "p_delivery": "تحویل", "approx_hood": "نشانگر محله را نشان می‌دهد، نه خود ساختمان را.", "approx_district": "نشانگر منطقه را نشان می‌دهد، نه خود ساختمان را.", "back_to": "بازگشت به {x}", "avail_short": "قابل خرید", "avail_here": "قابل خرید اینجا", "other_n": "{n} پروژهٔ دیگر که اینجا می‌شناسیم (خاکستری روی نقشه).", "pins_hint": "نشانگرهای سبز پروژه‌هایی هستند که از طریق ما می‌توانید بخرید. برای دیدن، روی یکی بزنید."}, "ru": {"lg_avail": "Доступно через нас", "lg_other": "Другие проекты", "grey_title": "Сейчас не предлагается через нас.", "grey_ask": "Спросить о похожих вариантах", "and_more": "+ ещё {n}. Полный список — у консультанта.", "st_selling": "В продаже", "st_sold": "Распродано", "st_resale": "Только вторичка", "st_pre": "Предстарт", "p_types": "Типы квартир", "p_delivery": "Сдача", "approx_hood": "Метка показывает район (махалле), а не точное здание.", "approx_district": "Метка показывает округ, а не точное здание.", "back_to": "Назад: {x}", "avail_short": "Доступно", "avail_here": "Доступно здесь", "other_n": "Ещё {n} известных нам проектов (серые на карте).", "pins_hint": "Зелёные метки — проекты, которые можно купить через нас. Нажмите, чтобы посмотреть."}};
+Object.keys(T3).forEach(l => T[l] && Object.assign(T[l], T3[l]));
 const t = (k, v={}) => ((T[L] && T[L][k] != null ? T[L][k] : T.en[k]) ?? k).replace(/\{(\w+)\}/g, (_, x) => v[x] ?? "");
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const norm = s => String(s||"").toLocaleLowerCase("tr").replace(/ı/g,"i").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g," ").trim();
@@ -227,19 +275,81 @@ function districtOf(p){ const d = norm(p.district); let best = null, at = 1e9;
 async function load(){
   const j = u => fetch(u).then(r => { if (!r.ok) throw new Error(u); return r.json(); });
   const [rows, geo, dgeo, prof, pdata] = await Promise.all([j("data/mahalleler.json"), j("data/mahalleler.geojson"), j("data/ilceler.geojson"), j("data/districts-en.json"),
-    fetch("/api/data").then(r => { if (!r.ok) throw 0; return r.json(); }).then(d => d.projects).catch(() => j("data.json"))]);
+    fetch("/api/data").then(r => { if (!r.ok) throw 0; return r.json(); }).catch(() => Promise.all([j("data.json"), j("pins.json").catch(() => [])]).then(([projects, pins]) => ({projects, pins})))]);
   S.rows = rows; S.geo = geo; S.dgeo = dgeo; S.profiles = prof;
   rows.forEach(r => { S.bySlug.set(r.slug, r); r.n = norm(r.name);
     const d = S.districts.get(r.district) || {name:r.district, side:r.side, hoods:[], area:0, cx:0, cy:0}; d.hoods.push(r); d.area += r.area; d.cx += r.c[0] * r.area; d.cy += r.c[1] * r.area; S.districts.set(r.district, d); });
   S.districts.forEach(d => { d.c = [d.cx / d.area, d.cy / d.area]; d.slug = slug(d.name); d.projects = []; d.hoods.sort((a,b) => a.name.localeCompare(b.name, "tr")); });
   // Approved projects (the same data the advisor uses), linked to their district and, where listed, their neighbourhood.
-  S.projects = (pdata || []).filter(p => p && p.name);
+  S.projects = (pdata.projects || []).filter(p => p && p.name);
+  S.others = (pdata.pins || []).map(([id, name, tier, lat, lng, acc]) => ({id, name, tier, lat, lng, acc}));
+  placePins();
   S.projects.forEach(p => { const dn = districtOf(p); if (!dn) return; const d = S.districts.get(dn); d.projects.push(p); p._d = dn;
     const h = norm(p.hood || ""); if (h) p._hoods = d.hoods.filter(r => r.n.length > 3 && (" " + h + " ").includes(" " + r.n + " ")).map(r => r.id); });
   const rank = p => (p.sales === "Selling" ? 0 : 2) + (p.conf === "high" ? 0 : 1) + ((p.risk||[]).length ? 3 : 0) + (p.fromUSD ? 0 : 1);
   S.districts.forEach(d => d.projects.sort((a,b) => rank(a) - rank(b) || (a.fromUSD||9e9) - (b.fromUSD||9e9)));
   S.geo.features.forEach(f => { const r = S.rows[f.properties.id]; f.properties.proj = S.districts.get(r.district).projects.length ? 1 : 0; });
 }
+
+/* ===== Project pins =====
+   Green = available through us (approved Tier 1). Grey = other projects we know about.
+   Many locations are still approximate (a neighbourhood or district centre): those share a point, so they are fanned out
+   in a small spiral around it, and the card says the spot is approximate. Exact spots come from the sheet's map links. */
+function pointIn(poly, x, y){ let inside = false;
+  for (const ring of poly){ for (let i = 0, j = ring.length - 1; i < ring.length; j = i++){ const [xi, yi] = ring[i], [xj, yj] = ring[j];
+    if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside; } } return inside; }
+function hoodAt(lng, lat){
+  for (const f of S.geo.features){ const g = f.geometry, polys = g.type === "Polygon" ? [g.coordinates] : g.coordinates;
+    for (const poly of polys){ const r = poly[0]; let minx = 1e9, miny = 1e9, maxx = -1e9, maxy = -1e9;
+      for (const [x, y] of r){ if (x < minx) minx = x; if (x > maxx) maxx = x; if (y < miny) miny = y; if (y > maxy) maxy = y; }
+      if (lng < minx || lng > maxx || lat < miny || lat > maxy) continue; if (pointIn(poly, lng, lat)) return f.properties.id; } }
+  return null;
+}
+function placePins(){
+  const all = [...S.projects.filter(p => isFinite(p.lat)).map(p => ({p, active:true})), ...S.others.filter(o => isFinite(o.lat)).map(o => ({p:o, active:false}))];
+  const groups = new Map();
+  all.forEach(x => { if (x.p.acc === "exact") { x.lng = x.p.lng; x.lat = x.p.lat; return; } const k = x.p.lat.toFixed(4) + "," + x.p.lng.toFixed(4); (groups.get(k) || groups.set(k, []).get(k)).push(x); });
+  groups.forEach(g => { g.sort((a, b) => (b.active - a.active) || String(a.p.id).localeCompare(b.p.id));
+    g.forEach((x, k) => { const r = g.length === 1 ? 0 : .0011 * Math.sqrt(k + .5), a = k * 2.39996; x.lat = x.p.lat + r * Math.cos(a); x.lng = x.p.lng + r * Math.sin(a) / Math.cos(x.p.lat * Math.PI / 180); }); });
+  S.pins = all;
+  // Neighbourhood membership only for spots we trust to that level (exact or neighbourhood centre)
+  all.forEach(x => { x.p._mid = (x.p.acc === "exact" || x.p.acc === "hood") ? hoodAt(x.p.lng, x.p.lat) : null; });
+  S.others.forEach(o => { const id = hoodAt(o.lng, o.lat); o._dn = id != null ? S.rows[id].district : null; });
+  S.otherByDistrict = new Map(); S.others.forEach(o => { if (o._dn) (S.otherByDistrict.get(o._dn) || S.otherByDistrict.set(o._dn, []).get(o._dn)).push(o); });
+}
+function districtOfName(o){ return o._dn || o._d || null; }
+const projById = id => S.projects.find(p => p.id === id);
+let showOthers = true;
+function addPinLayers(map){
+  const fc = (list) => ({type:"FeatureCollection", features:list.map((x, i) => ({type:"Feature", id:i, properties:{i:S.pins.indexOf(x)}, geometry:{type:"Point", coordinates:[x.lng, x.lat]}}))});
+  map.addSource("op", {type:"geojson", data:fc(S.pins.filter(x => !x.active)), cluster:true, clusterRadius:34, clusterMaxZoom:13});
+  map.addLayer({id:"op-cluster", type:"circle", source:"op", filter:["has","point_count"], paint:{"circle-color":"#C9D2DA", "circle-opacity":.55,
+    "circle-radius":["interpolate",["linear"],["get","point_count"], 2,9, 20,14, 80,20], "circle-stroke-color":"#ffffff", "circle-stroke-width":1, "circle-stroke-opacity":.7}});
+  map.addLayer({id:"op-dot", type:"circle", source:"op", filter:["!",["has","point_count"]], paint:{"circle-color":"#AEB9C3",
+    "circle-radius":["interpolate",["linear"],["zoom"], 10,3, 15,6], "circle-stroke-color":"#1B2630", "circle-stroke-width":1, "circle-opacity":.9}});
+  map.on("click", "op-cluster", e => { const f = e.features[0]; map.getSource("op").getClusterExpansionZoom(f.properties.cluster_id).then(z => map.easeTo({center:f.geometry.coordinates, zoom:z + .3})); });
+  map.on("click", "op-dot", e => { const x = S.pins[e.features[0].properties.i]; showOther(x, e.lngLat); });
+  ["op-cluster","op-dot"].forEach(l => { map.on("mouseenter", l, () => map.getCanvas().style.cursor = "pointer"); map.on("mouseleave", l, () => map.getCanvas().style.cursor = ""); });
+  map.on("mousemove", "op-dot", e => { const x = S.pins[e.features[0].properties.i], tip = $("#hoverTip"); tip.innerHTML = `${esc(clean(x.p.name))} <small>· ${esc(t("lg_other"))}</small>`; tip.style.left = e.point.x + "px"; tip.style.top = e.point.y + "px"; tip.hidden = false; });
+  map.on("mouseleave", "op-dot", () => $("#hoverTip").hidden = true);
+  // Green pins as HTML markers, so they can glow and grow
+  S.pins.filter(x => x.active).forEach(x => {
+    const el = document.createElement("button"); el.type = "button"; el.className = "gpin" + (x.p.acc !== "exact" ? " approx" : "") + (/^(sold|resale)/i.test(x.p.sales || "") ? " later" : "");
+    el.setAttribute("aria-label", clean(x.p.name)); el.innerHTML = `<i></i><span>${esc(clean(x.p.name))}</span>`;
+    el.addEventListener("click", ev => { ev.stopPropagation(); go("#project/" + x.p.id); });
+    x.marker = new maplibregl.Marker({element:el}).setLngLat([x.lng, x.lat]).addTo(map); x.el = el; el.setAttribute("aria-label", clean(x.p.name));
+  });
+  const z = () => { const zz = map.getZoom(); $("#map").classList.toggle("pins-far", zz < 10.6); $("#map").classList.toggle("pins-near", zz >= 13.2); }; map.on("zoom", z); z();
+}
+let popup = null;
+function showOther(x, at){
+  const d = districtOfName(x.p) || "";
+  popup?.remove();
+  popup = new maplibregl.Popup({closeButton:true, maxWidth:"260px", offset:10}).setLngLat(at).setHTML(`<div class="opop"><b dir="ltr">${esc(clean(x.p.name))}</b><span>${esc(t("grey_title"))}</span>${d ? `<button type="button" data-area="${esc(d)}">${esc(t("grey_ask"))} →</button>` : ""}</div>`).addTo(S.map);
+  popup.getElement().addEventListener("click", e => { const b = e.target.closest("[data-area]"); if (b){ const dd = S.districts.get(b.dataset.area); popup.remove(); openChat({type:"iha-area", district:b.dataset.area, side:dd ? dd.side : ""}); } });
+}
+function setOthers(v){ showOthers = v; ["op-cluster","op-dot"].forEach(l => S.map?.getLayer(l) && S.map.setLayoutProperty(l, "visibility", v ? "visible" : "none")); renderLegend(); }
+function highlightPins(ids){ S.pins.forEach(x => x.el && x.el.classList.toggle("hi", !!ids && ids.has(x.p.id))); }
 
 /* ===== Map ===== */
 const TILES = {url:"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", attribution:"Imagery © Esri, Maxar, Earthstar Geographics · Boundaries © OpenStreetMap contributors"};
@@ -270,6 +380,7 @@ function initMap(){
       const r = S.rows[f.id], tip = $("#hoverTip"); tip.innerHTML = `${esc(r.name)} <small>· ${esc(r.district)}</small>`; tip.style.left = e.point.x + "px"; tip.style.top = e.point.y + "px"; tip.hidden = false; });
     map.on("mouseleave", "m-fill", () => { setHover(null); map.getCanvas().style.cursor = ""; $("#hoverTip").hidden = true; });
     map.on("click", "m-fill", e => { const f = e.features[0]; if (f) go("#" + S.rows[f.id].slug); });
+    addPinLayers(map);
     applyFilter(); route(true);
   });
 }
@@ -300,8 +411,24 @@ const reduced = matchMedia("(prefers-reduced-motion: reduce)");
 
 /* ===== Panel ===== */
 function stat(v, label){ return `<div class="stat"><b>${v}</b><span>${esc(label)}</span></div>`; }
-function projCards(list){
-  return list.slice(0, 5).map(p => `<div class="pc"><b dir="ltr">${esc(clean(p.name))}</b><div class="row"><span dir="ltr">${esc(clean(p.district))}</span><strong>${p.fromUSD ? esc(t("from")) + " " + esc(money(p.fromUSD)) : esc(t("price_req"))}</strong></div><button type="button" data-ask="${esc(p.id)}">${esc(t("ask_proj"))} →</button></div>`).join("");
+function projCards(list, n = 6){
+  return list.slice(0, n).map(p => `<button type="button" class="pc" data-go="#project/${esc(p.id)}"><i class="gdot"></i><span class="pcb"><b dir="ltr">${esc(clean(p.name))}</b><span class="row"><span dir="ltr">${esc(clean(p.hood || p.district))}</span><strong>${p.fromUSD ? esc(t("from")) + " " + esc(money(p.fromUSD)) : esc(t("price_req"))}</strong></span></span></button>`).join("")
+    + (list.length > n ? `<p class="empty">${esc(t("and_more",{n:list.length - n}))}</p>` : "");
+}
+const STATUS = s => /^sold/i.test(s) ? "st_sold" : /^resale/i.test(s) ? "st_resale" : /pre/i.test(s) ? "st_pre" : /selling/i.test(s) ? "st_selling" : "";
+function renderProject(p){
+  const d = S.districts.get(p._d), r = p._mid != null ? S.rows[p._mid] : null, st = STATUS(p.sales || "");
+  $("#detail").innerHTML = `<div class="crumb"><button type="button" data-go="#">${esc(t("all_districts"))}</button>${d ? `<span>›</span><button type="button" data-go="#${d.slug}">${esc(d.name)}</button>` : ""}${r ? `<span>›</span><button type="button" data-go="#${r.slug}">${esc(r.name)}</button>` : ""}</div>
+    <div class="pcard">
+      <span class="kicker"><i class="gdot"></i>${esc(t("lg_avail"))}</span>
+      <h2 dir="ltr">${esc(clean(p.name))}</h2>
+      <div class="tags">${st ? `<span class="tag ${st}">${esc(t(st))}</span>` : ""}${p.status ? `<span class="tag">${esc(p.status)}</span>` : ""}${(p.bestFor||[]).slice(0,2).map(b => `<span class="tag">${esc(b)}</span>`).join("")}</div>
+      <div class="stats">${stat(p.fromUSD ? money(p.fromUSD) : "—", t("from"))}${stat(esc(p.unitTypes ? p.unitTypes.split(",").slice(0,3).join(", ") : "—"), t("p_types"))}${stat(esc((p.delivery || "—").replace(/\(.*?\)/g,"").slice(0,18)), t("p_delivery"))}</div>
+      ${(p.ksp||[]).length ? `<ul class="ksp">${p.ksp.slice(0,3).map(k => `<li dir="ltr">${esc(k)}</li>`).join("")}</ul>` : ""}
+      ${p.acc && p.acc !== "exact" ? `<p class="approxnote">${esc(t(p.acc === "hood" ? "approx_hood" : "approx_district"))}</p>` : ""}
+      <div class="pacts"><button class="btn" type="button" data-ask="${esc(p.id)}">${esc(t("ask_proj"))}</button>${d ? `<button class="btn ghost" type="button" data-go="#${d.slug}">${esc(t("back_to",{x:d.name}))}</button>` : ""}</div>
+    </div>`;
+  document.title = `${clean(p.name)} · Istanbul Neighbourhood Explorer`;
 }
 function aboutBlock(d){
   const txt = S.profiles[d.name]; if (!txt) return "";
@@ -310,7 +437,7 @@ function aboutBlock(d){
 function renderOverview(){
   const groups = [["european", t("side_eu"), "eu"], ["asian", t("side_as"), "as"]];
   const nP = [...S.districts.values()].reduce((a,d) => a + d.projects.length, 0);
-  $("#detail").innerHTML = `<div class="stats">${stat(nf(S.districts.size), t("st_districts"))}${stat(nf(S.rows.length), t("st_hoods"))}${stat(nf(nP), t("st_projects"))}</div>
+  $("#detail").innerHTML = `<p class="hint"><i class="gdot"></i>${esc(t("pins_hint"))}</p><div class="stats">${stat(nf(S.districts.size), t("st_districts"))}${stat(nf(S.rows.length), t("st_hoods"))}${stat(`<em class="g">${nf(nP)}</em>`, t("avail_short"))}</div>
     <div class="dlist">${groups.map(([side, label, cls]) => `<div><h3><i class="dot ${cls}"></i>${esc(label)}</h3><div class="chips">${[...S.districts.values()].filter(d => d.side === side && (S.filter === "all" || S.filter === side || (S.filter === "proj" && d.projects.length))).sort((a,b) => a.name.localeCompare(b.name,"tr")).map(d => `<button type="button" data-go="#${d.slug}">${esc(d.name)} <small>${d.projects.length ? "● " : ""}${d.hoods.length}</small></button>`).join("")}</div></div>`).join("")}</div>`;
   document.title = "Istanbul Neighbourhood Explorer";
 }
@@ -318,19 +445,19 @@ function renderDistrict(d){
   $("#detail").innerHTML = `<div class="crumb"><button type="button" data-go="#">${esc(t("all_districts"))}</button></div>
     <div><span class="kicker">${esc(t("district"))}</span><h2>${esc(d.name)}</h2></div>
     <div class="tags"><span class="tag"><i class="dot ${d.side === "asian" ? "as" : "eu"}"></i>${esc(t(d.side === "asian" ? "side_as" : "side_eu"))}</span></div>
-    <div class="stats">${stat(nf(d.hoods.length), t("n_hoods"))}${stat(nf(d.area, d.area < 10 ? 1 : 0) + " km²", t("area"))}${stat(nf(d.projects.length), t("st_projects"))}</div>
+    <div class="stats">${stat(nf(d.hoods.length), t("n_hoods"))}${stat(nf(d.area, d.area < 10 ? 1 : 0) + " km²", t("area"))}${stat(`<em class="g">${nf(d.projects.length)}</em>`, t("avail_short"))}</div>
     ${aboutBlock(d)}
-    <div class="plist"><h3>${esc(t("proj_district",{x:d.name}))}</h3>${d.projects.length ? projCards(d.projects) : `<p class="empty">${esc(t("proj_none"))}</p>`}</div>
+    <div class="plist"><h3>${esc(t("proj_district",{x:d.name}))}</h3>${d.projects.length ? projCards(d.projects) : `<p class="empty">${esc(t("proj_none"))}</p>`}${(S.otherByDistrict.get(d.name)||[]).length ? `<p class="empty"><i class="odot"></i> ${esc(t("other_n",{n:S.otherByDistrict.get(d.name).length}))}</p>` : ""}</div>
     <button class="btn" type="button" data-area="${esc(d.name)}">${esc(t("ask_area",{x:d.name}))}</button>
     <div><h3 style="font:600 .95rem var(--f-body);margin-bottom:8px">${esc(t("hoods_in",{x:d.name}))}</h3><div class="chips">${d.hoods.map(r => `<button type="button" data-go="#${r.slug}">${esc(r.name)}</button>`).join("")}</div></div>`;
   document.title = `${d.name} · Istanbul Neighbourhood Explorer`;
 }
 function renderHood(r){
-  const d = S.districts.get(r.district), here = d.projects.filter(p => (p._hoods||[]).includes(r.id));
+  const d = S.districts.get(r.district), here = d.projects.filter(p => p._mid === r.id || (p._hoods||[]).includes(r.id));
   $("#detail").innerHTML = `<div class="crumb"><button type="button" data-go="#">${esc(t("all_districts"))}</button><span>›</span><button type="button" data-go="#${d.slug}">${esc(d.name)}</button></div>
     <div><span class="kicker">${esc(t("hood"))}</span><h2>${esc(r.name)}</h2></div>
     <div class="tags"><span class="tag">${esc(d.name)}</span><span class="tag"><i class="dot ${r.side === "asian" ? "as" : "eu"}"></i>${esc(t(r.side === "asian" ? "side_as" : "side_eu"))}</span></div>
-    <div class="stats">${stat(nf(r.area, r.area < 10 ? 2 : 1) + " km²", t("area"))}${stat(nf(r.taksim, 1) + " km", t("taksim"))}${stat(nf(r.nb.length), t("nbs"))}</div>
+    <div class="stats">${stat(nf(r.area, r.area < 10 ? 2 : 1) + " km²", t("area"))}${stat(nf(r.taksim, 1) + " km", t("taksim"))}${stat(`<em class="g">${nf(here.length)}</em>`, t("avail_here"))}</div>
     <p class="empty">${esc(t("pitches",{n:nf(Math.round(r.area / .00714))}))} · ${esc(t("taksim"))}: ${esc(t("taksim_v",{n:nf(r.taksim,1)}))} (${esc(t("straight"))})</p>
     ${r.nb.length ? `<div><h3 style="font:600 .95rem var(--f-body);margin-bottom:8px">${esc(t("nbs"))}</h3><div class="chips">${r.nb.map(i => S.rows[i]).map(n => `<button type="button" data-go="#${n.slug}">${esc(n.name)}${n.district !== r.district ? ` <small>${esc(n.district)}</small>` : ""}</button>`).join("")}</div></div>` : ""}
     ${aboutBlock(d)}
@@ -343,6 +470,10 @@ function renderHood(r){
 function go(hash){ if (location.hash === hash || (hash === "#" && !location.hash)) route(); else location.hash = hash === "#" ? "" : hash; }
 function route(first){
   const h = decodeURIComponent(location.hash.slice(1));
+  if (h.startsWith("project/") && projById(h.slice(8))){ const p = projById(h.slice(8)), x = S.pins.find(q => q.p === p); S.sel = null; renderProject(p); highlightPins(new Set([p.id]));
+    if (S.map && x) S.map.flyTo({center:[x.lng, x.lat], zoom:Math.max(S.map.getZoom(), 14.2), duration:reduced.matches ? 0 : 1000, essential:true});
+    paintSelection(); if (!first && !matchMedia("(min-width:901px)").matches) $("#detail").scrollIntoView({behavior:reduced.matches ? "auto" : "smooth", block:"start"}); return; }
+  highlightPins(null);
   if (h && S.bySlug.has(h)){ const r = S.bySlug.get(h); S.sel = {type:"m", r}; renderHood(r); fitTo([r]); }
   else if (h && [...S.districts.values()].some(d => d.slug === h)){ const d = [...S.districts.values()].find(d => d.slug === h); S.sel = {type:"d", d}; renderDistrict(d); fitTo(d.hoods); }
   else { S.sel = null; renderOverview(); if (!first && S.map) S.map.fitBounds([[28.55,40.84],[29.45,41.26]], {padding:20, duration:reduced.matches ? 0 : 900}); }
@@ -379,6 +510,12 @@ function renderFilters(){
 }
 $("#filters").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (!b) return; S.filter = b.dataset.f; renderFilters(); applyFilter(); if (!S.sel) renderOverview(); });
 
+function renderLegend(){
+  $("#legend").innerHTML = `<span class="lg"><i class="gdot"></i>${esc(t("lg_avail"))} <b>${nf(S.projects.filter(p => isFinite(p.lat)).length)}</b></span>
+    <button type="button" class="lg tog" aria-pressed="${showOthers}" id="togOthers"><i class="odot"></i>${esc(t("lg_other"))} <b>${nf(S.others.length)}</b></button>`;
+}
+$("#legend").addEventListener("click", e => { if (e.target.closest("#togOthers")) setOthers(!showOthers); });
+
 /* ===== The advisor ===== */
 let frame = null;
 function openChat(msg){
@@ -403,7 +540,7 @@ function applyLang(code){
   document.querySelectorAll("[data-t]").forEach(el => el.textContent = t(el.dataset.t));
   $("#q").placeholder = t("search_ph"); $("#lang").value = L;
   try{ localStorage.setItem("iha_lang", L); }catch{}
-  renderFilters(); if (S.rows.length) route(true);
+  renderFilters(); if (S.rows.length){ route(true); renderLegend(); }
   if (frame) frame.contentWindow?.postMessage({type:"iha-lang", lang:L}, location.origin);
 }
 $("#lang").onchange = e => applyLang(e.target.value);
@@ -413,7 +550,7 @@ $("#lang").onchange = e => applyLang(e.target.value);
   const nav = (navigator.language || "en").slice(0,2);
   applyLang(saved || (LANGS.includes(nav) ? nav : "en"));
   await load();
-  route(true);
+  route(true); renderLegend();
   const start = () => window.maplibregl ? initMap() : setTimeout(start, 50); start();
 })();
 </script>
