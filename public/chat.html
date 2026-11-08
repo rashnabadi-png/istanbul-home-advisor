@@ -123,6 +123,26 @@ header{border-bottom:0}
 #restart{border-radius:999px}
 @media (max-width:560px){.msg.bot{margin-inline-start:38px}.msg.bot::before{inset-inline-start:-38px;width:28px;height:28px}.recs{margin-inline-start:0}}
 @media (prefers-reduced-motion:reduce){.msg,.card,.reply{animation:none}}
+
+/* Account step */
+.gatewrap{position:relative;align-self:stretch;margin-inline-start:42px;display:grid;animation:msgIn .3s ease both}
+.recs.locked{margin:0;filter:blur(7px) saturate(.8);opacity:.75;pointer-events:none;user-select:none;max-height:340px;overflow:hidden;-webkit-mask:linear-gradient(#000 55%,transparent);mask:linear-gradient(#000 55%,transparent)}
+.recs.locked + .gatebox{position:absolute;inset-inline:6%;top:24px}
+.gatebox{background:var(--surface);border-radius:20px;box-shadow:0 22px 50px -20px rgba(15,35,64,.55);padding:20px 20px 16px;display:grid;gap:10px;justify-items:center;text-align:center;border:1px solid var(--line)}
+.gico{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#1D4E9E,#2A9D8F);color:#fff}
+.gico svg{width:22px;height:22px}
+.gatebox h3{margin:0;font-size:1.08rem;line-height:1.3}
+.gatebox ul{margin:0;padding:0;list-style:none;display:grid;gap:5px;font-size:.88rem;color:var(--muted);text-align:start}
+.gatebox li{display:flex;gap:8px;align-items:flex-start}
+.gatebox li::before{content:"";flex:none;width:16px;height:16px;margin-top:2px;border-radius:50%;background:#22C55E url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center/10px no-repeat}
+.gbtn{min-height:44px;width:100%;max-width:300px;display:grid;place-items:center}
+.gwait{color:var(--muted);font-size:.85rem}
+.gsmall{margin:0;font-size:.74rem;color:var(--muted);line-height:1.45}
+.gsmall a{color:inherit}
+.userchip{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;padding:3px 9px 3px 3px;border-radius:999px;background:rgba(127,140,150,.16);color:inherit;flex:none;white-space:nowrap}
+.userchip img{width:22px;height:22px;border-radius:50%}
+.userchip[hidden]{display:none}
+@media (max-width:560px){.gatewrap{margin-inline-start:0}.recs.locked + .gatebox{inset-inline:3%}}
 </style>
 
 </head>
@@ -132,6 +152,7 @@ header{border-bottom:0}
     <div class="brand"><h1 id="brandName">Istanbul Home Advisor</h1><span id="tagline">New-build homes for international buyers</span></div>
     <div class="spacer"></div>
     <div class="lang" id="lang" aria-label="Language"></div>
+    <span class="userchip" id="userChip" hidden></span>
     <button class="btn small ghost" id="restart" type="button">Start over</button>
   </header>
   <div class="log" id="log" aria-live="polite"></div>
@@ -142,7 +163,7 @@ header{border-bottom:0}
       <button class="btn" id="send" type="submit">Send</button>
       <button class="btn ghost" id="stop" type="button" hidden>Stop</button>
     </form>
-    <input id="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px">
+    <input id="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;inset:0 auto auto 0;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden;clip-path:inset(50%)">
     <p class="foot"><span id="foot">Prices are asking prices from listed sources and dates; an agent confirms everything before you reserve. General information only, not legal or financial advice.</span> <a href="privacy.html" target="_blank" rel="noopener" class="privacy">Privacy / KVKK</a></p>
   </div>
 </div>
@@ -183,6 +204,7 @@ BUYING STEPS (typical)
 
 /* ===== Interface text (English is the source; other languages load from i18n.json) ===== */
 const EN = {
+  "gate_msg": "Good news: I've picked your {n} best matches from the projects we've checked.", "gate_msg0": "I'm ready to search our projects for you.", "gate_title": "Create your free account to see your matches", "gate_b1": "One tap with Google, no password", "gate_b2": "Your shortlist and answers are saved for next time", "gate_b3": "Real prices and availability from a real agent", "gate_privacy": "By continuing, you agree that we save your name, email and answers to create your account.", "privacy_link": "Privacy notice", "gate_welcome": "Welcome, {name}! Your account is ready. Here are your matches.", "gate_back": "Welcome back, {name}! Here are your matches.", "gate_err": "Sign-in didn't work. Please try again, or ask to talk to an agent.", "gate_fail": "Google sign-in couldn't load here. Please check your connection or ad blocker, or talk to an agent.", "signed_in_as": "Signed in as {x}",
   tagline:"New-build homes for international buyers", restart:"Start over", send:"Send", stop:"Stop",
   placeholder:"Type an answer or ask anything…", placeholderAnswer:"Type your answer…",
   foot:"Prices are asking prices from listed sources and dates; an agent confirms everything before you reserve. General information only, not legal or financial advice.",
@@ -269,6 +291,7 @@ const langName = () => LANGS.find(x=>x[0]===L)[2];
 let P = [], NAMES = {tier1x:[], tier2:[], tier3:[]};
 let ctl = null;
 const A = {}; const turns = []; let step = null;
+let USER = null; // the signed-in visitor (Google account), or null
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const money = n => n ? "$" + Math.round(n).toLocaleString("en-US") : "";
@@ -404,6 +427,8 @@ function answer(value, label){
   setTimeout(()=>go(nxt), 250);
 }
 function recommend(){
+  if (CONFIG.googleClientId && !USER) return gate();
+  $("#gate")?.remove();
   step = "results"; const r = rank(); const top = r.slice(0,3);
   if (!top.length){ addMsg("bot", t("none")); setReplies([["a_widen","widen"],["a_anyside","anyside"],["a_offplan","offplan"],["a_agent","lead"]]); return; }
   addMsg("bot", summaryLine() + "\n\n" + t("top",{n:top.length}));
@@ -432,19 +457,73 @@ function legalAnswer(topic){
   setReplies([["a_another_legal","legal"],["a_find_homes","flow"],["a_agent","lead"]]);
 }
 
+/* ===== Account step: visitors sign in with Google before the advisor shows their matches ===== */
+let gsi = null;
+function loadGsi(){
+  return gsi ||= new Promise((ok, bad) => {
+    if (window.google?.accounts?.id) return ok();
+    const sc = document.createElement("script"); sc.src = "https://accounts.google.com/gsi/client"; sc.async = true;
+    sc.onload = () => ok(); sc.onerror = () => { gsi = null; bad(new Error("gsi")); }; document.head.append(sc);
+    setTimeout(() => window.google?.accounts?.id ? ok() : bad(new Error("timeout")), 9000);
+  });
+}
+function gate(){
+  step = "gate"; const r = rank();
+  addMsg("bot", r.length ? t("gate_msg",{n:Math.min(3, r.length)}) : t("gate_msg0"));
+  $("#gate")?.remove();
+  const w = document.createElement("div"); w.className = "gatewrap"; w.id = "gate";
+  w.innerHTML = `${r.length ? `<div class="recs locked" aria-hidden="true" inert>${r.slice(0,2).map(card).join("")}</div>` : ""}
+    <div class="gatebox" role="group" aria-labelledby="gateT">
+      <div class="gico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+      <h3 id="gateT">${esc(t("gate_title"))}</h3>
+      <ul><li>${esc(t("gate_b1"))}</li><li>${esc(t("gate_b2"))}</li><li>${esc(t("gate_b3"))}</li></ul>
+      <div class="gbtn" id="gbtn"><span class="gwait">${esc(t("typing"))}</span></div>
+      <p class="gsmall">${esc(t("gate_privacy"))} <a href="privacy.html" target="_blank" rel="noopener">${esc(t("privacy_link"))}</a></p>
+    </div>`;
+  $("#log").append(w); scrollDown();
+  setReplies([["a_ask_another","ask"],["a_agent","lead"]]);
+  loadGsi().then(() => {
+    google.accounts.id.initialize({client_id:CONFIG.googleClientId, callback:onGoogle, ux_mode:"popup", auto_select:false, itp_support:true, use_fedcm_for_button:true});
+    const el = $("#gbtn"); if (!el) return; el.innerHTML = "";
+    google.accounts.id.renderButton(el, {type:"standard", theme:"filled_blue", size:"large", shape:"pill", text:"continue_with", logo_alignment:"left", locale:L, width:Math.min(300, el.clientWidth || 300)});
+  }).catch(() => { const el = $("#gbtn"); if (el) el.innerHTML = `<p class="gsmall">${esc(t("gate_fail"))}</p>`; });
+}
+async function onGoogle(resp){
+  try{
+    const r = await fetch("/api/auth", {method:"POST", headers:{"content-type":"application/json"},
+      body:JSON.stringify({credential:resp.credential, language:langName(), goal:A.goal||"", answers:A, page:QS.get("embed")==="1" ? "website" : "chat"})});
+    const j = await r.json().catch(()=>({}));
+    if (!r.ok || !j.user) throw 0;
+    USER = j.user; window.parent?.postMessage({type:"iha-user", user:USER}, location.origin);
+    $("#gate")?.remove(); setUserChip();
+    addMsg("bot", t(j.isNew ? "gate_welcome" : "gate_back", {name:(USER.name||"").split(" ")[0]}));
+    setTimeout(recommend, 300);
+  }catch{ addMsg("note", t("gate_err")); }
+}
+function setUserChip(){
+  const c = $("#userChip"); if (!c) return;
+  c.hidden = !USER; if (!USER) return;
+  c.innerHTML = `${USER.picture ? `<img src="${esc(USER.picture)}" alt="" referrerpolicy="no-referrer">` : ""}<span dir="auto">${esc((USER.name||USER.email).split(" ")[0])}</span>`;
+  c.title = t("signed_in_as",{x:USER.email});
+}
+async function loadUser(){
+  if (!CONFIG.googleClientId) return;
+  try{ const j = await fetch("/api/auth", {cache:"no-store"}).then(r=>r.json()); USER = j.user || null; setUserChip(); }catch{}
+}
+
 /* ===== Lead capture, one question at a time ===== */
 const LEAD = [{k:"name", q:"lead_name", ph:"ph_name"},{k:"phone", q:"lead_phone", ph:"ph_phone"},
   {k:"viewing", q:"lead_view", opts:[["o_v_visit","visit"],["o_v_video","video"],["o_v_here","here"]]},
   {k:"when", q:"lead_when", opts:[["o_morning","morning"],["o_afternoon","afternoon"],["o_evening","evening"],["o_anytime","any"]]}];
 let leadI = -1; let lead = {};
-function startLead(){ leadI = 0; step = "lead"; askLead(); }
+function startLead(){ leadI = 0; step = "lead"; if (USER && USER.name){ lead.name = USER.name; leadI = 1; } askLead(); }
 function askLead(){ const Q = LEAD[leadI]; if (!Q) return askConsent(); addMsg("bot", t(Q.q)); if (Q.opts) setReplies(Q.opts); else { setReplies([]); setPh(Q.ph); $("#input").focus(); } }
 function leadAnswer(v, label){ addMsg("me", label); lead[LEAD[leadI].k] = v; leadI++; setTimeout(askLead, 200); }
 function askConsent(){ step = "consent"; setPh(); addMsg("bot", t("consent")); setReplies([["o_agree","agree"],["o_decline","decline"]]); }
 async function finishLead(agree){
   step = "after"; setPh();
   if (!agree){ addMsg("bot", CONFIG.whatsapp ? t("declined_wa",{wa:CONFIG.whatsapp}) : t("declined")); setReplies([["a_keep","flow"]]); return; }
-  const rec = {...lead, language:langName(), answers:{...A}, shortlist:(window._ranked||[]).slice(0, window._shown||3).map(r=>r.p.id+" "+r.p.name), consent:"KVKK contact consent v1 ("+L+")", at:new Date().toISOString(),
+  const rec = {...lead, email:USER ? USER.email : "", language:langName(), answers:{...A}, shortlist:(window._ranked||[]).slice(0, window._shown||3).map(r=>r.p.id+" "+r.p.name), consent:"KVKK contact consent v1 ("+L+")", at:new Date().toISOString(),
     questions: turns.filter(x=>x.role==="user").slice(-3).map(x=>x.content.slice(0,300))};
   try{
     const r = await fetch("/api/lead", {method:"POST", headers:{"content-type":"application/json"},
@@ -494,7 +573,7 @@ function onReply(btn){
   const v = btn.dataset.v, label = btn.textContent;
   if (step==="lead") return leadAnswer(v, label);
   if (step==="consent"){ addMsg("me", label); return finishLead(v==="agree"); }
-  if (step==="results"||step==="after"){ addMsg("me", label); return afterAction(v); }
+  if (step==="results"||step==="after"||step==="gate"){ addMsg("me", label); return afterAction(v); }
   const st = S[step]; if (!st) return;
   if (st.multi){
     if (btn.dataset.done){ const sel = [...$("#replies").querySelectorAll('[aria-pressed="true"]')]; return answer(sel.map(b=>b.dataset.v), sel.length ? sel.map(b=>b.textContent).join(L==="ar"||L==="fa"?"، ":", ") : t("nopref")); }
@@ -626,7 +705,7 @@ function fromSite(m){
 }
 addEventListener("message", e => { if (e.origin!==location.origin || !e.data || typeof e.data!=="object") return;
   if (ready) fromSite(e.data); else pending.push(e.data); });
-init(); load().then(()=>{ ready = true; pending.splice(0).forEach(fromSite); });
+init(); load().then(loadUser).then(()=>{ ready = true; pending.splice(0).forEach(fromSite); });
 
 </script>
 

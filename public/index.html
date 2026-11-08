@@ -820,7 +820,7 @@ function ensureFrame(){
   if (frame) return frame;
   frame = document.createElement("iframe");
   frame.title = "Istanbul Home Advisor chat"; frame.src = "chat.html?embed=1&lang=" + L;
-  frame.setAttribute("allow", "clipboard-write");
+  frame.setAttribute("allow", "clipboard-write; identity-credentials-get");
   frame.addEventListener("load", () => frame.dataset.loaded = "1", {once:true});
   $("#panel").appendChild(frame);
   return frame;

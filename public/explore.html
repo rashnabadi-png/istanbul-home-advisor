@@ -521,7 +521,7 @@ $("#legend").addEventListener("click", e => { if (e.target.closest("#togOthers")
 /* ===== The advisor ===== */
 let frame = null;
 function openChat(msg){
-  if (!frame){ frame = document.createElement("iframe"); frame.title = "Istanbul Home Advisor chat"; frame.src = "chat.html?embed=1&lang=" + L; frame.addEventListener("load", () => frame.dataset.loaded = "1", {once:true}); $("#panel").appendChild(frame); }
+  if (!frame){ frame = document.createElement("iframe"); frame.title = "Istanbul Home Advisor chat"; frame.src = "chat.html?embed=1&lang=" + L; frame.setAttribute("allow", "clipboard-write; identity-credentials-get"); frame.addEventListener("load", () => frame.dataset.loaded = "1", {once:true}); $("#panel").appendChild(frame); }
   if (msg){ const send = () => frame.contentWindow.postMessage(msg, location.origin); if (frame.dataset.loaded) send(); else frame.addEventListener("load", send, {once:true}); }
   $("#panel").classList.add("open"); $("#fab").classList.add("hide");
   if (matchMedia("(max-width:560px)").matches) document.body.style.overflow = "hidden";

@@ -33,6 +33,20 @@ Buyer's browser ──► public/index.html (website) ──panel──► publi
 5. Fill in the [brackets] in `public/privacy.html` and have a lawyer check it.
 6. Domain: Vercel → Project → Settings → Domains → add `istanbulhomeadvisor.com` and `www.istanbulhomeadvisor.com`, then copy the DNS records Vercel shows into your domain registrar. Set `ALLOWED_ORIGINS` to `https://istanbulhomeadvisor.com,https://www.istanbulhomeadvisor.com`.
 
+## Visitor accounts (Sign in with Google, free)
+Before the advisor shows matching projects, visitors create an account with one tap on Google. Each account becomes a row
+in the sheet's **Users** tab (email, name, language, goal, answers, sign-in count). Leads from signed-in visitors carry their
+account email in column M of **Leads**. Until `GOOGLE_CLIENT_ID` is set, the chat shows matches without asking to sign in.
+1. https://console.cloud.google.com → pick the same project as the service account.
+2. **APIs & Services → OAuth consent screen**: External, app name "Istanbul Home Advisor", support email, logo optional,
+   authorised domain `istanbulhomeadvisor.com`, privacy policy `https://istanbulhomeadvisor.com/privacy.html`. Scopes: only the
+   default email, profile, openid. Then **Publish app** (no Google review is needed for these basic scopes).
+3. **Credentials → Create credentials → OAuth client ID → Web application**. Authorised JavaScript origins:
+   `https://istanbulhomeadvisor.com`, `https://www.istanbulhomeadvisor.com`, your `https://YOUR-APP.vercel.app`.
+   No redirect URI is needed.
+4. Copy the **Client ID** (ends in `.apps.googleusercontent.com`) → Vercel → Environment Variables → `GOOGLE_CLIENT_ID` → Redeploy.
+5. Optional: `SESSION_SECRET` (any long random text) signs the login cookie; without it a secret is derived from the service account key.
+
 ## Satellite map key (Esri, free tier)
 1. Sign up free at https://location.arcgis.com (no card needed for the free tier: 2 million map tiles a month).
 2. Create an API key: Developer credentials → New item → API key. Under privileges tick **Basemaps** only.

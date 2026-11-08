@@ -262,7 +262,20 @@
   "e_rate": "Too many questions at once, so please wait a minute.",
   "e_session": "Please sign in again to keep chatting.",
   "e_other": "Oops, something went wrong. Please try again.",
-  "load_fail": "The project list couldn't load. Reload the page and try again."
+  "load_fail": "The project list couldn't load. Reload the page and try again.",
+  "gate_msg": "Good news: I've picked your {n} best matches from the projects we've checked.",
+  "gate_msg0": "I'm ready to search our projects for you.",
+  "gate_title": "Create your free account to see your matches",
+  "gate_b1": "One tap with Google, no password",
+  "gate_b2": "Your shortlist and answers are saved for next time",
+  "gate_b3": "Real prices and availability from a real agent",
+  "gate_privacy": "By continuing, you agree that we save your name, email and answers to create your account.",
+  "privacy_link": "Privacy notice",
+  "gate_welcome": "Welcome, {name}! Your account is ready. Here are your matches.",
+  "gate_back": "Welcome back, {name}! Here are your matches.",
+  "gate_err": "Sign-in didn't work. Please try again, or ask to talk to an agent.",
+  "gate_fail": "Google sign-in couldn't load here. Please check your connection or ad blocker, or talk to an agent.",
+  "signed_in_as": "Signed in as {x}"
  },
  "tr": {
   "tagline": "Yabancı alıcılar için yeni projeler",
@@ -527,7 +540,20 @@
   "e_rate": "Aynı anda çok fazla soru geldi, lütfen bir dakika bekleyin.",
   "e_session": "Sohbete devam etmek için lütfen tekrar giriş yapın.",
   "e_other": "Hay aksi, bir şeyler ters gitti. Lütfen tekrar deneyin.",
-  "load_fail": "Proje listesi yüklenemedi. Sayfayı yenileyip tekrar deneyin."
+  "load_fail": "Proje listesi yüklenemedi. Sayfayı yenileyip tekrar deneyin.",
+  "gate_msg": "Güzel haber: Kontrol ettiğimiz projeler arasından size en uygun {n} projeyi seçtim.",
+  "gate_msg0": "Projelerimiz arasında sizin için aramaya hazırım.",
+  "gate_title": "Eşleşmelerinizi görmek için ücretsiz hesabınızı oluşturun",
+  "gate_b1": "Google ile tek dokunuş, şifre yok",
+  "gate_b2": "Kısa listeniz ve yanıtlarınız bir sonraki sefer için kaydedilir",
+  "gate_b3": "Gerçek bir danışmandan güncel fiyat ve müsaitlik",
+  "gate_privacy": "Devam ederek hesabınızı oluşturmak için adınızı, e-postanızı ve yanıtlarınızı kaydetmemizi kabul edersiniz.",
+  "privacy_link": "Aydınlatma metni",
+  "gate_welcome": "Hoş geldiniz, {name}! Hesabınız hazır. İşte eşleşmeleriniz.",
+  "gate_back": "Tekrar hoş geldiniz, {name}! İşte eşleşmeleriniz.",
+  "gate_err": "Giriş yapılamadı. Lütfen tekrar deneyin veya bir danışmanla görüşmek isteyin.",
+  "gate_fail": "Google ile giriş burada yüklenemedi. Bağlantınızı veya reklam engelleyicinizi kontrol edin ya da bir danışmanla görüşün.",
+  "signed_in_as": "{x} olarak giriş yapıldı"
  },
  "ar": {
   "tagline": "مساكن جديدة للمشترين الأجانب",
@@ -792,7 +818,20 @@
   "e_rate": "الأسئلة كثيرة دفعة واحدة، انتظر دقيقة من فضلك.",
   "e_session": "سجّل الدخول مجدداً من فضلك لنكمل المحادثة.",
   "e_other": "عذراً، حدث خطأ ما. حاول مرة أخرى من فضلك.",
-  "load_fail": "تعذّر تحميل قائمة المشاريع. أعد تحميل الصفحة وحاول مجدداً."
+  "load_fail": "تعذّر تحميل قائمة المشاريع. أعد تحميل الصفحة وحاول مجدداً.",
+  "gate_msg": "خبر جيد: اخترت لك أفضل {n} مشاريع مناسبة من بين المشاريع التي تحققنا منها.",
+  "gate_msg0": "أنا جاهز للبحث في مشاريعنا من أجلك.",
+  "gate_title": "أنشئ حسابك المجاني لرؤية النتائج المناسبة لك",
+  "gate_b1": "بضغطة واحدة عبر Google، بدون كلمة مرور",
+  "gate_b2": "تُحفظ قائمتك المختصرة وإجاباتك للمرة القادمة",
+  "gate_b3": "أسعار وتوفر حقيقيان من وكيل حقيقي",
+  "gate_privacy": "بالمتابعة، توافق على أن نحفظ اسمك وبريدك الإلكتروني وإجاباتك لإنشاء حسابك.",
+  "privacy_link": "إشعار الخصوصية",
+  "gate_welcome": "أهلًا {name}! حسابك جاهز. إليك النتائج المناسبة لك.",
+  "gate_back": "أهلًا بعودتك {name}! إليك النتائج المناسبة لك.",
+  "gate_err": "لم ينجح تسجيل الدخول. حاول مرة أخرى أو اطلب التحدث مع وكيل.",
+  "gate_fail": "تعذر تحميل تسجيل الدخول عبر Google هنا. تحقق من الاتصال أو مانع الإعلانات، أو تحدث مع وكيل.",
+  "signed_in_as": "تم تسجيل الدخول باسم {x}"
  },
  "fa": {
   "tagline": "خونه‌های نوساز برای خریداران خارجی",
@@ -1057,7 +1096,20 @@
   "e_rate": "یه‌دفعه سؤال زیاد شد، لطفاً یه دقیقه صبر کنید.",
   "e_session": "برای ادامه گفتگو لطفاً دوباره وارد بشید.",
   "e_other": "اوه، یه مشکلی پیش اومد. لطفاً دوباره امتحان کنید.",
-  "load_fail": "لیست پروژه‌ها بارگذاری نشد. صفحه رو دوباره باز کنید و امتحان کنید."
+  "load_fail": "لیست پروژه‌ها بارگذاری نشد. صفحه رو دوباره باز کنید و امتحان کنید.",
+  "gate_msg": "خبر خوب: از بین پروژه‌های بررسی‌شده، {n} پروژهٔ مناسب‌تر را برایتان انتخاب کردم.",
+  "gate_msg0": "آماده‌ام بین پروژه‌هایمان برایتان جست‌وجو کنم.",
+  "gate_title": "برای دیدن پروژه‌های مناسبتان، حساب رایگان بسازید",
+  "gate_b1": "با یک لمس با Google، بدون رمز عبور",
+  "gate_b2": "فهرست کوتاه و پاسخ‌هایتان برای دفعهٔ بعد ذخیره می‌شود",
+  "gate_b3": "قیمت و موجودی واقعی از یک مشاور واقعی",
+  "gate_privacy": "با ادامه، موافقت می‌کنید که نام، ایمیل و پاسخ‌هایتان را برای ساخت حساب ذخیره کنیم.",
+  "privacy_link": "اطلاعیهٔ حریم خصوصی",
+  "gate_welcome": "خوش آمدید {name}! حسابتان آماده است. این‌ها پروژه‌های مناسب شماست.",
+  "gate_back": "خوش برگشتید {name}! این‌ها پروژه‌های مناسب شماست.",
+  "gate_err": "ورود انجام نشد. دوباره امتحان کنید یا بخواهید با یک مشاور صحبت کنید.",
+  "gate_fail": "ورود با Google اینجا بارگذاری نشد. اتصال یا مسدودکنندهٔ تبلیغات را بررسی کنید، یا با یک مشاور صحبت کنید.",
+  "signed_in_as": "واردشده با {x}"
  },
  "ru": {
   "tagline": "Новостройки для иностранных покупателей",
@@ -1322,6 +1374,19 @@
   "e_rate": "Слишком много вопросов сразу — подождите минутку.",
   "e_session": "Войдите снова, чтобы продолжить чат.",
   "e_other": "Ой, что-то пошло не так. Попробуйте ещё раз.",
-  "load_fail": "Не удалось загрузить список проектов. Обновите страницу и попробуйте снова."
+  "load_fail": "Не удалось загрузить список проектов. Обновите страницу и попробуйте снова.",
+  "gate_msg": "Хорошие новости: я выбрал для вас {n} лучших варианта из проверенных нами проектов.",
+  "gate_msg0": "Я готов подобрать для вас проекты.",
+  "gate_title": "Создайте бесплатный аккаунт, чтобы увидеть подборку",
+  "gate_b1": "Одно нажатие через Google, без пароля",
+  "gate_b2": "Ваша подборка и ответы сохранятся на следующий раз",
+  "gate_b3": "Реальные цены и наличие от живого агента",
+  "gate_privacy": "Продолжая, вы соглашаетесь, что мы сохраним ваше имя, e-mail и ответы для создания аккаунта.",
+  "privacy_link": "Политика конфиденциальности",
+  "gate_welcome": "Добро пожаловать, {name}! Аккаунт готов. Вот ваша подборка.",
+  "gate_back": "С возвращением, {name}! Вот ваша подборка.",
+  "gate_err": "Не удалось войти. Попробуйте ещё раз или попросите связать вас с агентом.",
+  "gate_fail": "Вход через Google здесь не загрузился. Проверьте соединение или блокировщик рекламы либо свяжитесь с агентом.",
+  "signed_in_as": "Вы вошли как {x}"
  }
 }
