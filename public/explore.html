@@ -114,6 +114,8 @@ p{margin:0}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .maplibregl-ctrl-attrib{font:11px var(--f-body)}
 
+/* Without imagery (Esri key problem or monthly limit reached) the districts stay readable on the dark background */
+#map.no-imagery{background:radial-gradient(120% 90% at 50% 40%,#16334A,#0B1A26)}
 /* Project pins */
 #map .gpin{background:none;border:0;box-shadow:none}
 .gpin{width:18px;height:18px;padding:0;border:0;background:none;-webkit-appearance:none;appearance:none;cursor:pointer;display:grid;place-items:center}
@@ -357,12 +359,24 @@ function highlightPins(ids){ S.pins.forEach(x => x.el && x.el.classList.toggle("
 const TILES = {url:"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", attribution:"Imagery © Esri, Maxar, Earthstar Geographics · Boundaries © OpenStreetMap contributors"};
 function initMap(){
   const map = S.map = new maplibregl.Map({container:"map", attributionControl:false, maxPitch:0, dragRotate:false, pitchWithRotate:false, renderWorldCopies:false,
-    bounds:[[28.55,40.84],[29.45,41.26]], fitBoundsOptions:{padding:20}, maxBounds:[[27.6,40.6],[30.3,41.75]],
-    style:{version:8, sources:{sat:{type:"raster", tiles:[S.esriKey ? "https://ibasemaps-api.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}?token=" + encodeURIComponent(S.esriKey) : TILES.url], tileSize:256, maxzoom:19, attribution:TILES.attribution}},
+    bounds:[[28.55,40.84],[29.45,41.26]], fitBoundsOptions:{padding:20}, maxBounds:[[27.85,40.72],[30.02,41.62]],
+    // Tile budget (Esri free tier = 2M tiles/month): Istanbul only, zoom 8 to 18 (street level), fewer prefetched tiles,
+    // and tiles already downloaded are never fetched again in the same visit.
+    minZoom:8, maxZoom:18, prefetchZoomDelta:2, refreshExpiredTiles:false, maxTileCacheSize:1500,
+    style:{version:8, sources:{sat:{type:"raster", tiles:[S.esriKey ? "https://ibasemaps-api.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}?token=" + encodeURIComponent(S.esriKey) : TILES.url], tileSize:256, minzoom:8, maxzoom:18, bounds:[27.85,40.72,30.02,41.62], attribution:TILES.attribution}},
       layers:[{id:"bg", type:"background", paint:{"background-color":"#0B1A26"}},{id:"sat", type:"raster", source:"sat", paint:{"raster-brightness-max":.82,"raster-saturation":-.15}}]}});
   map.touchZoomRotate.disableRotation();
   map.addControl(new maplibregl.NavigationControl({showCompass:false}), "top-right");
   map.addControl(new maplibregl.AttributionControl({compact:true}), "bottom-left");
+  // If Esri stops sending imagery (key problem or monthly limit reached), stop asking for tiles after 8 failures in a row
+  // and keep the map usable: districts, neighbourhoods and pins still show on the dark background.
+  let tileErr = 0;
+  map.on("sourcedata", e => { if (e.sourceId === "sat" && e.tile && e.tile.state === "loaded") tileErr = 0; });
+  map.on("error", e => {
+    if (e.sourceId !== "sat" || !map.getLayer("sat") || ++tileErr < 8) return;
+    map.setLayoutProperty("sat", "visibility", "none"); document.getElementById("map").classList.add("no-imagery");
+    console.warn("Satellite tiles unavailable: showing the map without imagery.");
+  });
   map.on("load", () => {
     map.addSource("m", {type:"geojson", data:S.geo, promoteId:"id"});
     map.addSource("d", {type:"geojson", data:S.dgeo});
